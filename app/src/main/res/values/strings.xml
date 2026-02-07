@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Repairkz</string>
+    <string name="plumber">Сантехник</string>
+    <string name="electrician">Электрик</string>
+    <string name="handyman">Ремонт</string>
+    <string name="computer">Компьютер</string>
+    <string name="furniture">Сборка</string>
+    <string name="payment_system">Система оплаты</string>
+    <string name="themes">Темы</string>
+    <string name="exit">Выйти</string>
+
+
+</resources>
