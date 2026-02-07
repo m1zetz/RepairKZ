@@ -45,7 +45,7 @@ import com.example.repairkz.Navigation.Routes
 import com.example.repairkz.R
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Composable
+
 fun HomeScreen(navController: NavController){
     val homeScreenViewModel: HomeViewModel = hiltViewModel()
     LaunchedEffect(Unit) {
