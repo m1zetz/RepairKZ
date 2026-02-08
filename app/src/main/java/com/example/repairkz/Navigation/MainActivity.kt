@@ -8,6 +8,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.repairkz.Navigation.Routes.DETAILS
 
 import com.example.repairkz.ui.MainWindow
 import com.example.repairkz.ui.features.search.SearchScreen
@@ -24,7 +25,6 @@ class MainActivity : ComponentActivity() {
         setContent {
             RepairkzTheme {
                 val mainViewModel: MainViewModel = hiltViewModel()
-                val homeViewModel: HomeViewModel = hiltViewModel()
                 val navController = rememberNavController()
                 NavHost(
                     navController = navController,
@@ -37,6 +37,11 @@ class MainActivity : ComponentActivity() {
                         route = "${Routes.SEARCH}?pattern={pattern}"
                     ) {
                         SearchScreen(navController)
+                    }
+                    composable(
+                        DETAILS
+                    ){
+                        Details()
                     }
                 }
             }

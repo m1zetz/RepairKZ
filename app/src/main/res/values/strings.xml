@@ -9,5 +9,15 @@
     <string name="themes">Темы</string>
     <string name="exit">Выйти</string>
 
+    <string name="masterSpecialization">Тип мастера:</string>
+    <string name="masterName">Имя мастера:</string>
+    <string name="time">Дата и время:</string>
+    <string name="description">Задача мастера:</string>
+    <string name="cost">Стоимость:</string>
+    <string name="paymentMethod">Способ оплаты:</string>
+    <string name="payment_card">Картой</string>
+    <string name="payment_cash">Наличные</string>
+
 
 </resources>
+
