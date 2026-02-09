@@ -15,6 +15,8 @@ import com.example.repairkz.ui.features.search.SearchScreen
 import com.example.repairkz.ui.theme.RepairkzTheme
 import com.example.repairkz.ui.features.home.HomeViewModel
 import com.example.repairkz.ui.features.main.MainViewModel
+import com.example.repairkz.ui.features.notifiacton.NotificationViewModel
+import com.example.repairkz.ui.features.search.SearchViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -25,23 +27,20 @@ class MainActivity : ComponentActivity() {
         setContent {
             RepairkzTheme {
                 val mainViewModel: MainViewModel = hiltViewModel()
+                val notificationViewModel: NotificationViewModel = hiltViewModel()
+                val searchViewModel: SearchViewModel = hiltViewModel()
                 val navController = rememberNavController()
                 NavHost(
                     navController = navController,
                     startDestination = Routes.MAIN_WINDOW
                 ) {
                     composable(Routes.MAIN_WINDOW) {
-                        MainWindow(mainViewModel,navController)
+                        MainWindow(mainViewModel,navController, notificationViewModel)
                     }
                     composable(
                         route = "${Routes.SEARCH}?pattern={pattern}"
                     ) {
-                        SearchScreen(navController)
-                    }
-                    composable(
-                        DETAILS
-                    ){
-                        Details()
+                        SearchScreen(navController, searchViewModel)
                     }
                 }
             }
