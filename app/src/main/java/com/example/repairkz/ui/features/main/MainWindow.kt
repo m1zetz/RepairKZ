@@ -19,13 +19,14 @@ import com.example.repairkz.ui.features.components.BottomNavigation
 import com.example.repairkz.ui.features.home.HomeScreen
 import com.example.repairkz.ui.features.main.MainIntent
 import com.example.repairkz.ui.features.main.MainViewModel
+import com.example.repairkz.ui.features.notifiacton.NotificationViewModel
 import com.example.repairkz.ui.features.notifiacton.NotificationsScreen
 import com.example.repairkz.ui.features.settings.SettingsScreen
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainWindow(mainViewModel: MainViewModel, navController: NavController){
+fun MainWindow(mainViewModel: MainViewModel, navController: NavController, notificationViewModel: NotificationViewModel){
     val selectedItemIndex = mainViewModel.screenIndexState.collectAsState()
 
     Scaffold(
@@ -57,7 +58,7 @@ fun MainWindow(mainViewModel: MainViewModel, navController: NavController){
         ) {
             when(selectedItemIndex.value.selectedIndex){
                 0 -> HomeScreen(navController = navController)
-                1 -> NotificationsScreen()
+                1 -> NotificationsScreen(notificationViewModel)
                 2 -> SettingsScreen()
             }
 

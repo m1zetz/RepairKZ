@@ -25,6 +25,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.example.repairkz.common.ui.ProfileString
 
 @Composable
 fun SettingsScreen() {
@@ -33,8 +34,10 @@ fun SettingsScreen() {
     ) {
         item {
             ProfileString(
-                null,
-                toProfileIntent = {}
+                "",
+                intent = {},
+                name = "Maxim Ius",
+                description = ""
             )
             StandartString(
                 R.string.payment_system,
@@ -51,46 +54,6 @@ fun SettingsScreen() {
             )
         }
 
-    }
-}
-
-@Composable
-fun ProfileString(imageUri: Uri?, toProfileIntent: () -> Unit) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 8.dp, vertical = 8.dp),
-        onClick = {
-            toProfileIntent()
-        }
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp)
-        ) {
-            AsyncImage(
-                model = imageUri ?: R.drawable.ic_launcher_background,
-                contentDescription = "UserPhoto",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .size(56.dp)
-                    .clip(CircleShape)
-                    .align(Alignment.CenterVertically)
-
-            )
-            Spacer(modifier = Modifier.size(12.dp))
-            Column(
-                verticalArrangement = Arrangement.Top,
-                modifier = Modifier
-                    .align(Alignment.Top),
-            ) {
-                Text(
-                    "Maxim Ius",
-                    fontSize = 18.sp
-                )
-            }
-        }
     }
 }
 
