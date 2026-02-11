@@ -13,9 +13,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -24,38 +28,85 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.example.repairkz.Navigation.Routes
 import com.example.repairkz.common.ui.ProfileString
 
 @Composable
-fun SettingsScreen() {
-    LazyColumn(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        item {
-            ProfileString(
-                "",
-                intent = {},
-                name = "Maxim Ius",
-                description = ""
-            )
-            StandartString(
-                R.string.payment_system,
-                intent = {}
-            )
-            StandartString(
-                R.string.themes,
-                intent = {}
-            )
-            StandartString(
-                R.string.exit,
-                intent = {},
-                color = MaterialTheme.colorScheme.error
-            )
+fun SettingsScreen(settingsViewModel: SettingsViewModel, navController: NavController) {
+
+    val uiState by settingsViewModel.uiState.collectAsState()
+
+    LaunchedEffect(Unit) {
+        settingsViewModel.settingEffectsChannel.collect {effect ->
+            when(effect) {
+                is SettingsEffects.NavigateToUserInfo -> {
+                    val route = if(effect.userId != null){
+                        "${Routes.USERINFO}?userId=${effect.userId}"
+                    } else{
+                        Routes.USERINFO
+                    }
+                    navController.navigate(route)
+                }
+            }
+        }
+    }
+
+    when(val state = uiState){
+        is SettingsState.Success -> {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                item {
+                    ProfileString(
+                        "",
+                        intent = {},
+                        name = "${state.userData.userId} ${state.userData.lastName}",
+                        description = "Статус -> ${state.userData.status}"
+                    )
+                    StandartString(
+                        R.string.payment_system,
+                        intent = {}
+                    )
+                    StandartString(
+                        R.string.themes,
+                        intent = {}
+                    )
+                    StandartString(
+                        R.string.exit,
+                        intent = {},
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+
+            }
         }
 
+        is SettingsState.Error -> {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(state.message)
+            }
+        }
+        SettingsState.Loading -> {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                CircularProgressIndicator()
+            }
+        }
     }
-}
+
+
+    }
+
+
 
 @Composable
 fun StandartString(

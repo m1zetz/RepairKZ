@@ -1,5 +1,6 @@
 package com.example.repairkz.common.models
 
+import com.example.repairkz.common.enums.PaymentMethod
 import java.math.BigDecimal
 import java.time.LocalDateTime
 
@@ -12,7 +13,3 @@ data class Order(
     val paymentMethod: PaymentMethod
 )
 
-enum class PaymentMethod {
-    CASH,
-    CARD
-}

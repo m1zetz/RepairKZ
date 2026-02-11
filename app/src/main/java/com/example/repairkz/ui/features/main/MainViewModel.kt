@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class MainViewModel @Inject constructor() : ViewModel() {
-    private var _screenIndexState = MutableStateFlow(MainUiState())
+    private val _screenIndexState = MutableStateFlow(MainUiState())
     val screenIndexState = _screenIndexState.asStateFlow()
 
     fun handleIntent(intent: MainIntent){

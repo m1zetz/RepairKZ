@@ -52,51 +52,55 @@ fun NotificationsScreen(notificationViewModel: NotificationViewModel) {
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
-        if (currentState.isLoading) {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                CircularProgressIndicator()
-            }
-
-        } else if (currentState.error != null) {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(currentState.error!!)
-            }
-
-        } else {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                items(currentState.notifications) {order ->
-                    NotifyCard(
-                        "Вы заказали мастера ${order.masterSpecialization} на ${order.time.toRussianString()}",
-                        intent = {
-                            notificationViewModel.handleIntent(NotificationIntent.ShowDetails(order))
-                        }
-                    )
+        when(val state = currentState){
+            is NotificationState.Success -> {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    items(state.notifications) {order ->
+                        NotifyCard(
+                            "Вы заказали мастера ${order.masterSpecialization} на ${order.time.toRussianString()}",
+                            intent = {
+                                notificationViewModel.handleIntent(NotificationIntent.ShowDetails(order))
+                            }
+                        )
+                    }
+                }
+                state.selectedOrder?.let { order ->
+                    ModalBottomSheet(
+                        onDismissRequest = {
+                            notificationViewModel.handleIntent(NotificationIntent.HideDetails)
+                        },
+                        sheetState = sheetState
+                    ) {
+                        Details(order)
+                    }
                 }
             }
 
+            is NotificationState.Error -> {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(state.message)
+                }
+            }
+            NotificationState.Loading -> {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
         }
+
     }
 
-    currentState.selectedOrder?.let { order ->
-        ModalBottomSheet(
-            onDismissRequest = {
-                notificationViewModel.handleIntent(NotificationIntent.HideDetails)
-            },
-            sheetState = sheetState
-        ) {
-            Details(order)
-        }
-    }
+
 
 
 }

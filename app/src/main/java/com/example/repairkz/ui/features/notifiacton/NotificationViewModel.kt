@@ -17,7 +17,7 @@ import java.lang.Exception
 @HiltViewModel
 class NotificationViewModel @Inject constructor(private val repository: NotificationRepository) : ViewModel() {
 
-    private var _state = MutableStateFlow(NotificationState())
+    private val _state = MutableStateFlow<NotificationState>(NotificationState.Loading)
     val state = _state.asStateFlow()
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -25,29 +25,26 @@ class NotificationViewModel @Inject constructor(private val repository: Notifica
         when(intent){
             is NotificationIntent.GetNotifications ->{
                 viewModelScope.launch {
-                    _state.update {
-                        it.copy(isLoading = true)
-                    }
+                    _state.value = NotificationState.Loading
                     try{
-                        _state.update {
-                            it.copy(notifications = repository.getNotifications(), isLoading = false)
-                        }
+                        _state.value = NotificationState.Success(notifications = repository.getNotifications())
                     } catch(e: Exception){
-                        _state.update {
-                            it.copy(error = "Ошибка запроса", isLoading = false)
-                        }
+                        _state.value = NotificationState.Error(message = "Ошибка запроса")
                     }
                 }
             }
             is NotificationIntent.ShowDetails -> {
-                _state.update {
-                    it.copy(selectedOrder = intent.order)
+                val currentState = _state.value
+                if(currentState is NotificationState.Success){
+                    _state.value = currentState.copy(selectedOrder = intent.order)
                 }
+
             }
 
             NotificationIntent.HideDetails -> {
-                _state.update {
-                    it.copy(selectedOrder = null)
+                val currentState = _state.value
+                if(currentState is NotificationState.Success){
+                    _state.value = currentState.copy(selectedOrder = null)
                 }
             }
         }

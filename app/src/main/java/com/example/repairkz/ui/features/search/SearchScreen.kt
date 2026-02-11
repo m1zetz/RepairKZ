@@ -35,7 +35,7 @@ import com.example.repairkz.ui.features.notifiacton.NotificationIntent
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchScreen(navController: NavController, searchViewModel: SearchViewModel) {
-    val state by searchViewModel.uiState.collectAsStateWithLifecycle()
+    val currentState by searchViewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         searchViewModel.handleIntent(SearchIntents.GetData)
@@ -51,59 +51,75 @@ fun SearchScreen(navController: NavController, searchViewModel: SearchViewModel)
     }
 
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        if (state.isLoading) {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                CircularProgressIndicator()
-            }
-        } else if (state.error != null) {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(state.error!!)
-            }
-        } else {
-            Scaffold {
-                SearchBar(
-                    query = state.query,
-                    onQueryChange = { newText ->
-                        searchViewModel.handleIntent(SearchIntents.ChangeText(newText))
-                    },
+    Scaffold(Modifier.fillMaxSize()) {
+        SearchBar(
+            query = currentState.query,
+            onQueryChange = { newText ->
+                searchViewModel.handleIntent(SearchIntents.ChangeText(newText))
+            },
 
-                    onSearch = {},
-                    active = true,
-                    onActiveChange = {},
-                    leadingIcon = {
-                        IconButton(
-                            onClick = {
-                                searchViewModel.handleIntent(SearchIntents.NavigateToBack)
-                            }
-                        ) {
-                            Icon(Icons.Default.ArrowBack, null)
-                        }
-                    },
-                    modifier = Modifier.statusBarsPadding()
+            onSearch = {},
+            active = true,
+            onActiveChange = {},
+            leadingIcon = {
+                IconButton(
+                    onClick = {
+                        searchViewModel.handleIntent(SearchIntents.NavigateToBack)
+                    }
                 ) {
-                    Text("Результаты для: ${state.query}", modifier = Modifier.padding(16.dp))
-                    state.listOfMasters?.let { listOfMaters ->
+                    Icon(Icons.Default.ArrowBack, null)
+                }
+            },
+            modifier = Modifier.statusBarsPadding()
+        ) {
+            when(val state = currentState.result){
+                is SearchResult.Success ->{
+                    Text("Результаты для: ${currentState.query}", modifier = Modifier.padding(16.dp))
+                    state.masters.let { listOfMaters ->
                         LazyColumn(
                             modifier = Modifier.fillMaxSize()
                         ) {
                             items(listOfMaters){master ->
-                            ProfileString(master.avatarURL ?: "", master.masterName, master.masterSpecialization)
+                                ProfileString(master.avatarURL ?: "", master.masterName, master.masterSpecialization)
                             }
                         }
                     }
                 }
 
+                is SearchResult.Error -> {
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(state.message)
+                    }
+                }
+                SearchResult.Idle -> {
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = "Введите имя мастера или специализацию"
+                        )
+                    }
+                }
+                SearchResult.Loading -> {
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                }
             }
+
         }
+
     }
+
 }
 
