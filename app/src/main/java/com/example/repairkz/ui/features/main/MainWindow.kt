@@ -1,5 +1,7 @@
 package com.example.repairkz.ui
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -22,11 +24,13 @@ import com.example.repairkz.ui.features.main.MainViewModel
 import com.example.repairkz.ui.features.notifiacton.NotificationViewModel
 import com.example.repairkz.ui.features.notifiacton.NotificationsScreen
 import com.example.repairkz.ui.features.settings.SettingsScreen
+import com.example.repairkz.ui.features.settings.SettingsViewModel
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainWindow(mainViewModel: MainViewModel, navController: NavController, notificationViewModel: NotificationViewModel){
+fun MainWindow(mainViewModel: MainViewModel, navController: NavController, notificationViewModel: NotificationViewModel, settingsViewModel: SettingsViewModel){
     val selectedItemIndex = mainViewModel.screenIndexState.collectAsState()
 
     Scaffold(
@@ -59,7 +63,7 @@ fun MainWindow(mainViewModel: MainViewModel, navController: NavController, notif
             when(selectedItemIndex.value.selectedIndex){
                 0 -> HomeScreen(navController = navController)
                 1 -> NotificationsScreen(notificationViewModel)
-                2 -> SettingsScreen()
+                2 -> SettingsScreen(settingsViewModel, navController)
             }
 
         }

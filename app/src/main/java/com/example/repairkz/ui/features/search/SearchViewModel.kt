@@ -39,17 +39,17 @@ class SearchViewModel @Inject constructor(
             }
             SearchIntents.GetData -> {
                 viewModelScope.launch {
-                    _uiState.update {
-                        it.copy(isLoading = true)
-                    }
+                    _uiState.value = _uiState.value.copy(
+                        result = SearchResult.Loading
+                    )
                     try{
-                        _uiState.update {
-                            it.copy(listOfMasters = repository.getMasters(), isLoading = false)
-                        }
+                        _uiState.value = _uiState.value.copy(
+                            result = SearchResult.Success(repository.getMasters())
+                        )
                     } catch (e: Exception){
-                        _uiState.update {
-                            it.copy(error = "Ошибка запроса", isLoading = false)
-                        }
+                        _uiState.value = _uiState.value.copy(
+                            result = SearchResult.Error("Ошибка запроса")
+                        )
                     }
                 }
             }
