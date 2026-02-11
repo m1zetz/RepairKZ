@@ -62,7 +62,7 @@ fun SettingsScreen(settingsViewModel: SettingsViewModel, navController: NavContr
                     ProfileString(
                         "",
                         intent = {},
-                        name = "${state.userData.userId} ${state.userData.lastName}",
+                        name = "${state.userData.firstName} ${state.userData.lastName}",
                         description = "Статус -> ${state.userData.status}"
                     )
                     StandartString(
