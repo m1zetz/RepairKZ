@@ -7,4 +7,12 @@ object Routes {
     const val USERINFO = "user_info"
     const val SIGN_IN_SCREEN = "sign_in"
     const val SIGN_UP_SCREEN = "sign_up"
+
+    fun userInfoRoute(id:Int?): String{
+        return if(id!=null){
+            "${USERINFO}?userId=${id}"
+        } else{
+            USERINFO
+        }
+    }
 }

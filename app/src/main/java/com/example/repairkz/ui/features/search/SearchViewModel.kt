@@ -4,6 +4,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.repairkz.data.searchData.SearchRepository
+import com.example.repairkz.domain.useCases.searchData.GetMastersUseCase
+import com.example.repairkz.ui.features.search.SearchResult.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.channels.Channel
@@ -17,7 +19,7 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class SearchViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val repository: SearchRepository
+    private val getMastersUseCase: GetMastersUseCase
 ) : ViewModel() {
 
     private val initialPattern: String = savedStateHandle.get<String>("pattern") ?: ""
@@ -37,20 +39,26 @@ class SearchViewModel @Inject constructor(
                     _searchEffectsChannel.send(SearchEffects.NavigateBack)
                 }
             }
-            SearchIntents.GetData -> {
+            is SearchIntents.GetData -> {
                 viewModelScope.launch {
                     _uiState.value = _uiState.value.copy(
                         result = SearchResult.Loading
                     )
                     try{
                         _uiState.value = _uiState.value.copy(
-                            result = SearchResult.Success(repository.getMasters())
+                            result = Success(getMastersUseCase())
                         )
                     } catch (e: Exception){
                         _uiState.value = _uiState.value.copy(
-                            result = SearchResult.Error("Ошибка запроса")
+                            result = Error("Ошибка запроса")
                         )
                     }
+                }
+            }
+
+            is SearchIntents.NavigateToUserInfo -> {
+                viewModelScope.launch {
+                    _searchEffectsChannel.send(SearchEffects.NavigateToUserInfo(intent.id))
                 }
             }
         }

@@ -23,7 +23,7 @@ import coil.compose.AsyncImage
 import com.example.repairkz.R
 
 @Composable
-fun ProfileString(imageUrl: String, name: String, description: String, intent: () -> Unit = {}) {
+fun ProfileString(imageUrl: String?, name: String, description: String, intent: () -> Unit = {}) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -37,16 +37,30 @@ fun ProfileString(imageUrl: String, name: String, description: String, intent: (
                 .fillMaxWidth()
                 .padding(12.dp)
         ) {
-            AsyncImage(
-                model = R.drawable.ic_launcher_background, //ава
-                contentDescription = "UserPhoto",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .size(56.dp)
-                    .clip(CircleShape)
-                    .align(Alignment.CenterVertically)
+            imageUrl?.let { url ->
+                AsyncImage(
+                    model = url,
+                    contentDescription = "UserPhoto",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(56.dp)
+                        .clip(CircleShape)
+                        .align(Alignment.CenterVertically)
 
-            )
+                )
+            } ?: run {
+                AsyncImage(
+                    model = R.drawable.ic_launcher_background,
+                    contentDescription = "UserPhoto",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(56.dp)
+                        .clip(CircleShape)
+                        .align(Alignment.CenterVertically)
+
+                )
+            }
+
             Spacer(modifier = Modifier.size(12.dp))
             Column(
                 verticalArrangement = Arrangement.Top,

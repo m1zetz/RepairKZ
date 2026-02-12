@@ -19,8 +19,13 @@ sealed class SearchIntents{
     data class ChangeText(val text: String) : SearchIntents()
     object GetData: SearchIntents()
     object NavigateToBack : SearchIntents()
+
+    data class NavigateToUserInfo(val id: Int) : SearchIntents()
+
 }
 
 sealed interface SearchEffects{
     object NavigateBack : SearchEffects
+
+    data class NavigateToUserInfo(val id: Int) : SearchEffects
 }

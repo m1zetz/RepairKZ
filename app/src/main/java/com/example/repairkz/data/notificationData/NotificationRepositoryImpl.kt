@@ -13,7 +13,7 @@ import java.time.LocalDateTime
 class NotificationRepositoryImpl @Inject constructor() : NotificationRepository {
     @RequiresApi(Build.VERSION_CODES.O)
     override suspend fun getNotifications(): List<Order> {
-        delay(3000)
+        delay(1000)
         val order = Order(
             "Сантехник",
             "Антон",
