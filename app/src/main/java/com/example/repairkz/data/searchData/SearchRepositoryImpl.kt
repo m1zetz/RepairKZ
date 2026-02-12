@@ -6,6 +6,7 @@ import javax.inject.Inject
 class SearchRepositoryImpl @Inject constructor() : SearchRepository {
     override suspend fun getMasters(): List<Master> {
         val master = Master(
+            67,
             "Электрик",
             "Илья",
             null,

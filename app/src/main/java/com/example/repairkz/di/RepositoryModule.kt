@@ -1,5 +1,7 @@
 package com.example.repairkz.di
 
+import com.example.repairkz.data.masterData.MasterRepository
+import com.example.repairkz.data.masterData.MasterRepositoryImpl
 import com.example.repairkz.data.notificationData.NotificationRepository
 import com.example.repairkz.data.notificationData.NotificationRepositoryImpl
 import com.example.repairkz.data.searchData.SearchRepository
@@ -20,5 +22,10 @@ object RepositoryModule{
     @Provides
     fun provideSearchRepository() : SearchRepository {
         return SearchRepositoryImpl()
+    }
+
+    @Provides
+    fun provideMasterRepository() : MasterRepository {
+        return MasterRepositoryImpl()
     }
 }

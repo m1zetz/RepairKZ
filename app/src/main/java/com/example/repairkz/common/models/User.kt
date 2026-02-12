@@ -4,6 +4,7 @@ import com.example.repairkz.common.enums.StatusOfUser
 
 data class User(
     val userId: Int,
+    val userPhotoUrl: String?,
     val firstName: String,
     val lastName: String,
     val email: String,

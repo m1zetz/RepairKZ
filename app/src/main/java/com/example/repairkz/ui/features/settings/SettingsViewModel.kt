@@ -3,6 +3,7 @@ package com.example.repairkz.ui.features.settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.repairkz.data.userData.UserRepository
+import com.example.repairkz.domain.useCases.userData.GetUserDataUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.channels.Channel
@@ -12,7 +13,9 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 @HiltViewModel
-class SettingsViewModel @Inject constructor(userRepository: UserRepository) : ViewModel() {
+class SettingsViewModel @Inject constructor(
+    private val getUserDataUseCase: GetUserDataUseCase
+) : ViewModel() {
     private var _uiState = MutableStateFlow<SettingsState>(SettingsState.Loading)
     val uiState = _uiState.asStateFlow()
 
@@ -21,14 +24,14 @@ class SettingsViewModel @Inject constructor(userRepository: UserRepository) : Vi
 
     init {
         viewModelScope.launch {
-            userRepository.userData.collect { user ->
-                if (user!=null){
-                    _uiState.value = SettingsState.Success(user)
-                } else{
-                    _uiState.value = SettingsState.Error("Ошибка запроса")
-                }
-
+            val user = getUserDataUseCase()
+            user.onSuccess { user ->
+                _uiState.value = SettingsState.Success(user)
             }
+            user.onFailure {exception ->
+                _uiState.value = SettingsState.Error(exception.message ?: "Неизвестная ошибка")
+            }
+
         }
     }
 

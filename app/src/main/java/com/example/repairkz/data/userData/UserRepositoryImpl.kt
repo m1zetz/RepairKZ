@@ -15,12 +15,13 @@ class UserRepositoryImpl @Inject constructor() : UserRepository {
     override suspend fun fetchUserData(): Result<User> {
         val user = User(
             1,
+            null,
             "Maxim",
             "Ius",
             "iusmaxim@gmail.com",
             StatusOfUser.CLIENT
         )
-        _userData.value = user
+        _userData.value = null
         return Result.success(user)
     }
 }

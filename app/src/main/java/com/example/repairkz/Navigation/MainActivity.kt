@@ -14,6 +14,7 @@ import com.example.repairkz.Navigation.Routes.DETAILS
 
 import com.example.repairkz.ui.MainWindow
 import com.example.repairkz.ui.features.UserInfo.UserInfo
+import com.example.repairkz.ui.features.UserInfo.UserInfoViewModel
 import com.example.repairkz.ui.features.search.SearchScreen
 import com.example.repairkz.ui.theme.RepairkzTheme
 import com.example.repairkz.ui.features.home.HomeViewModel
@@ -31,7 +32,6 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             RepairkzTheme {
-
                 val navController = rememberNavController()
                 NavHost(
                     navController = navController,
@@ -52,7 +52,8 @@ class MainActivity : ComponentActivity() {
                     composable(
                         route = "${Routes.USERINFO}?userId={userId}"
                     ){
-                        UserInfo()
+                        val userInfoViewModel: UserInfoViewModel = hiltViewModel()
+                        UserInfo(userInfoViewModel)
                     }
                 }
             }

@@ -10,7 +10,7 @@ sealed class SettingsState{
 
 
 sealed class SettingIntent {
-    data class toUserScreen(val user: User) : SettingIntent()
+    data class toUserScreen(val id: Int) : SettingIntent()
 }
 
 

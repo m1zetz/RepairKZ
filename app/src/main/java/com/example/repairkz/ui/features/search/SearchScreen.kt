@@ -28,6 +28,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.example.repairkz.Navigation.Routes
+import com.example.repairkz.Navigation.Routes.userInfoRoute
 import com.example.repairkz.common.ui.ProfileString
 import com.example.repairkz.ui.features.notifiacton.NotificationIntent
 
@@ -45,6 +47,9 @@ fun SearchScreen(navController: NavController, searchViewModel: SearchViewModel)
         searchViewModel.searchEffectsChannel.collect { effect ->
             when (effect) {
                 is SearchEffects.NavigateBack -> navController.popBackStack()
+                is SearchEffects.NavigateToUserInfo -> {
+                    navController.navigate(userInfoRoute(effect.id))
+                }
             }
         }
 
@@ -80,7 +85,9 @@ fun SearchScreen(navController: NavController, searchViewModel: SearchViewModel)
                             modifier = Modifier.fillMaxSize()
                         ) {
                             items(listOfMaters){master ->
-                                ProfileString(master.avatarURL ?: "", master.masterName, master.masterSpecialization)
+                                ProfileString(master.avatarURL, master.masterName, master.masterSpecialization, intent = {
+                                    searchViewModel.handleIntent(SearchIntents.NavigateToUserInfo(master.id))
+                                })
                             }
                         }
                     }

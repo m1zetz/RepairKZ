@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.repairkz.Navigation.Routes
+import com.example.repairkz.Navigation.Routes.userInfoRoute
 import com.example.repairkz.common.ui.ProfileString
 
 @Composable
@@ -42,12 +43,7 @@ fun SettingsScreen(settingsViewModel: SettingsViewModel, navController: NavContr
         settingsViewModel.settingEffectsChannel.collect {effect ->
             when(effect) {
                 is SettingsEffects.NavigateToUserInfo -> {
-                    val route = if(effect.userId != null){
-                        "${Routes.USERINFO}?userId=${effect.userId}"
-                    } else{
-                        Routes.USERINFO
-                    }
-                    navController.navigate(route)
+                    navController.navigate(userInfoRoute(effect.userId))
                 }
             }
         }
@@ -60,8 +56,8 @@ fun SettingsScreen(settingsViewModel: SettingsViewModel, navController: NavContr
             ) {
                 item {
                     ProfileString(
-                        "",
-                        intent = {},
+                        state.userData.userPhotoUrl,
+                        intent = { settingsViewModel.handleIntent(SettingIntent.toUserScreen(state.userData.userId))},
                         name = "${state.userData.firstName} ${state.userData.lastName}",
                         description = "Статус -> ${state.userData.status}"
                     )
