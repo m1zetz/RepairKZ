@@ -7,9 +7,11 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.repairkz.Navigation.Routes.DETAILS
 
 import com.example.repairkz.ui.MainWindow
@@ -44,7 +46,13 @@ class MainActivity : ComponentActivity() {
                         MainWindow(mainViewModel,navController, notificationViewModel, settingsViewModel)
                     }
                     composable(
-                        route = "${Routes.SEARCH}?pattern={pattern}"
+                        route = "${Routes.SEARCH}?pattern={pattern}",
+                        arguments = listOf(
+                            navArgument("pattern"){
+                                type = NavType.IntType
+                                defaultValue = 0
+                            }
+                        )
                     ) {
                         val searchViewModel: SearchViewModel = hiltViewModel()
                         SearchScreen(navController, searchViewModel)

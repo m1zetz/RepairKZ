@@ -2,9 +2,9 @@
     <string name="app_name">Repairkz</string>
     <string name="plumber">Сантехник</string>
     <string name="electrician">Электрик</string>
-    <string name="handyman">Ремонт</string>
+    <string name="handyman">Мелкий ремонт</string>
     <string name="computer">Компьютер</string>
-    <string name="furniture">Сборка</string>
+    <string name="furniture">Сборка мебели</string>
     <string name="payment_system">Система оплаты</string>
     <string name="themes">Темы</string>
     <string name="exit">Выйти</string>
@@ -17,6 +17,15 @@
     <string name="paymentMethod">Способ оплаты:</string>
     <string name="payment_card">Картой</string>
     <string name="payment_cash">Наличные</string>
+    <string name="Karagandy">Караганда</string>
+    <string name="Astana">Астана</string>
+    <string name="Almaty">Алматы</string>
+    <string name="Shymkent">Шымкент</string>
+
+    <string name="experienceInYears">Стаж в годах:</string>
+    <string name="city">Город:</string>
+    <string name="Specialization">Специализация</string>
+    <string name="detail_descriptions">Детали описания:</string>
 
 
 </resources>

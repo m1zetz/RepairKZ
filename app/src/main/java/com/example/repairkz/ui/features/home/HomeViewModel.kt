@@ -1,5 +1,7 @@
 package com.example.repairkz.ui.features.home
 
+import com.example.repairkz.R
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,7 +19,7 @@ class HomeViewModel @Inject constructor() : ViewModel() {
         when(intent){
             is HomeScreenIntent.ClickOnCard -> {
                 viewModelScope.launch {
-                    _effectsChannel.send(Effects.NavigateToSearch(intent.pattern))
+                    _effectsChannel.send(Effects.NavigateToSearch(intent.pattern?.resId))
                 }
             }
         }
