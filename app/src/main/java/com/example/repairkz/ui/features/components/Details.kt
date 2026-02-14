@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import com.example.repairkz.common.enums.PaymentMethod
 import com.example.repairkz.common.extensions.toRussianString
 import com.example.repairkz.common.models.Order
-
+import com.example.repairkz.common.ui.ShortInfoCard
 
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -33,37 +33,16 @@ fun Details(orderData: Order){
             .padding(8.dp)
             .verticalScroll(rememberScrollState())
     ) {
-        OrderInfoCard(R.string.masterSpecialization, orderData.masterSpecialization)
-        OrderInfoCard(R.string.masterName, orderData.masterName)
-        OrderInfoCard(R.string.time, "${orderData.time.toRussianString()} в ${orderData.time.hour}:${orderData.time.minute}")
-        OrderInfoCard(R.string.description, orderData.description)
-        OrderInfoCard(R.string.cost, "${orderData.cost} ₸")
+        ShortInfoCard(R.string.masterSpecialization, orderData.masterSpecialization)
+        ShortInfoCard(R.string.masterName, orderData.masterName)
+        ShortInfoCard(R.string.time, "${orderData.time.toRussianString()} в ${orderData.time.hour}:${orderData.time.minute}")
+        ShortInfoCard(R.string.description, orderData.description)
+        ShortInfoCard(R.string.cost, "${orderData.cost} ₸")
         val paymentText = when(orderData.paymentMethod) {
             PaymentMethod.CASH -> stringResource(R.string.payment_cash)
             PaymentMethod.CARD -> stringResource(R.string.payment_card)
         }
-        OrderInfoCard(R.string.payment_system, paymentText)
+        ShortInfoCard(R.string.payment_system, paymentText)
     }
 }
 
-@Composable
-fun OrderInfoCard(labelStringResource: Int, value: String) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp)
-
-    ) {
-        Column(modifier = Modifier.padding(8.dp)) {
-            Text(
-                text = stringResource(labelStringResource),
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.secondary
-            )
-            Text(
-                text = value,
-                style = MaterialTheme.typography.bodyLarge
-            )
-        }
-    }
-}

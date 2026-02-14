@@ -103,7 +103,6 @@ fun SettingsScreen(settingsViewModel: SettingsViewModel, navController: NavContr
     }
 
 
-
 @Composable
 fun StandartString(
     textR: Int,
