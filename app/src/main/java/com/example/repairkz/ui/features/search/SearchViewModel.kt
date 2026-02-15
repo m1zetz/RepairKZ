@@ -1,9 +1,11 @@
 package com.example.repairkz.ui.features.search
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.repairkz.domain.useCases.searchData.GetMastersUseCase
+import com.example.repairkz.common.models.Master
+import com.example.repairkz.domain.useCases.masterData.GetMastersUseCase
 import com.example.repairkz.ui.features.search.SearchEffects.*
 import com.example.repairkz.ui.features.search.SearchResult.*
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -45,9 +47,35 @@ class SearchViewModel @Inject constructor(
                         it.copy(result = Loading)
                     }
                     try{
-                        _uiState.update {
-                            it.copy(result = Success(getMastersUseCase()))
+                        val result = getMastersUseCase()
+
+                        val filter = _uiState.value.filterData
+                        result.onSuccess { masters ->
+
+                            val mastersFromSearch = masters.filter { master ->
+
+                                val name = _uiState.value.query.isEmpty() || master.masterName.uppercase().contains(_uiState.value.query.uppercase())
+                                name
+                            }
+                            if(_uiState.value.isFilterActive){
+                                val sorteredMasters = masters.filter { master ->
+
+                                    val city = filter.city == null || master.city == filter.city
+                                    val spec = filter.masterSpecialization == null || master.masterSpecialization == filter.masterSpecialization
+                                    val descriptions = filter.detailDescriptions.isEmpty() || master.description.contains(filter.detailDescriptions)
+                                    val years = filter.experienceInYears.isEmpty() || master.experienceInYears >= (filter.experienceInYears.toIntOrNull()?:0)
+                                    city && spec && descriptions && years
+                                }
+                                _uiState.update {
+                                        it.copy(result = Success(sorteredMasters))
+                                    }
+                            } else{
+                                _uiState.update {
+                                    it.copy(result = Success(mastersFromSearch))
+                                }
+                            }
                         }
+
                     } catch (e: Exception){
                         _uiState.update {
                             it.copy(result = Error("Ошибка запроса"))
@@ -80,11 +108,15 @@ class SearchViewModel @Inject constructor(
 
 
             SearchIntents.ApplyFilters -> {
-
+                _uiState.update {
+                    it.copy(isFilterActive = true, isFiltersSheetOpen = false)
+                }
+                handleIntent(SearchIntents.GetData)
             }
+
             SearchIntents.ResetFilters -> {
                 _uiState.update {
-                    it.copy(filterData = FilterData())
+                    it.copy(filterData = FilterData(), isFilterActive = false)
                 }
             }
         }

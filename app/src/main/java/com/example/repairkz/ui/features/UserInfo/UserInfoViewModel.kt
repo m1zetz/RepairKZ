@@ -1,12 +1,13 @@
 package com.example.repairkz.ui.features.UserInfo
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.repairkz.common.models.Master
 import com.example.repairkz.common.models.User
 import com.example.repairkz.domain.useCases.masterData.GetMasterByIdUseCase
-import com.example.repairkz.domain.useCases.searchData.GetMastersUseCase
+import com.example.repairkz.domain.useCases.masterData.GetMastersUseCase
 import com.example.repairkz.domain.useCases.userData.GetUserDataUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
@@ -47,9 +48,11 @@ class UserInfoViewModel @Inject constructor(
         val masterResult = getMasterByIdUseCase(id)
         masterResult.onSuccess { master ->
             _uiState.value = UserState.Success(null, master)
+
         }
         masterResult.onFailure {
             _uiState.value = UserState.Error("Ошибка сети")
+
         }
     }
 

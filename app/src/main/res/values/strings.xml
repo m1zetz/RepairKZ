@@ -33,6 +33,7 @@
     <string name="other">Другой</string>
     <string name="apply_filters">Применить фильтры</string>
     <string name="reset_filters">Сбросить фильтры</string>
+    <string name="find_by_name">Поиск по имени</string>
 
 
 </resources>

@@ -9,8 +9,8 @@ data class SearchUiState(
     val initialPatternResId: Int?,
     val result: SearchResult = SearchResult.Idle,
     val filterData: FilterData = FilterData(),
-    val isFiltersSheetOpen: Boolean = false
-
+    val isFiltersSheetOpen: Boolean = false,
+    val isFilterActive: Boolean = false
 )
 
 sealed class SearchResult {
