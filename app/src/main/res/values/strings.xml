@@ -26,6 +26,13 @@
     <string name="city">Город:</string>
     <string name="Specialization">Специализация</string>
     <string name="detail_descriptions">Детали описания:</string>
+    <string name="choice_city">Выберите город</string>
+    <string name="choice_spec">Выберите специализацию</string>
+    <string name="enter_expirence">Введите опыт в годах</string>
+    <string name="enter_words">Ключевые слова</string>
+    <string name="other">Другой</string>
+    <string name="apply_filters">Применить фильтры</string>
+    <string name="reset_filters">Сбросить фильтры</string>
 
 
 </resources>

@@ -19,7 +19,7 @@ class HomeViewModel @Inject constructor() : ViewModel() {
         when(intent){
             is HomeScreenIntent.ClickOnCard -> {
                 viewModelScope.launch {
-                    _effectsChannel.send(Effects.NavigateToSearch(intent.pattern?.resId))
+                    _effectsChannel.send(Effects.NavigateToSearch(intent.pattern?.resID))
                 }
             }
         }
