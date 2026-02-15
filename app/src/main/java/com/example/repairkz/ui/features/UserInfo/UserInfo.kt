@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 
 @Composable
 fun UserInfo(userInfoViewModel: UserInfoViewModel){
@@ -45,7 +46,7 @@ fun UserInfo(userInfoViewModel: UserInfoViewModel){
                     Text(state.userData.status.toString())
                 }
                 if(state.masterData != null){
-                    Text(state.masterData.masterSpecialization)
+                    Text(stringResource(state.masterData.masterSpecialization.resID))
                 }
 
             }

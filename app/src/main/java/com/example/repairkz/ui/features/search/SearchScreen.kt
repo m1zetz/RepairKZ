@@ -1,5 +1,6 @@
 package com.example.repairkz.ui.features.search
 
+import android.util.Log
 import com.example.repairkz.R
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
@@ -91,6 +92,7 @@ fun SearchScreen(navController: NavController, searchViewModel: SearchViewModel)
                 query = currentState.query,
                 onQueryChange = { newText ->
                     searchViewModel.handleIntent(SearchIntents.ChangeText(newText))
+                    searchViewModel.handleIntent(SearchIntents.GetData)
                 },
 
                 onSearch = {},
@@ -117,6 +119,7 @@ fun SearchScreen(navController: NavController, searchViewModel: SearchViewModel)
                         )
                     }
                 },
+                placeholder = {Text(stringResource(R.string.find_by_name))},
                 modifier = Modifier.statusBarsPadding()
             ) {
                 when (val state = currentState.result) {
@@ -133,7 +136,7 @@ fun SearchScreen(navController: NavController, searchViewModel: SearchViewModel)
                                     ProfileString(
                                         master.avatarURL,
                                         master.masterName,
-                                        master.masterSpecialization,
+                                        stringResource(master.masterSpecialization.resID),
                                         intent = {
                                             searchViewModel.handleIntent(
                                                 SearchIntents.NavigateToUserInfo(
