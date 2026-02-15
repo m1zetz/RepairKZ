@@ -3,7 +3,6 @@ package com.example.repairkz.ui.features.search
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.repairkz.data.searchData.SearchRepository
 import com.example.repairkz.domain.useCases.searchData.GetMastersUseCase
 import com.example.repairkz.ui.features.search.SearchEffects.*
 import com.example.repairkz.ui.features.search.SearchResult.*
@@ -76,7 +75,57 @@ class SearchViewModel @Inject constructor(
             }
 
             is SearchIntents.FilterActions -> {
+                handleFilterAction(intent.action)
+            }
 
+
+            SearchIntents.ApplyFilters -> {
+
+            }
+            SearchIntents.ResetFilters -> {
+                _uiState.update {
+                    it.copy(filterData = FilterData())
+                }
+            }
+        }
+    }
+    fun handleFilterAction(action: FilterIntents){
+        when(action){
+            is FilterIntents.UpdateCity -> {
+                _uiState.update {
+                    it.copy(
+                        filterData = it.filterData.copy(
+                            city = action.city
+                        )
+                    )
+                }
+            }
+            is FilterIntents.UpdateDetailDescriptions -> {
+                _uiState.update {
+                    it.copy(
+                        filterData = it.filterData.copy(
+                            detailDescriptions = action.words
+                        )
+                    )
+                }
+            }
+            is FilterIntents.UpdateMasterSpecialization -> {
+                _uiState.update {
+                    it.copy(
+                        filterData = it.filterData.copy(
+                            masterSpecialization = action.spec
+                        )
+                    )
+                }
+            }
+            is FilterIntents.UpdateYears -> {
+                _uiState.update {
+                    it.copy(
+                        filterData = it.filterData.copy(
+                            experienceInYears = action.years
+                        )
+                    )
+                }
             }
         }
     }

@@ -142,7 +142,7 @@ fun CardOfMaster(cardFill: CardFill, onClick: () -> Unit) {
                 modifier = Modifier.size(32.dp)
             )
             Spacer(Modifier.height(8.dp))
-            Text(text = stringResource(cardFill.spec.resId))
+            Text(text = stringResource(cardFill.spec.resID))
         }
     }
 }

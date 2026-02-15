@@ -1,6 +1,6 @@
 package com.example.repairkz.ui.features.search
 
-import com.example.repairkz.common.enums.Cities
+import com.example.repairkz.common.enums.CitiesEnum
 import com.example.repairkz.common.enums.MasterSpetializationsEnum
 import com.example.repairkz.common.models.Master
 
@@ -21,10 +21,10 @@ sealed class SearchResult {
 }
 
 data class FilterData(
-    val experienceInYears: Int? = null,
-    val city: Cities? = null,
+    val experienceInYears: String = "",
+    val city: CitiesEnum? = null,
     val masterSpecialization: MasterSpetializationsEnum? = null,
-    val detailDescriptions: String? = null
+    val detailDescriptions: String = ""
 )
 
 sealed class SearchIntents {
@@ -32,17 +32,22 @@ sealed class SearchIntents {
     object GetData : SearchIntents()
     object NavigateToBack : SearchIntents()
     data class NavigateToUserInfo(val id: Int) : SearchIntents()
+
     object OpenFilters : SearchIntents()
     object CloseFilters : SearchIntents()
 
+    object ApplyFilters : SearchIntents()
+    object ResetFilters : SearchIntents()
     data class FilterActions(val action: FilterIntents) : SearchIntents()
+
+
 }
 
 sealed class FilterIntents{
     data class UpdateMasterSpecialization(val spec: MasterSpetializationsEnum) : FilterIntents()
-    data class UpdateYears(val years: Int) : FilterIntents()
+    data class UpdateYears(val years: String) : FilterIntents()
     data class UpdateDetailDescriptions(val words: String) : FilterIntents()
-    data class UpdateCity(val city: Cities) : FilterIntents()
+    data class UpdateCity(val city: CitiesEnum) : FilterIntents()
 
 }
 sealed interface SearchEffects {

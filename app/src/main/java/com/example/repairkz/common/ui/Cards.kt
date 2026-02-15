@@ -1,5 +1,6 @@
 package com.example.repairkz.common.ui
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,15 +10,19 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
@@ -104,7 +109,43 @@ fun ShortInfoCard(titleResID: Int, value: String) {
 }
 
 @Composable
-fun ShortInputCard(titleResID: Int, value: String, changeValue:(newValue: String)->Unit) {
+fun ShortInputCard(
+    @StringRes titleResID: Int,
+    @StringRes placeholderResId: Int,
+    value: String,
+    changeValue: (newValue: String) -> Unit,
+    keyboardType: KeyboardType = KeyboardType.Text
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+
+        ) {
+        Column(modifier = Modifier.padding(8.dp)) {
+            Text(
+                text = stringResource(titleResID),
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.secondary
+            )
+            Spacer(modifier = Modifier.size(8.dp))
+            OutlinedTextField(
+                modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+                value = value,
+                onValueChange = { newValue ->
+                    changeValue(newValue)
+                },
+                shape = MaterialTheme.shapes.medium,
+                placeholder = { Text(stringResource(placeholderResId)) }
+            )
+
+        }
+    }
+}
+
+@Composable
+fun ShortWithComposableCard(titleResID: Int, Сomposable: @Composable () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -117,12 +158,8 @@ fun ShortInputCard(titleResID: Int, value: String, changeValue:(newValue: String
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.secondary
             )
-            BasicTextField(
-                value = value,
-                onValueChange = { newValue ->
-                    changeValue(newValue)
-                }
-            )
+            Spacer(modifier = Modifier.size(8.dp))
+            Сomposable()
         }
     }
 }
