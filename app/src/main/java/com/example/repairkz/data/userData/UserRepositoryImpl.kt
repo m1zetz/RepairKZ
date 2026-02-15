@@ -1,5 +1,6 @@
 package com.example.repairkz.data.userData
 
+import com.example.repairkz.common.enums.CitiesEnum
 import com.example.repairkz.common.enums.StatusOfUser
 import com.example.repairkz.common.models.User
 import jakarta.inject.Inject
@@ -14,12 +15,14 @@ class UserRepositoryImpl @Inject constructor() : UserRepository {
 
     override suspend fun fetchUserData(): Result<User> {
         val user = User(
-            1,
-            null,
-            "Maxim",
-            "Ius",
-            "iusmaxim@gmail.com",
-            StatusOfUser.CLIENT
+            userId = 1,
+            userPhotoUrl = null,
+            firstName = "Maxim",
+            lastName = "Ius",
+            email = "iusmaxim@gmail.com",
+            phoneNumber = "+77071234567",
+            status = StatusOfUser.CLIENT,
+            city = CitiesEnum.ALMATY
         )
         _userData.value = null
         return Result.success(user)

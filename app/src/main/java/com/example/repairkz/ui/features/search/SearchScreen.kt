@@ -134,13 +134,13 @@ fun SearchScreen(navController: NavController, searchViewModel: SearchViewModel)
                             ) {
                                 items(listOfMaters) { master ->
                                     ProfileString(
-                                        master.avatarURL,
-                                        master.masterName,
+                                        master.userPhotoUrl,
+                                        master.firstName,
                                         stringResource(master.masterSpecialization.resID),
                                         intent = {
                                             searchViewModel.handleIntent(
                                                 SearchIntents.NavigateToUserInfo(
-                                                    master.id
+                                                    master.userId
                                                 )
                                             )
                                         })
