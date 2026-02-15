@@ -17,64 +17,82 @@ class MasterRepositoryImpl @Inject constructor() : MasterRepository {
     override suspend fun getMasters(): Result<List<Master>> {
         val mastersList = listOf(
             Master(
-                id = 67,
-                masterSpecialization = MasterSpetializationsEnum.ELECTRIC,
-                masterName = "Илья",
-                avatarURL = null,
+                userId = 67,
+                userPhotoUrl = null,
+                firstName = "Илья",
+                lastName = "Иванов",
+                email = "ilya.master@mail.kz",
+                phoneNumber = "+77071112233",
+                status = StatusOfUser.MASTER,
+                city = CitiesEnum.KARAGANDY,
                 experienceInYears = 3,
                 description = "Починка - 1500 тг, диагностика - 800 тг, уборка - 4500 тг",
-                city = CitiesEnum.KARAGANDY,
-                StatusOfUser.MASTER
+                masterSpecialization = MasterSpetializationsEnum.ELECTRIC
             ),
             Master(
-                id = 2,
-                masterSpecialization = MasterSpetializationsEnum.PLUMBER,
-                masterName = "Арман",
-                avatarURL = null,
+                userId = 2,
+                userPhotoUrl = null,
+                firstName = "Арман",
+                lastName = "Сериков",
+                email = "arman.plumb@google.com",
+                phoneNumber = "+77472223344",
+                status = StatusOfUser.MASTER,
+                city = CitiesEnum.ASTANA,
                 experienceInYears = 10,
                 description = "Устранение засоров, замена смесителя, установка ванн. Быстро и качественно.",
-                city = CitiesEnum.ASTANA,
-                StatusOfUser.MASTER
+                masterSpecialization = MasterSpetializationsEnum.PLUMBER
             ),
             Master(
-                id = 3,
-                masterSpecialization = MasterSpetializationsEnum.FURNITURE,
-                masterName = "Дмитрий",
-                avatarURL = null,
+                userId = 3,
+                userPhotoUrl = null,
+                firstName = "Дмитрий",
+                lastName = "Соколов",
+                email = "dima.remont@yandex.kz",
+                phoneNumber = "+77013334455",
+                status = StatusOfUser.MASTER,
+                city = CitiesEnum.ALMATY,
                 experienceInYears = 5,
                 description = "Покраска стен, обои, ламинат. Опыт работы в новостройках.",
-                city = CitiesEnum.ALMATY,
-                StatusOfUser.MASTER
+                masterSpecialization = MasterSpetializationsEnum.FURNITURE
             ),
             Master(
-                id = 4,
-                masterSpecialization = MasterSpetializationsEnum.ELECTRIC,
-                masterName = "Сергей",
-                avatarURL = null,
+                userId = 4,
+                userPhotoUrl = null,
+                firstName = "Сергей",
+                lastName = "Ли",
+                email = "sergey.electr@mail.ru",
+                phoneNumber = "+77774445566",
+                status = StatusOfUser.MASTER,
+                city = CitiesEnum.KARAGANDY,
                 experienceInYears = 1,
                 description = "Замена розеток и выключателей. Недорого.",
-                city = CitiesEnum.KARAGANDY,
-                StatusOfUser.MASTER
+                masterSpecialization = MasterSpetializationsEnum.ELECTRIC
             ),
             Master(
-                id = 5,
-                masterSpecialization = MasterSpetializationsEnum.PLUMBER,
-                masterName = "Александр",
-                avatarURL = null,
+                userId = 5,
+                userPhotoUrl = null,
+                firstName = "Александр",
+                lastName = "Петров",
+                email = "alex.plumb@mail.kz",
+                phoneNumber = "+77055556677",
+                status = StatusOfUser.MASTER,
+                city = CitiesEnum.SHYMKENT,
                 experienceInYears = 7,
                 description = "Монтаж отопления и водопровода любой сложности.",
-                city = CitiesEnum.SHYMKENT,
-                StatusOfUser.MASTER
+                masterSpecialization = MasterSpetializationsEnum.PLUMBER
             ),
             Master(
-                id = 6,
-                masterSpecialization = MasterSpetializationsEnum.СOMPUTER,
-                masterName = "Берик",
-                avatarURL = null,
+                userId = 6,
+                userPhotoUrl = null,
+                firstName = "Берик",
+                lastName = "Ахметов",
+                email = "berik.it@gmail.com",
+                phoneNumber = "+77006667788",
+                status = StatusOfUser.MASTER,
+                city = CitiesEnum.ASTANA,
                 experienceInYears = 12,
                 description = "Профессиональная укладка плитки и керамогранита. Гарантия 2 года.",
-                city = CitiesEnum.ASTANA,
-                StatusOfUser.MASTER
+                masterSpecialization = MasterSpetializationsEnum.СOMPUTER
             )
         )
         _masters.value = mastersList
@@ -86,7 +104,7 @@ class MasterRepositoryImpl @Inject constructor() : MasterRepository {
             getMasters()
         }
 
-        val master = _masters.value?.find { it.id == id }
+        val master = _masters.value?.find { it.userId == id }
         return if (master != null) {
             Result.success(master)
         } else {

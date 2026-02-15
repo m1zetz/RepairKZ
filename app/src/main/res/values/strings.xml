@@ -35,6 +35,10 @@
     <string name="reset_filters">Сбросить фильтры</string>
     <string name="find_by_name">Поиск по имени</string>
 
+    <string name="do_order">Заказать</string>
+    <string name="to_favorites">В избранное</string>
+    <string name="report">Пожаловаться</string>
+
 
 </resources>
 

@@ -54,7 +54,7 @@ class SearchViewModel @Inject constructor(
 
                             val mastersFromSearch = masters.filter { master ->
 
-                                val name = _uiState.value.query.isEmpty() || master.masterName.uppercase().contains(_uiState.value.query.uppercase())
+                                val name = _uiState.value.query.isEmpty() || master.firstName.uppercase().contains(_uiState.value.query.uppercase())
                                 name
                             }
                             if(_uiState.value.isFilterActive){
