@@ -12,6 +12,8 @@ import jakarta.inject.Inject
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
@@ -19,7 +21,7 @@ import kotlinx.coroutines.launch
 class SettingsViewModel @Inject constructor(
     private val getUserDataUseCase: GetUserDataUseCase,
     private val updateUserStatusUseCase: UpdateUserStatusUseCase,
-    private val getProfileTypeUseCase: GetProfileTypeUseCase
+    private val userRepository: UserRepository
 ) : ViewModel() {
     private var _uiState = MutableStateFlow<SettingsState>(SettingsState.Loading)
     val uiState = _uiState.asStateFlow()
@@ -29,21 +31,27 @@ class SettingsViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            val user = getUserDataUseCase()
-            user.onSuccess { user ->
-                _uiState.value = SettingsState.Success(user)
-            }
-            user.onFailure {exception ->
-                _uiState.value = SettingsState.Error(exception.message ?: "Неизвестная ошибка")
-            }
+            getUserDataUseCase()
 
         }
+    }
+
+    init {
+        userRepository.userData.onEach { user ->
+            if (user != null){
+                _uiState.value = SettingsState.Success(user)
+            } else{
+                _uiState.value = SettingsState.Error("Вы не зарегистрированы")
+            }
+        }.launchIn(viewModelScope)
+
     }
 
     fun handleIntent(intent: SettingIntent) {
         when (intent) {
             is SettingIntent.toUserScreen -> {
                 viewModelScope.launch {
+
                     _settingEffectsChannel.send(NavigateToUserInfo(intent.id))
                 }
             }
