@@ -3,6 +3,7 @@ package com.example.repairkz.ui.features.search
 import com.example.repairkz.common.enums.CitiesEnum
 import com.example.repairkz.common.enums.MasterSpetializationsEnum
 import com.example.repairkz.common.models.Master
+import com.example.repairkz.ui.features.UserInfo.UserTypes
 
 data class SearchUiState(
     val query: String = "",

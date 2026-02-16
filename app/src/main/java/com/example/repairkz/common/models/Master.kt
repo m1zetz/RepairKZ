@@ -13,8 +13,21 @@ data class Master(
     override val phoneNumber: String,
     override val status: StatusOfUser,
     override val city: CitiesEnum,
-    val experienceInYears: Int,
-    val description: String,
-    val masterSpecialization: MasterSpetializationsEnum
+    val experienceInYears: Int? = null,
+    val description: String? = null,
+    val masterSpecialization: MasterSpetializationsEnum? = null
 
-) : User(userId, userPhotoUrl, firstName, lastName, email, phoneNumber, status, city)
+) : User(userId, userPhotoUrl, firstName, lastName, email, phoneNumber, status, city){
+    override fun toUser(): User {
+        return User(
+            userId = this.userId,
+            userPhotoUrl = this.userPhotoUrl,
+            firstName = this.firstName,
+            lastName = this.lastName,
+            email = this.email,
+            phoneNumber = this.phoneNumber,
+            status = StatusOfUser.CLIENT,
+            city = this.city
+        )
+    }
+}
