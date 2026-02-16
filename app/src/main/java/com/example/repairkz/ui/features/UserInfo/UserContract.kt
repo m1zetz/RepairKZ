@@ -7,11 +7,19 @@ import com.example.repairkz.common.models.User
 
 sealed class UserState {
     object Loading : UserState()
-    data class Success(
-        val user: User,
-        val clientId: Int? = null
-    ) : UserState()
+//    data class Success(
+//        val user: User,
+//        val clientId: Int? = null,
+//    ) : UserState()
+
+    data class Success(val userTypes: UserTypes) : UserState()
     data class Error(val message: String) : UserState()
+}
+
+sealed class UserTypes{
+    data class IsCurrentUser(val user: User) : UserTypes()
+    data class IsCurrentMaster(val master: Master): UserTypes()
+    data class IsOtherMaster(val master: Master) : UserTypes()
 }
 
 sealed class UserIntent{

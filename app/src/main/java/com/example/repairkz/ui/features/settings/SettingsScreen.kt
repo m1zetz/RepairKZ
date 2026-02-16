@@ -32,6 +32,7 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.repairkz.Navigation.Routes
 import com.example.repairkz.Navigation.Routes.userInfoRoute
+import com.example.repairkz.common.enums.StatusOfUser
 import com.example.repairkz.common.ui.ProfileString
 
 @Composable
@@ -43,7 +44,7 @@ fun SettingsScreen(settingsViewModel: SettingsViewModel, navController: NavContr
         settingsViewModel.settingEffectsChannel.collect {effect ->
             when(effect) {
                 is SettingsEffects.NavigateToUserInfo -> {
-                    navController.navigate(userInfoRoute(effect.userId))
+                    navController.navigate(userInfoRoute(effect.id))
                 }
             }
         }
@@ -72,6 +73,13 @@ fun SettingsScreen(settingsViewModel: SettingsViewModel, navController: NavContr
                     StandartString(
                         R.string.exit,
                         intent = {},
+                        color = MaterialTheme.colorScheme.error
+                    )
+                    StandartString(
+                        R.string.become_a_master,
+                        intent = {
+                            settingsViewModel.handleIntent(SettingIntent.BecomeAMaster(StatusOfUser.MASTER))
+                        },
                         color = MaterialTheme.colorScheme.error
                     )
                 }

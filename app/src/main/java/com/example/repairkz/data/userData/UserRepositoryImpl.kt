@@ -7,6 +7,7 @@ import jakarta.inject.Inject
 import jakarta.inject.Singleton
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 
 @Singleton
 class UserRepositoryImpl @Inject constructor() : UserRepository {
@@ -14,17 +15,38 @@ class UserRepositoryImpl @Inject constructor() : UserRepository {
     override val userData = _userData.asStateFlow()
 
     override suspend fun fetchUserData(): Result<User> {
-        val user = User(
-            userId = 1,
-            userPhotoUrl = null,
-            firstName = "Maxim",
-            lastName = "Ius",
-            email = "iusmaxim@gmail.com",
-            phoneNumber = "+77071234567",
-            status = StatusOfUser.CLIENT,
-            city = CitiesEnum.ALMATY
-        )
-        _userData.value = null
-        return Result.success(user)
+        val currentState = userData.value
+        if (currentState != null) {
+            return Result.success(currentState)
+        } else {
+            val user = User(
+                userId = 1,
+                userPhotoUrl = null,
+                firstName = "Maxim",
+                lastName = "Ius",
+                email = "iusmaxim@gmail.com",
+                phoneNumber = "+77071234567",
+                status = StatusOfUser.CLIENT,
+                city = CitiesEnum.ALMATY
+            )
+            _userData.value = user
+            return Result.success(user)
+        }
+    }
+
+    override suspend fun updateUserStatus(statusOfUser: StatusOfUser) {
+        when (statusOfUser) {
+            StatusOfUser.CLIENT -> {
+                _userData.update {
+                    it?.toUser()
+                }
+            }
+
+            StatusOfUser.MASTER -> {
+                _userData.update {
+                    it?.toMaster()
+                }
+            }
+        }
     }
 }

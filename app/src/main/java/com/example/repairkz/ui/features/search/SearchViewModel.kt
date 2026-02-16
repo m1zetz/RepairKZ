@@ -6,8 +6,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.repairkz.common.models.Master
 import com.example.repairkz.domain.useCases.masterData.GetMastersUseCase
+import com.example.repairkz.domain.useCases.userData.GetProfileTypeUseCase
 import com.example.repairkz.ui.features.search.SearchEffects.*
 import com.example.repairkz.ui.features.search.SearchResult.*
+import com.example.repairkz.ui.features.settings.SettingsEffects.NavigateToUserInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.channels.Channel
@@ -21,7 +23,8 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class SearchViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val getMastersUseCase: GetMastersUseCase
+    private val getMastersUseCase: GetMastersUseCase,
+    private val getProfileTypeUseCase: GetProfileTypeUseCase
 ) : ViewModel() {
 
     private val initialPatternResId: Int? = savedStateHandle.get<Int>("pattern")
@@ -62,8 +65,9 @@ class SearchViewModel @Inject constructor(
 
                                     val city = filter.city == null || master.city == filter.city
                                     val spec = filter.masterSpecialization == null || master.masterSpecialization == filter.masterSpecialization
-                                    val descriptions = filter.detailDescriptions.isEmpty() || master.description.contains(filter.detailDescriptions)
-                                    val years = filter.experienceInYears.isEmpty() || master.experienceInYears >= (filter.experienceInYears.toIntOrNull()?:0)
+                                    val descriptions = filter.detailDescriptions.isEmpty() || master.description?.contains(filter.detailDescriptions) ?: false
+                                    val years =
+                                        filter.experienceInYears.isEmpty() || (master.experienceInYears ?: 0) >= (filter.experienceInYears.toIntOrNull() ?: 0)
                                     city && spec && descriptions && years
                                 }
                                 _uiState.update {
@@ -86,9 +90,10 @@ class SearchViewModel @Inject constructor(
 
             is SearchIntents.NavigateToUserInfo -> {
                 viewModelScope.launch {
-                    _searchEffectsChannel.send(NavigateToUserInfo(intent.id))
+                    _searchEffectsChannel.send(SearchEffects.NavigateToUserInfo(intent.id))
                 }
             }
+
 
 
             SearchIntents.OpenFilters -> {
@@ -119,6 +124,8 @@ class SearchViewModel @Inject constructor(
                     it.copy(filterData = FilterData(), isFilterActive = false)
                 }
             }
+
+
         }
     }
     fun handleFilterAction(action: FilterIntents){

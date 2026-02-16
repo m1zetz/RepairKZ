@@ -1,5 +1,6 @@
 package com.example.repairkz.common.models
 
+import com.example.repairkz.common.enums.MasterSpetializationsEnum
 import com.example.repairkz.common.enums.PaymentMethod
 import java.math.BigDecimal
 import java.time.LocalDateTime

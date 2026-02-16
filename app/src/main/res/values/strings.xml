@@ -39,6 +39,9 @@
     <string name="to_favorites">В избранное</string>
     <string name="report">Пожаловаться</string>
 
+    <string name="become_a_master">Стать мастером</string>
+    <string name="not_specified">Нет специализации</string>
+
 
 </resources>
 

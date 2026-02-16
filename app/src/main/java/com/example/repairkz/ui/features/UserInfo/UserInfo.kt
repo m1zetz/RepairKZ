@@ -43,7 +43,7 @@ fun UserInfo(userInfoViewModel: UserInfoViewModel){
             }
         }
         is UserState.Success -> {
-            val user = state.user
+            val user = state.userTypes
             Surface(
                 modifier = Modifier.fillMaxSize(),
             ) {
@@ -51,19 +51,34 @@ fun UserInfo(userInfoViewModel: UserInfoViewModel){
                     modifier = Modifier.fillMaxSize(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Cap(user.userPhotoUrl, user.firstName, user.lastName)
+//                    Cap(state.userTypes., user.firstName, user.lastName)
                     when(user){
-                        is Master -> {
-                            MasterBar(
-                                onIntent = { intent ->
-                                    userInfoViewModel.handleIntent(intent)
-                                },
-                                userId = state.clientId?:0,
-                                masterId = user.userId,
-                            )
+                        is UserTypes.IsCurrentMaster -> {
+                            Column(
+                                modifier = Modifier.fillMaxSize(),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ){
+                                Text("Я мастер")
+                            }
                         }
-                        else ->{
-
+                        is UserTypes.IsCurrentUser -> {
+                            Column(
+                                modifier = Modifier.fillMaxSize(),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ){
+                                Text("Я клиент")
+                            }
+                        }
+                        is UserTypes.IsOtherMaster -> {
+                            Column(
+                                modifier = Modifier.fillMaxSize(),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ){
+                                Text(user.master.firstName)
+                            }
                         }
                     }
 
