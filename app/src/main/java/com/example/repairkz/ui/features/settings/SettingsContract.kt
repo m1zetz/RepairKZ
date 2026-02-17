@@ -1,6 +1,7 @@
 package com.example.repairkz.ui.features.settings
 
 import com.example.repairkz.common.enums.StatusOfUser
+import com.example.repairkz.common.intents.AppIntent
 import com.example.repairkz.common.models.User
 import com.example.repairkz.ui.features.UserInfo.UserTypes
 
@@ -11,7 +12,7 @@ sealed class SettingsState{
 }
 
 
-sealed class SettingIntent {
+sealed class SettingIntent{
     data class toUserScreen(val id: Int) : SettingIntent()
 
     data class BecomeAMaster(val status: StatusOfUser) : SettingIntent()

@@ -33,6 +33,7 @@ import coil.compose.AsyncImage
 import com.example.repairkz.Navigation.Routes
 import com.example.repairkz.Navigation.Routes.userInfoRoute
 import com.example.repairkz.common.enums.StatusOfUser
+import com.example.repairkz.common.intents.MainIntent
 import com.example.repairkz.common.ui.ProfileString
 
 @Composable

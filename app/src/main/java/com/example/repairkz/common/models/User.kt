@@ -2,6 +2,7 @@ package com.example.repairkz.common.models
 
 import com.example.repairkz.common.enums.CitiesEnum
 import com.example.repairkz.common.enums.StatusOfUser
+import com.example.repairkz.ui.features.UserInfo.CommonInfo
 
 open class User(
     open val userId: Int,
@@ -25,6 +26,18 @@ open class User(
     ) : User{
         val updatedUser = User(userId,userPhotoUrl,firstName,lastName,email,phoneNumber,statusOfUser,city)
         return updatedUser
+    }
+
+    fun getCommonInfo(
+        userPhotoUrl: String? = this.userPhotoUrl,
+        firstName: String = this.firstName,
+        lastName: String = this.lastName,
+    ) : CommonInfo{
+        return CommonInfo(
+            userPhotoUrl?: "",
+            firstName,
+            lastName
+        )
     }
 
     fun toMaster(

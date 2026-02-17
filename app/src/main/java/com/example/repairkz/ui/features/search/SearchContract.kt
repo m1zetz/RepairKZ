@@ -3,7 +3,6 @@ package com.example.repairkz.ui.features.search
 import com.example.repairkz.common.enums.CitiesEnum
 import com.example.repairkz.common.enums.MasterSpetializationsEnum
 import com.example.repairkz.common.models.Master
-import com.example.repairkz.ui.features.UserInfo.UserTypes
 
 data class SearchUiState(
     val query: String = "",
@@ -39,16 +38,16 @@ sealed class SearchIntents {
 
     object ApplyFilters : SearchIntents()
     object ResetFilters : SearchIntents()
-    data class FilterActions(val action: FilterIntents) : SearchIntents()
+    data class FilterAction(val action: FilterIntent) : SearchIntents()
 
 
 }
 
-sealed class FilterIntents{
-    data class UpdateMasterSpecialization(val spec: MasterSpetializationsEnum) : FilterIntents()
-    data class UpdateYears(val years: String) : FilterIntents()
-    data class UpdateDetailDescriptions(val words: String) : FilterIntents()
-    data class UpdateCity(val city: CitiesEnum) : FilterIntents()
+sealed class FilterIntent{
+    data class UpdateMasterSpecialization(val spec: MasterSpetializationsEnum) : FilterIntent()
+    data class UpdateYears(val years: String) : FilterIntent()
+    data class UpdateDetailDescriptions(val words: String) : FilterIntent()
+    data class UpdateCity(val city: CitiesEnum) : FilterIntent()
 
 }
 sealed interface SearchEffects {

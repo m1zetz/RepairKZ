@@ -46,7 +46,7 @@ fun Cap(
                 horizontalArrangement = Arrangement.Center
             ) {
                 AsyncImage(
-                    model = userPhotoUrl ?: R.drawable.ic_launcher_background,
+                    model = if (userPhotoUrl.isNullOrEmpty()) R.drawable.ic_launcher_background else userPhotoUrl,
                     contentDescription = "UserPhoto",
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
