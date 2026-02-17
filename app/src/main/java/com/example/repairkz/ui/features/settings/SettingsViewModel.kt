@@ -55,7 +55,6 @@ class SettingsViewModel @Inject constructor(
                     _settingEffectsChannel.send(NavigateToUserInfo(intent.id))
                 }
             }
-
             is SettingIntent.BecomeAMaster -> {
                 viewModelScope.launch {
                     updateUserStatusUseCase(intent.status)

@@ -1,6 +1,5 @@
 package com.example.repairkz.ui.features.search
 
-import android.util.Log
 import com.example.repairkz.R
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
@@ -33,6 +32,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -55,8 +55,7 @@ import com.example.repairkz.common.ui.ShortWithComposableCard
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchScreen(navController: NavController, searchViewModel: SearchViewModel) {
-    val currentState by searchViewModel.uiState.collectAsStateWithLifecycle()
-    val context = LocalContext.current
+    val currentState by searchViewModel.uiState.collectAsState()
 
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true
@@ -65,15 +64,6 @@ fun SearchScreen(navController: NavController, searchViewModel: SearchViewModel)
         searchViewModel.handleIntent(SearchIntents.GetData)
     }
 
-    LaunchedEffect(Unit) {
-        currentState.initialPatternResId?.let { resId ->
-            if (resId != 0) {
-                val pattern = context.getString(resId)
-                searchViewModel.handleIntent(SearchIntents.ChangeText(pattern))
-            }
-
-        }
-    }
 
     LaunchedEffect(searchViewModel.searchEffectsChannel) {
         searchViewModel.searchEffectsChannel.collect { effect ->
@@ -232,7 +222,7 @@ fun Filters(searchState: SearchUiState, onIntent: (SearchIntents) -> Unit) {
             R.string.enter_expirence,
             searchState.filterData.experienceInYears,
             { newValue ->
-                onIntent(SearchIntents.FilterActions(FilterIntents.UpdateYears(newValue)))
+                onIntent(SearchIntents.FilterAction(FilterIntent.UpdateYears(newValue)))
             },
             keyboardType = KeyboardType.Number
         )
@@ -241,7 +231,7 @@ fun Filters(searchState: SearchUiState, onIntent: (SearchIntents) -> Unit) {
             R.string.enter_words,
             searchState.filterData.detailDescriptions,
             { newValue ->
-                onIntent(SearchIntents.FilterActions(FilterIntents.UpdateDetailDescriptions(newValue)))
+                onIntent(SearchIntents.FilterAction(FilterIntent.UpdateDetailDescriptions(newValue)))
             }
         )
 
@@ -253,7 +243,7 @@ fun Filters(searchState: SearchUiState, onIntent: (SearchIntents) -> Unit) {
                     searchState.filterData.city,
                     CitiesEnum.entries,
                     onSelect = { city ->
-                        onIntent(SearchIntents.FilterActions(FilterIntents.UpdateCity(city)))
+                        onIntent(SearchIntents.FilterAction(FilterIntent.UpdateCity(city)))
                     }
                 )
             }
@@ -267,7 +257,7 @@ fun Filters(searchState: SearchUiState, onIntent: (SearchIntents) -> Unit) {
                     searchState.filterData.masterSpecialization,
                     MasterSpetializationsEnum.entries,
                     onSelect = { spec ->
-                        onIntent(SearchIntents.FilterActions(FilterIntents.UpdateMasterSpecialization(spec)))
+                        onIntent(SearchIntents.FilterAction(FilterIntent.UpdateMasterSpecialization(spec)))
                     }
                 )
             }

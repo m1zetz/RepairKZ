@@ -51,7 +51,7 @@ fun UserInfo(userInfoViewModel: UserInfoViewModel){
                     modifier = Modifier.fillMaxSize(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-//                    Cap(state.userTypes., user.firstName, user.lastName)
+                    Cap(user.commonInfo.photoUrl, user.commonInfo.firstName, user.commonInfo.lastName)
                     when(user){
                         is UserTypes.IsCurrentMaster -> {
                             Column(

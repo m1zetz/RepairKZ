@@ -2,6 +2,7 @@ package com.example.repairkz.common.ui
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -14,6 +15,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 
 interface DisplayableEnum {
@@ -31,6 +33,7 @@ fun <T> EnumDropDown(
 ) where T : Enum<T>, T : DisplayableEnum {
 
     var menuIsOpen by remember { mutableStateOf(false) }
+    val focusManager = LocalFocusManager.current
 
     ExposedDropdownMenuBox(
         expanded = menuIsOpen,
@@ -45,14 +48,15 @@ fun <T> EnumDropDown(
             modifier = Modifier
                 .menuAnchor()
                 .fillMaxWidth(),
-            shape = MaterialTheme.shapes.medium
+            shape = MaterialTheme.shapes.medium,
 
         )
         ExposedDropdownMenu(
             expanded = menuIsOpen,
             onDismissRequest = {
                 menuIsOpen = false
-            }
+            },
+
         ) {
             elements.forEach { item ->
                 DropdownMenuItem(
@@ -60,6 +64,7 @@ fun <T> EnumDropDown(
                     onClick = {
                         onSelect(item)
                         menuIsOpen = false
+                        focusManager.clearFocus()
                     }
                 )
             }

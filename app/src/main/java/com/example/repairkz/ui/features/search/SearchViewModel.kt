@@ -1,15 +1,13 @@
 package com.example.repairkz.ui.features.search
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.repairkz.common.models.Master
+import com.example.repairkz.common.enums.MasterSpetializationsEnum
 import com.example.repairkz.domain.useCases.masterData.GetMastersUseCase
 import com.example.repairkz.domain.useCases.userData.GetProfileTypeUseCase
 import com.example.repairkz.ui.features.search.SearchEffects.*
 import com.example.repairkz.ui.features.search.SearchResult.*
-import com.example.repairkz.ui.features.settings.SettingsEffects.NavigateToUserInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.channels.Channel
@@ -33,6 +31,17 @@ class SearchViewModel @Inject constructor(
 
     private val _searchEffectsChannel = Channel<SearchEffects>(Channel.BUFFERED)
     val searchEffectsChannel = _searchEffectsChannel.receiveAsFlow()
+
+    init {
+        initialPatternResId?.let{ id ->
+            val masterSpecialization = MasterSpetializationsEnum.getSpecByResId(id)
+            if(masterSpecialization != MasterSpetializationsEnum.UNKNOWN){
+                handleIntent(SearchIntents.FilterAction(FilterIntent.UpdateMasterSpecialization(masterSpecialization)))
+                handleIntent(SearchIntents.ApplyFilters)
+            }
+        }
+
+    }
 
     fun handleIntent(intent: SearchIntents) {
         when (intent) {
@@ -107,7 +116,7 @@ class SearchViewModel @Inject constructor(
                 }
             }
 
-            is SearchIntents.FilterActions -> {
+            is SearchIntents.FilterAction -> {
                 handleFilterAction(intent.action)
             }
 
@@ -123,14 +132,15 @@ class SearchViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(filterData = FilterData(), isFilterActive = false)
                 }
+                handleIntent(SearchIntents.GetData)
             }
 
 
         }
     }
-    fun handleFilterAction(action: FilterIntents){
+    fun handleFilterAction(action: FilterIntent){
         when(action){
-            is FilterIntents.UpdateCity -> {
+            is FilterIntent.UpdateCity -> {
                 _uiState.update {
                     it.copy(
                         filterData = it.filterData.copy(
@@ -139,7 +149,7 @@ class SearchViewModel @Inject constructor(
                     )
                 }
             }
-            is FilterIntents.UpdateDetailDescriptions -> {
+            is FilterIntent.UpdateDetailDescriptions -> {
                 _uiState.update {
                     it.copy(
                         filterData = it.filterData.copy(
@@ -148,7 +158,7 @@ class SearchViewModel @Inject constructor(
                     )
                 }
             }
-            is FilterIntents.UpdateMasterSpecialization -> {
+            is FilterIntent.UpdateMasterSpecialization -> {
                 _uiState.update {
                     it.copy(
                         filterData = it.filterData.copy(
@@ -157,7 +167,7 @@ class SearchViewModel @Inject constructor(
                     )
                 }
             }
-            is FilterIntents.UpdateYears -> {
+            is FilterIntent.UpdateYears -> {
                 _uiState.update {
                     it.copy(
                         filterData = it.filterData.copy(
