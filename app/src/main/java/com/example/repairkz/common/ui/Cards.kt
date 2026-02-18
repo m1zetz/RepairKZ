@@ -1,6 +1,5 @@
 package com.example.repairkz.common.ui
 
-import android.content.Intent
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -13,21 +12,19 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
@@ -39,10 +36,23 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.repairkz.R
+import com.example.repairkz.common.models.User
 import com.example.repairkz.ui.features.UserInfo.UserIntent
 
 @Composable
-fun ProfileString(imageUrl: String?, name: String, description: String, intent: () -> Unit = {}) {
+fun ProfileString(
+    user: User,
+    intent: () -> Unit = {},
+    descriptionPrefix: String = "",
+
+) {
+
+    val displayDescription = if(descriptionPrefix.isNotEmpty()){
+        "${descriptionPrefix} ${stringResource(user.status.resID)}"
+    }else{
+        stringResource(user.displayDescriptionRes)
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -57,8 +67,8 @@ fun ProfileString(imageUrl: String?, name: String, description: String, intent: 
                 .padding(12.dp)
         ) {
             AsyncImage(
-                model = imageUrl ?: R.drawable.ic_launcher_background,
-                contentDescription = "UserPhoto",
+                model = user.userPhotoUrl ?: R.drawable.ic_launcher_background,
+                contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .size(56.dp)
@@ -74,11 +84,11 @@ fun ProfileString(imageUrl: String?, name: String, description: String, intent: 
                     .align(Alignment.Top),
             ) {
                 Text(
-                    name,
+                    "${user.firstName} ${user.lastName}",
                     fontSize = 18.sp
                 )
                 Text(
-                    description,
+                    displayDescription,
                     fontSize = 16.sp
                 )
             }
@@ -114,7 +124,7 @@ fun ShortInputCard(
     @StringRes placeholderResId: Int,
     value: String,
     changeValue: (newValue: String) -> Unit,
-    keyboardType: KeyboardType = KeyboardType.Text
+    keyboardType: KeyboardType = KeyboardType.Text,
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
@@ -133,7 +143,10 @@ fun ShortInputCard(
             Spacer(modifier = Modifier.size(8.dp))
             OutlinedTextField(
                 modifier = Modifier.fillMaxWidth(),
-                keyboardOptions = KeyboardOptions(keyboardType = keyboardType, imeAction = ImeAction.Done),
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = keyboardType,
+                    imeAction = ImeAction.Done
+                ),
                 value = value,
                 onValueChange = { newValue ->
                     changeValue(newValue)
@@ -178,7 +191,7 @@ fun ProfileMainActions(
     icon: ImageVector,
     action: UserIntent,
     onAction: (UserIntent) -> Unit,
-    modifier: Modifier
+    modifier: Modifier,
 ) {
     Card(
         shape = RoundedCornerShape(24.dp),
@@ -202,6 +215,40 @@ fun ProfileMainActions(
             )
             Spacer(Modifier.height(8.dp))
             Text(text = stringResource(titleResId))
+        }
+    }
+}
+
+
+@Composable
+fun StandartString(
+    textR: Int,
+    intent: () -> Unit,
+    color: Color = MaterialTheme.colorScheme.onSurface,
+    icon: ImageVector? = null,
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp, vertical = 8.dp),
+        onClick = {
+            intent()
+        }
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp)
+        ) {
+
+            icon?.let { icon ->
+                Icon(icon, null)
+                Spacer(modifier = Modifier.size(8.dp))
+            }
+            Text(
+                text = stringResource(textR),
+                color = color
+            )
         }
     }
 }

@@ -67,4 +67,8 @@ open class User(
     open fun toUser() : User{
         return this
     }
+
+    open val displayDescriptionRes: Int
+        get() = this.status.resID
+
 }

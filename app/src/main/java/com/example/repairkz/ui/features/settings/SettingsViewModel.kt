@@ -3,7 +3,6 @@ package com.example.repairkz.ui.features.settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.repairkz.data.userData.UserRepository
-import com.example.repairkz.domain.useCases.userData.GetProfileTypeUseCase
 import com.example.repairkz.domain.useCases.userData.GetUserDataUseCase
 import com.example.repairkz.domain.useCases.userData.UpdateUserStatusUseCase
 import com.example.repairkz.ui.features.settings.SettingsEffects.*
@@ -32,14 +31,13 @@ class SettingsViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             getUserDataUseCase()
-
         }
     }
 
     init {
         userRepository.userData.onEach { user ->
             if (user != null){
-                _uiState.value = SettingsState.Success(user)
+                _uiState.value = SettingsState.Success(user, user.status, true)
             } else{
                 _uiState.value = SettingsState.Error("Вы не зарегистрированы")
             }
@@ -55,7 +53,7 @@ class SettingsViewModel @Inject constructor(
                     _settingEffectsChannel.send(NavigateToUserInfo(intent.id))
                 }
             }
-            is SettingIntent.BecomeAMaster -> {
+            is SettingIntent.SwitchStatus -> {
                 viewModelScope.launch {
                     updateUserStatusUseCase(intent.status)
                 }

@@ -1,5 +1,6 @@
 package com.example.repairkz.common.models
 
+import com.example.repairkz.R
 import com.example.repairkz.common.enums.CitiesEnum
 import com.example.repairkz.common.enums.MasterSpetializationsEnum
 import com.example.repairkz.common.enums.StatusOfUser
@@ -30,4 +31,9 @@ data class Master(
             city = this.city
         )
     }
+
+    override val displayDescriptionRes : Int
+        get() = this.masterSpecialization?.resID?: R.string.not_specified
+
+
 }

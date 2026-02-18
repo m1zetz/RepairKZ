@@ -40,7 +40,14 @@
     <string name="report">Пожаловаться</string>
 
     <string name="become_a_master">Стать мастером</string>
+    <string name="become_a_client">Стать клиентом</string>
     <string name="not_specified">Нет специализации</string>
+    <string name="your_status">Ваш статус:</string>
+
+    <string name="client">Клиент</string>
+    <string name="master">Мастер</string>
+    <string name="error">Ошибка</string>
+
 
 
 </resources>
