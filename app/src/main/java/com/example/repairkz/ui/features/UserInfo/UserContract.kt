@@ -1,6 +1,7 @@
 package com.example.repairkz.ui.features.UserInfo
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.net.Uri
 import com.example.repairkz.common.enums.PhotoSourceEnum
 import com.example.repairkz.common.models.Master
@@ -32,7 +33,7 @@ sealed class UserIntent{
     object OpenSheet : UserIntent()
     object CloseSheet : UserIntent()
     data class ChangeAvatar(val typeOfSelect: PhotoSourceEnum): UserIntent()
-    data class SelectedPhoto(val uri: Uri?, val context: Context) : UserIntent()
+    data class SelectedPhoto(val uri: Uri?, val bitmap: Bitmap?) : UserIntent()
     sealed class MasterProfileIntent : UserIntent(){
         data class DoOrder(val userId: Int): MasterProfileIntent()
         data class AddToFavorites(val userId: Int): MasterProfileIntent()
