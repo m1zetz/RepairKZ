@@ -1,6 +1,7 @@
 package com.example.repairkz.ui.features.profile.common
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -10,7 +11,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.CameraAlt
 import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -21,12 +26,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.repairkz.R
+import com.example.repairkz.ui.features.UserInfo.CommonInfo
+import com.example.repairkz.ui.features.UserInfo.UserIntent
 
 @Composable
 fun Cap(
-    userPhotoUrl: String?,
-    firstName: String,
-    lastName: String
+    commonInfo: CommonInfo,
+    changeAvatarIntent: (UserIntent) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -45,15 +51,32 @@ fun Cap(
                     .padding(top = 8.dp, bottom = 4.dp, start = 8.dp, end = 8.dp),
                 horizontalArrangement = Arrangement.Center
             ) {
-                AsyncImage(
-                    model = if (userPhotoUrl.isNullOrEmpty()) R.drawable.ic_launcher_background else userPhotoUrl,
-                    contentDescription = "UserPhoto",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .size(140.dp)
-                        .clip(CircleShape)
+                Box(
+                    modifier = Modifier.size(140.dp),
+                    contentAlignment = Alignment.BottomEnd
+                ){
+                    AsyncImage(
+                        model = commonInfo.photoUrl.ifEmpty { R.drawable.ic_launcher_background },
+                        contentDescription = "UserPhoto",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clip(CircleShape)
+                    )
+                    if(commonInfo.isMe){
+                        IconButton(
+                            onClick = {changeAvatarIntent(UserIntent.OpenSheet)}
+                        ) {
+                            Icon(
+                                Icons.Outlined.CameraAlt,
+                                null,
+                                modifier = Modifier.size(40.dp)
+                            )
+                        }
+                    }
+                }
 
-                )
+
             }
             Row(
                 modifier = Modifier
@@ -61,9 +84,9 @@ fun Cap(
                     .padding(top = 4.dp, bottom = 8.dp, start = 8.dp, end = 8.dp),
                 horizontalArrangement = Arrangement.Center
             ) {
-                Text(firstName, fontSize = 28.sp)
+                Text(commonInfo.firstName, fontSize = 28.sp)
                 Spacer(modifier = Modifier.size(4.dp))
-                Text(lastName, fontSize = 28.sp)
+                Text(commonInfo.lastName, fontSize = 28.sp)
             }
         }
 

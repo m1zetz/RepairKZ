@@ -19,16 +19,15 @@ class GetProfileTypeUseCase @Inject constructor(
             onSuccess = { user ->
                 if (user.userId == comingId || comingId == null) {
                     if(user is Master){
-                        Result.success(UserTypes.IsCurrentMaster(user, user.getCommonInfo()))
+                        Result.success(UserTypes.IsCurrentMaster(user, user.getCommonInfo(isMe = true)))
                     }
                     else{
-                        Result.success(UserTypes.IsCurrentUser(user, user.getCommonInfo()))
+                        Result.success(UserTypes.IsCurrentUser(user, user.getCommonInfo(isMe = true)))
                     }
                 } else {
                     val masterResult = masterRepository.fetchMasterById(comingId)
                     masterResult.map { master ->
-                        val masterCommonInfo = CommonInfo(master.firstName,master.lastName,master.userPhotoUrl?:"")
-                        UserTypes.IsOtherMaster(master, master.getCommonInfo())
+                        UserTypes.IsOtherMaster(master, master.getCommonInfo(isMe = false))
                     }
                 }
             },

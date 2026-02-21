@@ -48,6 +48,9 @@
     <string name="master">Мастер</string>
     <string name="error">Ошибка</string>
 
+    <string name="from_camera">Сделать снимок</string>
+    <string name="from_gallery">Выбрать из галереи</string>
+
 
 
 </resources>
