@@ -32,11 +32,13 @@ open class User(
         userPhotoUrl: String? = this.userPhotoUrl,
         firstName: String = this.firstName,
         lastName: String = this.lastName,
+        isMe: Boolean
     ) : CommonInfo{
         return CommonInfo(
             userPhotoUrl?: "",
             firstName,
-            lastName
+            lastName,
+            isMe = isMe
         )
     }
 

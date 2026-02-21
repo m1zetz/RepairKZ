@@ -49,4 +49,8 @@ class UserRepositoryImpl @Inject constructor() : UserRepository {
             }
         }
     }
+
+    override suspend fun updateUserData(user: User) {
+        _userData.value = user
+    }
 }

@@ -44,7 +44,6 @@ fun ProfileString(
     user: User,
     intent: () -> Unit = {},
     descriptionPrefix: String = "",
-
 ) {
 
     val displayDescription = if(descriptionPrefix.isNotEmpty()){

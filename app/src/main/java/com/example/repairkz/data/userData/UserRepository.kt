@@ -9,5 +9,7 @@ interface UserRepository {
     suspend fun fetchUserData() : Result<User>
     suspend fun updateUserStatus(statusOfUser: StatusOfUser)
 
+    suspend fun updateUserData(user: User)
+
 
 }

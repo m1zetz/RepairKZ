@@ -178,7 +178,7 @@ fun SearchScreen(navController: NavController, searchViewModel: SearchViewModel)
 
         ModalBottomSheet(
             onDismissRequest = { searchViewModel.handleIntent(SearchIntents.CloseFilters) },
-            sheetState = sheetState
+
         ) {
             Filters(
                 currentState,
