@@ -86,8 +86,8 @@ class MainActivity : ComponentActivity() {
 
                             Camera(
                                 context = context,
-                                takeNewPhoto = { uri ->
-                                    userInfoViewModel.handleIntent(UserIntent.SelectedPhoto(uri, context))
+                                takeNewPhoto = { bitmap ->
+                                    userInfoViewModel.handleIntent(UserIntent.SelectedPhoto(null, bitmap))
                                     navController.popBackStack()
                                 }
                             )

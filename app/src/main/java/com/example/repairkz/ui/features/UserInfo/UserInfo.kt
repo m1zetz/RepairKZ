@@ -62,7 +62,7 @@ fun UserInfo(userInfoViewModel: UserInfoViewModel, navController: NavController)
 
     val mediaLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
-            userInfoViewModel.handleIntent(UserIntent.SelectedPhoto(uri, context))
+            userInfoViewModel.handleIntent(UserIntent.SelectedPhoto(uri, null))
         }
 
 

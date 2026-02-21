@@ -1,13 +1,19 @@
 package com.example.repairkz.ui.features.UserInfo
 
+import android.content.Context
+import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.repairkz.common.utils.getImageUriFromBitmap
 import com.example.repairkz.domain.useCases.userData.GetProfileTypeUseCase
 import com.example.repairkz.domain.useCases.userData.GetUserDataUseCase
 import com.example.repairkz.domain.useCases.userData.UpdateUserDataUseCase
+import com.example.repairkz.ui.features.UserInfo.UserEffects.*
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,10 +23,11 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class UserInfoViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
     savedStateHandle: SavedStateHandle,
     private val getUserDataUseCase: GetUserDataUseCase,
     private val getProfileTypeUseCase: GetProfileTypeUseCase,
-    private val updateUserDataUseCase: UpdateUserDataUseCase
+    private val updateUserDataUseCase: UpdateUserDataUseCase,
 ) : ViewModel() {
 
 
@@ -54,15 +61,28 @@ class UserInfoViewModel @Inject constructor(
 
             is UserIntent.ChangeAvatar -> {
                 viewModelScope.launch {
-                    _channel.send(UserEffects.OpenPhotoPicker(intent.typeOfSelect))
+                    _channel.send(OpenPhotoPicker(intent.typeOfSelect))
                 }
 
             }
 
             is UserIntent.SelectedPhoto -> {
-                intent.uri?.let{ uri ->
-                    viewModelScope.launch {
-                        getUserDataUseCase().onSuccess {user->
+
+                viewModelScope.launch(Dispatchers.IO) {
+                    val finalUri: Uri? =
+                        when {
+                            intent.uri != null -> {
+                                intent.uri
+                            }
+
+                            intent.bitmap != null -> {
+                                getImageUriFromBitmap(context, intent.bitmap)
+                            }
+
+                            else -> null
+                        }
+                    finalUri?.let { uri ->
+                        getUserDataUseCase().onSuccess { user ->
                             val newUser = user.copy(
                                 userPhotoUrl = uri.toString()
                             )
@@ -70,9 +90,7 @@ class UserInfoViewModel @Inject constructor(
                             defineUser(comingId)
                         }
 
-
                     }
-
 
 
                 }
@@ -80,32 +98,31 @@ class UserInfoViewModel @Inject constructor(
 
             UserIntent.CloseSheet -> {
                 _uiState.update { currentState ->
-                    if(currentState is UserState.Success){
+                    if (currentState is UserState.Success) {
                         currentState.copy(avatarSheetState = false)
-                    }
-                    else{
+                    } else {
                         currentState
                     }
                 }
-
             }
             UserIntent.OpenSheet -> {
                 _uiState.update { currentState ->
-                    if(currentState is UserState.Success){
+                    if (currentState is UserState.Success) {
                         currentState.copy(avatarSheetState = true)
-                    }
-                    else{
+                    } else {
                         currentState
                     }
                 }
             }
         }
-    }
 
+
+    }
     init {
         defineUser(comingId)
     }
-    fun defineUser(id:Int?){
+
+    fun defineUser(id: Int?) {
         viewModelScope.launch {
             _uiState.value = UserState.Loading
             getProfileTypeUseCase(id).fold(

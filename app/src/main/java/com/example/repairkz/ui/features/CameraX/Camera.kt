@@ -1,6 +1,6 @@
 package com.example.repairkz.ui.features.CameraX
 
-
+import com.example.repairkz.common.utils.takePhoto
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
@@ -58,6 +58,7 @@ import com.canhub.cropper.CropImageOptions
 import com.canhub.cropper.CropImageView
 import java.io.ByteArrayOutputStream
 import androidx.core.net.toUri
+import com.example.repairkz.common.utils.getImageUriFromBitmap
 import com.example.repairkz.ui.features.UserInfo.UserInfoViewModel
 import com.example.repairkz.ui.features.UserInfo.UserIntent
 import java.io.File
@@ -65,7 +66,7 @@ import java.io.FileOutputStream
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Camera(context: Context, takeNewPhoto:(Uri?)-> Unit) {
+fun Camera(context: Context, takeNewPhoto:(Bitmap?)-> Unit) {
     val controller = remember {
         LifecycleCameraController(context).apply {
             setEnabledUseCases(
@@ -138,62 +139,24 @@ fun Camera(context: Context, takeNewPhoto:(Uri?)-> Unit) {
 }
 
 
-private fun takePhoto(
-    controller: LifecycleCameraController,
-    onPhotoTaken: (Bitmap) -> Unit,
-    context: Context,
-) {
-    controller.takePicture(
-        ContextCompat.getMainExecutor(context),
-        object : ImageCapture.OnImageCapturedCallback() {
-            override fun onCaptureSuccess(image: ImageProxy) {
-                super.onCaptureSuccess(image)
-                val bitmap = image.toBitmap()
-                val angle = image.imageInfo.rotationDegrees
-                val matrix = Matrix()
-                if(controller.cameraSelector ==  CameraSelector.DEFAULT_FRONT_CAMERA){
-                    matrix.postScale(1.0f, -1.0f)
-                }
-                matrix.postRotate(angle.toFloat())
-                val rotatedBitmap = Bitmap.createBitmap(
-                    bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true
-                )
 
-                onPhotoTaken(rotatedBitmap)
-                image.close()
-            }
-            override fun onError(exception: ImageCaptureException) {
-                super.onError(exception)
-            }
-        }
-    )
-}
 
-@SuppressLint("UseKtx")
-fun getImageUriFromBitmap(context: Context, bitmap: Bitmap): Uri{
-    val cacheFile = File(context.cacheDir, "photo_${System.currentTimeMillis()}.jpg")
-    FileOutputStream(cacheFile).use { fos ->
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 80, fos)
-    }
-    return Uri.fromFile(cacheFile)
-}
 
-fun getImageBitmapFromUri(context: Context, uri: Uri?): Bitmap {
-    return MediaStore.Images.Media.getBitmap(context.contentResolver,uri)
-}
+
+
 @Composable
-fun PhotoPreview(context: Context, bitmap: Bitmap, save: (Uri?) -> Unit) {
-    var uri by remember { mutableStateOf<Uri?>(null) }
+fun PhotoPreview(context: Context, bitmap: Bitmap, save: (Bitmap?) -> Unit) {
+    var newBitmap by remember { mutableStateOf<Bitmap?>(null) }
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
         val cropLauncher = rememberLauncherForActivityResult(CropImageContract()) { result ->
             if (result.isSuccessful) {
-                uri = result.uriContent
+                newBitmap = result.bitmap
             }
         }
         AsyncImage(
-            model = uri ?: bitmap,
+            model = newBitmap ?: bitmap,
             contentDescription = null,
             modifier = Modifier.align(
                 Alignment.Center
@@ -223,7 +186,7 @@ fun PhotoPreview(context: Context, bitmap: Bitmap, save: (Uri?) -> Unit) {
             }
             IconButton(
                 onClick = {
-                    save(uri?: getImageUriFromBitmap(context,bitmap))
+                    save(newBitmap?: bitmap)
                 }
             ) {
                 Icon(Icons.Default.CrueltyFree, null)
