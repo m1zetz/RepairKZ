@@ -15,8 +15,14 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Bolt
+import androidx.compose.material.icons.filled.Computer
+import androidx.compose.material.icons.filled.Handyman
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.TableBar
+import androidx.compose.material.icons.filled.Tablet
+import androidx.compose.material.icons.filled.WaterDrop
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -60,11 +66,11 @@ fun HomeScreen(navController: NavController){
 
     val mastersCards = remember {
         listOf(
-            CardFill(Icons.Default.Settings, MasterSpetializationsEnum.PLUMBER),
-            CardFill(Icons.Default.Settings, MasterSpetializationsEnum.ELECTRIC),
-            CardFill(Icons.Default.Settings, MasterSpetializationsEnum.СOMPUTER),
-            CardFill(Icons.Default.Settings, MasterSpetializationsEnum.HANDYMAN),
-            CardFill(Icons.Default.Settings, MasterSpetializationsEnum.FURNITURE)
+            CardFill(Icons.Default.WaterDrop, MasterSpetializationsEnum.PLUMBER),
+            CardFill(Icons.Default.Bolt, MasterSpetializationsEnum.ELECTRIC),
+            CardFill(Icons.Default.Computer, MasterSpetializationsEnum.СOMPUTER),
+            CardFill(Icons.Default.Handyman, MasterSpetializationsEnum.HANDYMAN),
+            CardFill(Icons.Default.TableBar, MasterSpetializationsEnum.FURNITURE)
         )
     }
     Column(

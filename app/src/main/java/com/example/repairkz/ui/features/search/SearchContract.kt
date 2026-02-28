@@ -10,7 +10,9 @@ data class SearchUiState(
     val result: SearchResult = SearchResult.Idle,
     val filterData: FilterData = FilterData(),
     val isFiltersSheetOpen: Boolean = false,
-    val isFilterActive: Boolean = false
+    val isFilterActive: Boolean = false,
+    val searchFieldState: Boolean = true
+
 )
 
 sealed class SearchResult {
@@ -28,6 +30,7 @@ data class FilterData(
 )
 
 sealed class SearchIntents {
+    data class ChangeSearchFieldState(val state: Boolean) : SearchIntents()
     data class ChangeText(val text: String) : SearchIntents()
     object GetData : SearchIntents()
     object NavigateToBack : SearchIntents()

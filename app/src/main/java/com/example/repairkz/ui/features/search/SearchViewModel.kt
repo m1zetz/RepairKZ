@@ -99,7 +99,7 @@ class SearchViewModel @Inject constructor(
 
             is SearchIntents.NavigateToUserInfo -> {
                 viewModelScope.launch {
-                    _searchEffectsChannel.send(SearchEffects.NavigateToUserInfo(intent.id))
+                    _searchEffectsChannel.send(NavigateToUserInfo(intent.id))
                 }
             }
 
@@ -135,7 +135,14 @@ class SearchViewModel @Inject constructor(
                 handleIntent(SearchIntents.GetData)
             }
 
+            is SearchIntents.ChangeSearchFieldState -> {
+                if (!intent.state){
+                    viewModelScope.launch {
+                        _searchEffectsChannel.send(NavigateBack)
+                    }
+                }
 
+            }
         }
     }
     fun handleFilterAction(action: FilterIntent){

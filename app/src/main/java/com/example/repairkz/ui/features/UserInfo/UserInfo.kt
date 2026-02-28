@@ -1,5 +1,6 @@
 package com.example.repairkz.ui.features.UserInfo
 
+import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import com.example.repairkz.R
@@ -12,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Camera
 import androidx.compose.material.icons.filled.PermMedia
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
@@ -30,12 +30,11 @@ import androidx.navigation.NavController
 import com.example.repairkz.Navigation.Routes
 import com.example.repairkz.common.enums.PhotoSourceEnum
 import com.example.repairkz.common.ui.StandartString
-import com.example.repairkz.ui.features.CameraX.Camera
 import com.example.repairkz.ui.features.profile.common.Cap
-import java.io.File
+import com.example.repairkz.ui.features.profile.master.MasterBar
 
 private val CAMERAX_PERMISSIONS = arrayOf(
-    android.Manifest.permission.CAMERA,
+    Manifest.permission.CAMERA,
 )
 
 private fun hasRequiredPermissions(context: Context): Boolean {
@@ -58,11 +57,13 @@ fun UserInfo(userInfoViewModel: UserInfoViewModel, navController: NavController)
 
     }
 
-
-
     val mediaLauncher =
-        rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
-            userInfoViewModel.handleIntent(UserIntent.SelectedPhoto(uri, null))
+        rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) {
+            if (it!= null){
+                userInfoViewModel.handleIntent(UserIntent.GetPhotoFromMedia(uri = it))
+                navController.navigate(Routes.PHOTO_PREVIEW)
+            }
+
         }
 
 
@@ -71,6 +72,7 @@ fun UserInfo(userInfoViewModel: UserInfoViewModel, navController: NavController)
             when (effect) {
                 is UserEffects.OpenPhotoPicker -> {
                     when (effect.typeOfSelect) {
+
                         PhotoSourceEnum.CAMERA -> {
                             if (hasRequiredPermissions(context)){
                                 navController.navigate(Routes.CAMERA)
@@ -80,16 +82,18 @@ fun UserInfo(userInfoViewModel: UserInfoViewModel, navController: NavController)
                                 )
                             }
                         }
-
                         PhotoSourceEnum.GALLERY -> {
                             mediaLauncher.launch(
-                                PickVisualMediaRequest(mediaType = ActivityResultContracts.PickVisualMedia.ImageOnly)
+                                PickVisualMediaRequest(mediaType = ActivityResultContracts.PickVisualMedia.ImageOnly, )
                             )
                         }
                     }
 
                 }
 
+                UserEffects.NavigateToPreview -> {
+
+                }
             }
         }
     }
@@ -155,9 +159,14 @@ fun UserInfo(userInfoViewModel: UserInfoViewModel, navController: NavController)
                             Column(
                                 modifier = Modifier.fillMaxSize(),
                                 horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Center
+                                verticalArrangement = Arrangement.Top
                             ) {
-                                Text(user.master.firstName)
+                                MasterBar(
+                                    { intent ->
+                                        userInfoViewModel.handleIntent(intent)
+                                    },
+                                    masterId = user.commonInfo.id,
+                                )
                             }
                         }
                     }
@@ -183,7 +192,7 @@ fun UserInfo(userInfoViewModel: UserInfoViewModel, navController: NavController)
                         icon = Icons.Default.Camera
                     )
                     StandartString(
-                        R.string.from_camera,
+                        R.string.from_gallery,
                         intent = {
                             userInfoViewModel.handleIntent(
                                 UserIntent.ChangeAvatar(

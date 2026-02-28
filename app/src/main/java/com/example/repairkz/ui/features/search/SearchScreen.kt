@@ -57,9 +57,6 @@ import com.example.repairkz.common.ui.ShortWithComposableCard
 fun SearchScreen(navController: NavController, searchViewModel: SearchViewModel) {
     val currentState by searchViewModel.uiState.collectAsState()
 
-    val sheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = true
-    )
     LaunchedEffect(Unit) {
         searchViewModel.handleIntent(SearchIntents.GetData)
     }
@@ -86,8 +83,10 @@ fun SearchScreen(navController: NavController, searchViewModel: SearchViewModel)
                 },
 
                 onSearch = {},
-                active = true,
-                onActiveChange = {},
+                active = currentState.searchFieldState,
+                onActiveChange = { state ->
+                    searchViewModel.handleIntent(SearchIntents.ChangeSearchFieldState(state))
+                },
                 leadingIcon = {
                     IconButton(
                         onClick = {

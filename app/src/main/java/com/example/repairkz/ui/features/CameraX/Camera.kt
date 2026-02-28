@@ -1,28 +1,20 @@
 package com.example.repairkz.ui.features.CameraX
 
+import com.example.repairkz.R
 import com.example.repairkz.common.utils.takePhoto
-import android.annotation.SuppressLint
 import android.content.Context
-import android.content.Intent
 import android.graphics.Bitmap
 import androidx.camera.core.CameraSelector
-import androidx.camera.core.ImageCapture
-import androidx.camera.core.ImageCaptureException
-import androidx.camera.core.ImageProxy
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
 import androidx.camera.view.PreviewView
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Photo
 import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -34,39 +26,33 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import android.graphics.Matrix
 import android.net.Uri
 import android.provider.MediaStore
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContract
-import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.icons.filled.Camera
 import androidx.compose.material.icons.filled.Crop
 import androidx.compose.material.icons.filled.CrueltyFree
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import coil.compose.AsyncImage
-import com.canhub.cropper.CropImage
 import com.canhub.cropper.CropImageContract
 import com.canhub.cropper.CropImageContractOptions
 import com.canhub.cropper.CropImageOptions
 import com.canhub.cropper.CropImageView
-import java.io.ByteArrayOutputStream
-import androidx.core.net.toUri
-import com.example.repairkz.common.utils.getImageUriFromBitmap
-import com.example.repairkz.ui.features.UserInfo.UserInfoViewModel
-import com.example.repairkz.ui.features.UserInfo.UserIntent
-import java.io.File
-import java.io.FileOutputStream
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Camera(context: Context, takeNewPhoto:(Bitmap?)-> Unit) {
+fun Camera(context: Context, takeNewPhoto: (Uri?) -> Unit) {
     val controller = remember {
         LifecycleCameraController(context).apply {
             setEnabledUseCases(
@@ -76,7 +62,7 @@ fun Camera(context: Context, takeNewPhoto:(Bitmap?)-> Unit) {
     }
     val scaffoldState = rememberBottomSheetScaffoldState()
 
-    var bitmap = remember { mutableStateOf<Bitmap?>(null) }
+    var uri = remember { mutableStateOf<Uri?>(null) }
 
     BottomSheetScaffold(
         scaffoldState = scaffoldState,
@@ -85,7 +71,7 @@ fun Camera(context: Context, takeNewPhoto:(Bitmap?)-> Unit) {
 
         }
     ) { paddingValues ->
-        if (bitmap.value == null) {
+        if (uri.value == null) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -106,8 +92,8 @@ fun Camera(context: Context, takeNewPhoto:(Bitmap?)-> Unit) {
                 ) {
                     IconButton(
                         onClick = {
-                            takePhoto(controller, onPhotoTaken = { newBitMap ->
-                                bitmap.value = newBitMap
+                            takePhoto(controller, onPhotoTaken = { newUri ->
+                                uri.value = newUri
                             }, context)
                         }
                     ) {
@@ -130,8 +116,8 @@ fun Camera(context: Context, takeNewPhoto:(Bitmap?)-> Unit) {
             }
 
 
-        } else{
-            PhotoPreview(context,bitmap.value!!, save = {uri ->
+        } else {
+            PhotoPreview(context, uri.value!!, save = { uri ->
                 takeNewPhoto(uri)
             })
         }
@@ -139,28 +125,33 @@ fun Camera(context: Context, takeNewPhoto:(Bitmap?)-> Unit) {
 }
 
 
-
-
-
-
-
 @Composable
-fun PhotoPreview(context: Context, bitmap: Bitmap, save: (Bitmap?) -> Unit) {
-    var newBitmap by remember { mutableStateOf<Bitmap?>(null) }
+fun PhotoPreview(
+    context: Context,
+    uri: Uri,
+    save: (Uri?) -> Unit,
+) {
+    var newUri by remember { mutableStateOf<Uri?>(null) }
+
     Box(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
     ) {
         val cropLauncher = rememberLauncherForActivityResult(CropImageContract()) { result ->
             if (result.isSuccessful) {
-                newBitmap = result.bitmap
+                val croppedUri = result.uriContent
+                newUri = croppedUri
             }
         }
         AsyncImage(
-            model = newBitmap ?: bitmap,
+            model = newUri ?: uri,
             contentDescription = null,
-            modifier = Modifier.align(
-                Alignment.Center
-            )
+            modifier = Modifier
+                .align(
+                    Alignment.Center
+                )
+                .fillMaxSize(),
+            contentScale = ContentScale.Fit
         )
         Row(
             modifier = Modifier
@@ -175,21 +166,26 @@ fun PhotoPreview(context: Context, bitmap: Bitmap, save: (Bitmap?) -> Unit) {
                         CropImageContractOptions(
                             cropImageOptions = CropImageOptions(
                                 guidelines = CropImageView.Guidelines.ON,
+                                activityBackgroundColor = ContextCompat.getColor(
+                                    context,
+                                    R.color.crop_background
+                                )
+                            ),
+                            uri = uri
 
-                                ),
-                            uri = getImageUriFromBitmap(context, bitmap)
                         )
                     )
+
                 }
             ) {
-                Icon(Icons.Default.Crop, null)
+                Icon(Icons.Default.Crop, null, tint = Color.White)
             }
             IconButton(
                 onClick = {
-                    save(newBitmap?: bitmap)
+                    save(newUri ?: uri)
                 }
             ) {
-                Icon(Icons.Default.CrueltyFree, null)
+                Icon(Icons.Default.CrueltyFree, null, tint = Color.White)
             }
         }
     }
@@ -201,7 +197,7 @@ fun CameraPreview(
     controller: LifecycleCameraController,
     modifier: Modifier,
 ) {
-    
+
     val lifeCycleOwner = LocalLifecycleOwner.current
     AndroidView(
         factory = {
