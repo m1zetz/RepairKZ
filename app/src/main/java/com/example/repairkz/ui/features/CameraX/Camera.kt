@@ -1,14 +1,17 @@
 package com.example.repairkz.ui.features.CameraX
 
+import android.app.Activity
 import com.example.repairkz.R
 import com.example.repairkz.common.utils.takePhoto
 import android.content.Context
+import android.content.ContextWrapper
+import android.content.pm.ActivityInfo
 import android.graphics.Bitmap
 import androidx.camera.core.CameraSelector
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
 import androidx.camera.view.PreviewView
-import androidx.compose.foundation.layout.Arrangement
+
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -29,30 +32,56 @@ import androidx.compose.ui.Modifier
 import android.net.Uri
 import android.provider.MediaStore
 import android.util.Log
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.icons.filled.Camera
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Circle
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Crop
 import androidx.compose.material.icons.filled.CrueltyFree
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.canhub.cropper.CropImageContract
 import com.canhub.cropper.CropImageContractOptions
 import com.canhub.cropper.CropImageOptions
 import com.canhub.cropper.CropImageView
+import com.example.repairkz.common.extensions.getActivityOrNull
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Camera(context: Context, takeNewPhoto: (Uri?) -> Unit) {
+
+    DisposableEffect(Unit) {
+
+        val activity = context.getActivityOrNull()
+        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        onDispose {
+            activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+        }
+    }
+
     val controller = remember {
         LifecycleCameraController(context).apply {
             setEnabledUseCases(
@@ -62,7 +91,7 @@ fun Camera(context: Context, takeNewPhoto: (Uri?) -> Unit) {
     }
     val scaffoldState = rememberBottomSheetScaffoldState()
 
-    var uri = remember { mutableStateOf<Uri?>(null) }
+    val uri = rememberSaveable { mutableStateOf<Uri?>(null) }
 
     BottomSheetScaffold(
         scaffoldState = scaffoldState,
@@ -87,39 +116,67 @@ fun Camera(context: Context, takeNewPhoto: (Uri?) -> Unit) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .align(Alignment.BottomCenter)
-                        .padding(16.dp),
-                    horizontalArrangement = Arrangement.SpaceAround
+                        .padding(16.dp)
+                        .navigationBarsPadding(),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    IconButton(
-                        onClick = {
-                            takePhoto(controller, onPhotoTaken = { newUri ->
-                                uri.value = newUri
-                            }, context)
+                    Spacer(Modifier.weight(1f))
+                    Box(Modifier.weight(1f), contentAlignment = Alignment.Center) {
+                        IconButton(
+                            onClick = {
+                                takePhoto(controller, onPhotoTaken = { newUri ->
+                                    uri.value = newUri
+                                }, context)
+                            },
+                            Modifier
+                                .size(80.dp)
+
+                        ) {
+                            Icon(
+                                Icons.Default.Circle, null, Modifier
+                                    .size(80.dp),
+                                tint = Color.White
+                            )
                         }
-                    ) {
-                        Icon(Icons.Default.Camera, null)
+                    }
+                    Box(Modifier.weight(1f), contentAlignment = Alignment.CenterEnd) {
+                        IconButton(
+                            onClick = {
+                                controller.cameraSelector =
+                                    if (controller.cameraSelector == CameraSelector.DEFAULT_BACK_CAMERA) {
+                                        CameraSelector.DEFAULT_FRONT_CAMERA
+                                    } else {
+                                        CameraSelector.DEFAULT_BACK_CAMERA
+                                    }
+                            },
+                            Modifier
+                                .padding(end = 32.dp)
+                                .size(56.dp)
+
+                        ) {
+                            Icon(
+                                Icons.Default.SwapHoriz, null,
+                                Modifier.size(30.dp),
+                                tint = Color.White
+                            )
+                        }
                     }
 
-                    IconButton(
-                        onClick = {
-                            controller.cameraSelector =
-                                if (controller.cameraSelector == CameraSelector.DEFAULT_BACK_CAMERA) {
-                                    CameraSelector.DEFAULT_FRONT_CAMERA
-                                } else {
-                                    CameraSelector.DEFAULT_BACK_CAMERA
-                                }
-                        }
-                    ) {
-                        Icon(Icons.Default.SwapHoriz, null)
-                    }
+
                 }
             }
 
 
         } else {
+            BackHandler {
+                uri.value = null
+            }
             PhotoPreview(context, uri.value!!, save = { uri ->
                 takeNewPhoto(uri)
-            })
+            },
+                onDismissRequest = {
+                    uri.value = null
+                })
         }
     }
 }
@@ -129,66 +186,97 @@ fun Camera(context: Context, takeNewPhoto: (Uri?) -> Unit) {
 fun PhotoPreview(
     context: Context,
     uri: Uri,
+    onDismissRequest: () -> Unit,
     save: (Uri?) -> Unit,
 ) {
     var newUri by remember { mutableStateOf<Uri?>(null) }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = Color.Black
     ) {
-        val cropLauncher = rememberLauncherForActivityResult(CropImageContract()) { result ->
-            if (result.isSuccessful) {
-                val croppedUri = result.uriContent
-                newUri = croppedUri
-            }
-        }
-        AsyncImage(
-            model = newUri ?: uri,
-            contentDescription = null,
+        Box(
             modifier = Modifier
-                .align(
-                    Alignment.Center
-                )
-                .fillMaxSize(),
-            contentScale = ContentScale.Fit
-        )
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .align(Alignment.BottomCenter)
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceAround
+                .fillMaxSize()
         ) {
-            IconButton(
-                onClick = {
-                    cropLauncher.launch(
-                        CropImageContractOptions(
-                            cropImageOptions = CropImageOptions(
-                                guidelines = CropImageView.Guidelines.ON,
-                                activityBackgroundColor = ContextCompat.getColor(
-                                    context,
-                                    R.color.crop_background
-                                )
-                            ),
-                            uri = uri
-
-                        )
-                    )
-
+            val cropLauncher = rememberLauncherForActivityResult(CropImageContract()) { result ->
+                if (result.isSuccessful) {
+                    val croppedUri = result.uriContent
+                    newUri = croppedUri
                 }
-            ) {
-                Icon(Icons.Default.Crop, null, tint = Color.White)
             }
-            IconButton(
-                onClick = {
-                    save(newUri ?: uri)
-                }
+            AsyncImage(
+                model = newUri ?: uri,
+                contentDescription = null,
+                modifier = Modifier
+                    .align(
+                        Alignment.Center
+                    )
+                    .fillMaxSize(),
+                contentScale = ContentScale.Fit
+            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.BottomCenter)
+                    .padding(16.dp)
+                    .navigationBarsPadding(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceAround
             ) {
-                Icon(Icons.Default.CrueltyFree, null, tint = Color.White)
+                IconButton(
+                    onClick = {
+                        cropLauncher.launch(
+                            CropImageContractOptions(
+                                cropImageOptions = CropImageOptions(
+                                    guidelines = CropImageView.Guidelines.ON,
+                                    activityBackgroundColor = ContextCompat.getColor(
+                                        context,
+                                        R.color.crop_background
+                                    )
+                                ),
+                                uri = uri
+
+                            )
+                        )
+
+                    },
+                    modifier = Modifier.size(56.dp)
+                ) {
+                    Icon(
+                        Icons.Default.Crop, null,
+                        tint = Color.White,
+                        modifier = Modifier.size(30.dp)
+                    )
+                }
+                IconButton(
+                    onClick = {
+                        save(newUri ?: uri)
+                    },
+                    modifier = Modifier.size(56.dp)
+                ) {
+                    Icon(
+                        Icons.Default.Check, null, tint = Color.White,
+                        modifier = Modifier.size(30.dp)
+                    )
+                }
+                IconButton(
+                    onClick = {
+                        onDismissRequest()
+                    },
+                    modifier = Modifier.size(56.dp)
+                ) {
+                    Icon(
+                        Icons.Default.Close,
+                        null,
+                        tint = Color.White,
+                        modifier = Modifier.size(30.dp)
+                    )
+                }
             }
         }
     }
+
 }
 
 
@@ -199,13 +287,20 @@ fun CameraPreview(
 ) {
 
     val lifeCycleOwner = LocalLifecycleOwner.current
-    AndroidView(
-        factory = {
-            PreviewView(it).apply {
-                this.controller = controller
-                controller.bindToLifecycle(lifeCycleOwner)
-            }
-        },
-        modifier = modifier
-    )
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = Color.Black
+    ) {
+        AndroidView(
+            factory = {
+                PreviewView(it).apply {
+                    this.controller = controller
+                    controller.bindToLifecycle(lifeCycleOwner)
+                }
+            },
+            modifier = modifier.aspectRatio(3f / 4f)
+
+        )
+    }
+
 }

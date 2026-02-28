@@ -72,14 +72,17 @@ fun NavGraphBuilder.profileGraph(navController: NavController){
                 uri?.let{ nonNullUri ->
                     PhotoPreview(
                         context,
-                        uri = nonNullUri
+                        uri = nonNullUri,
+                        onDismissRequest = {
+                            navController.popBackStack()
+                        },
                     ) { uri ->
                         userInfoViewModel.handleIntent(
                             UserIntent.SelectedPhoto(
                                 uri,
                             )
                         )
-                        navController.popBackStack()
+
                     }
                 }
             }

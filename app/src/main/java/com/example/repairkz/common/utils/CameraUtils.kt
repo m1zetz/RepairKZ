@@ -37,10 +37,11 @@ fun takePhoto(
                     val bitmap = proxy.toBitmap()
                     val angle = image.imageInfo.rotationDegrees
                     val matrix = Matrix()
-                    if(controller.cameraSelector ==  CameraSelector.DEFAULT_FRONT_CAMERA){
-                        matrix.postScale(1.0f, -1.0f)
-                    }
+
                     matrix.postRotate(angle.toFloat())
+                    if(controller.cameraSelector ==  CameraSelector.DEFAULT_FRONT_CAMERA){
+                        matrix.postScale(-1.0f, 1.0f)
+                    }
                     val rotatedBitmap = Bitmap.createBitmap(
                         bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true
                     )
