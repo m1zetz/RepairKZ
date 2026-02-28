@@ -7,6 +7,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
@@ -15,17 +17,18 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
-import com.example.repairkz.Navigation.Routes.DETAILS
 import com.example.repairkz.Navigation.Routes.PROFILE_GROUP
+import com.example.repairkz.Navigation.profile.profileGraph
 
 import com.example.repairkz.ui.MainWindow
 import com.example.repairkz.ui.features.CameraX.Camera
+import com.example.repairkz.ui.features.CameraX.PhotoPreview
 import com.example.repairkz.ui.features.UserInfo.UserInfo
 import com.example.repairkz.ui.features.UserInfo.UserInfoViewModel
 import com.example.repairkz.ui.features.UserInfo.UserIntent
+import com.example.repairkz.ui.features.UserInfo.UserState
 import com.example.repairkz.ui.features.search.SearchScreen
 import com.example.repairkz.ui.theme.RepairkzTheme
-import com.example.repairkz.ui.features.home.HomeViewModel
 import com.example.repairkz.ui.features.main.MainViewModel
 import com.example.repairkz.ui.features.notifiacton.NotificationViewModel
 import com.example.repairkz.ui.features.search.SearchViewModel
@@ -40,9 +43,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+
             RepairkzTheme {
                 val navController = rememberNavController()
-                val context = LocalContext.current
                 NavHost(
                     navController = navController,
                     startDestination = Routes.MAIN_WINDOW
@@ -51,12 +54,17 @@ class MainActivity : ComponentActivity() {
                         val mainViewModel: MainViewModel = hiltViewModel()
                         val notificationViewModel: NotificationViewModel = hiltViewModel()
                         val settingsViewModel: SettingsViewModel = hiltViewModel()
-                        MainWindow(mainViewModel,navController, notificationViewModel, settingsViewModel)
+                        MainWindow(
+                            mainViewModel,
+                            navController,
+                            notificationViewModel,
+                            settingsViewModel
+                        )
                     }
                     composable(
                         route = "${Routes.SEARCH}?pattern={pattern}",
                         arguments = listOf(
-                            navArgument("pattern"){
+                            navArgument("pattern") {
                                 type = NavType.IntType
                                 defaultValue = 0
                             }
@@ -65,34 +73,7 @@ class MainActivity : ComponentActivity() {
                         val searchViewModel: SearchViewModel = hiltViewModel()
                         SearchScreen(navController, searchViewModel)
                     }
-
-                    navigation(
-                        startDestination = "${Routes.USERINFO}?userId={userId}",
-                        route = Routes.PROFILE_GROUP
-                    ){
-
-                        composable(
-                            route = "${Routes.USERINFO}?userId={userId}"
-                        ){
-                            val parrentEntry = navController.getBackStackEntry(Routes.PROFILE_GROUP)
-
-                            val userInfoViewModel: UserInfoViewModel = hiltViewModel(parrentEntry)
-
-                            UserInfo(userInfoViewModel, navController)
-                        }
-                        composable(Routes.CAMERA){
-                            val parrentEntry = navController.getBackStackEntry(Routes.PROFILE_GROUP)
-                            val userInfoViewModel: UserInfoViewModel = hiltViewModel(parrentEntry)
-
-                            Camera(
-                                context = context,
-                                takeNewPhoto = { bitmap ->
-                                    userInfoViewModel.handleIntent(UserIntent.SelectedPhoto(null, bitmap))
-                                    navController.popBackStack()
-                                }
-                            )
-                        }
-                    }
+                    profileGraph(navController)
 
                 }
             }

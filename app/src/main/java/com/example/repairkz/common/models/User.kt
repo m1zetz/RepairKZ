@@ -29,12 +29,14 @@ open class User(
     }
 
     fun getCommonInfo(
+        id: Int = this.userId,
         userPhotoUrl: String? = this.userPhotoUrl,
         firstName: String = this.firstName,
         lastName: String = this.lastName,
         isMe: Boolean
     ) : CommonInfo{
         return CommonInfo(
+            id,
             userPhotoUrl?: "",
             firstName,
             lastName,

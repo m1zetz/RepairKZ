@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CameraAlt
 import androidx.compose.material3.Card
@@ -42,8 +43,9 @@ fun Cap(
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(8.dp)
-                .statusBarsPadding()
+                .padding(horizontal = 8.dp, vertical = 2.dp)
+                .statusBarsPadding(),
+            shape = RoundedCornerShape(24.dp)
         ) {
             Row(
                 modifier = Modifier

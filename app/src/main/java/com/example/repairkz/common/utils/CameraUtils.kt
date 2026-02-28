@@ -23,29 +23,35 @@ fun getImageUriFromBitmap(context: Context, bitmap: Bitmap): Uri{
     return Uri.fromFile(cacheFile)
 }
 
+
 fun takePhoto(
     controller: LifecycleCameraController,
-    onPhotoTaken: (Bitmap) -> Unit,
+    onPhotoTaken: (Uri) -> Unit,
     context: Context,
 ) {
     controller.takePicture(
         ContextCompat.getMainExecutor(context),
         object : ImageCapture.OnImageCapturedCallback() {
             override fun onCaptureSuccess(image: ImageProxy) {
-                super.onCaptureSuccess(image)
-                val bitmap = image.toBitmap()
-                val angle = image.imageInfo.rotationDegrees
-                val matrix = Matrix()
-                if(controller.cameraSelector ==  CameraSelector.DEFAULT_FRONT_CAMERA){
-                    matrix.postScale(1.0f, -1.0f)
+                image.use { proxy ->
+                    val bitmap = proxy.toBitmap()
+                    val angle = image.imageInfo.rotationDegrees
+                    val matrix = Matrix()
+                    if(controller.cameraSelector ==  CameraSelector.DEFAULT_FRONT_CAMERA){
+                        matrix.postScale(1.0f, -1.0f)
+                    }
+                    matrix.postRotate(angle.toFloat())
+                    val rotatedBitmap = Bitmap.createBitmap(
+                        bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true
+                    )
+                    if(bitmap != rotatedBitmap){
+                        bitmap.recycle()
+                    }
+                    val uri = getImageUriFromBitmap(context, rotatedBitmap)
+                    onPhotoTaken(uri)
+                    rotatedBitmap.recycle()
                 }
-                matrix.postRotate(angle.toFloat())
-                val rotatedBitmap = Bitmap.createBitmap(
-                    bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true
-                )
 
-                onPhotoTaken(rotatedBitmap)
-                image.close()
             }
             override fun onError(exception: ImageCaptureException) {
                 super.onError(exception)

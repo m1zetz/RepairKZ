@@ -2,6 +2,7 @@ package com.example.repairkz.Navigation
 
 object Routes {
     const val MAIN_WINDOW = "main_window"
+    const val PHOTO_PREVIEW = "camera_preview"
     const val SEARCH = "search"
     const val CAMERA = "camera"
     const val DETAILS = "details"
