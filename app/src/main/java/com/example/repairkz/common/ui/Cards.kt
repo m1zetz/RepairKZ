@@ -124,6 +124,7 @@ fun ShortInputCard(
     value: String,
     changeValue: (newValue: String) -> Unit,
     keyboardType: KeyboardType = KeyboardType.Text,
+
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current

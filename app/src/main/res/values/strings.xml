@@ -51,6 +51,27 @@
     <string name="from_camera">Сделать снимок</string>
     <string name="from_gallery">Выбрать из галереи</string>
 
+    <string name="welcome">Welcome to RepairKZ</string>
+    <string name="registration">Регистрация</string>
+    <string name="confirmation">Подтверждение</string>
+    <string name="send_code">Отправить код</string>
+    <string name="sign_in">Войти</string>
+    <string name="get_code">Получить код</string>
+    <string name="password">password</string>
+    <string name="sign_up">Зарегистрироваться</string>
+    <string name="to_sign_up">Регистрация</string>
+    <string name="input_email">Введите почту:</string>
+    <string name="email_example">your_email@mail.ru</string>
+    <string name="input_password">Введите пароль:</string>
+    <string name="password_example">mypassword23213</string>
+
+    <string name="password_empty">Вы забыли ввести пароль</string>
+    <string name="email_empty">Вы забыли ввести почту</string>
+    <string name="email_invalid_format">Недопустимый формат почты</string>
+    <string name="short_password">Пароль должен содержать больше 6 символов</string>
+    <string name="no_numbers">Пароль должен содержать цифры</string>
+    <string name="no_uppercase">Пароль должен содержать хотя бы одну заглавную букву</string>
+    <string name="no_lowercase">Пароль должен содержать хотя бы одну букву</string>
 
 
 </resources>
