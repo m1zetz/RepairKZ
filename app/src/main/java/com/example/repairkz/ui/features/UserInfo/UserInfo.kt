@@ -135,7 +135,7 @@ fun UserInfo(userInfoViewModel: UserInfoViewModel, navController: NavController)
                         commonInfo = user.commonInfo,
                         changeAvatarIntent = { intent -> userInfoViewModel.handleIntent(intent) })
                     when (user) {
-                        is UserTypes.IsCurrentMaster -> {
+                        is UserTypes.IsCurrentUser, is UserTypes.IsCurrentMaster -> {
                             Column(
                                 modifier = Modifier.fillMaxSize(),
                                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -143,17 +143,12 @@ fun UserInfo(userInfoViewModel: UserInfoViewModel, navController: NavController)
                             ) {
                                 Text("Я мастер")
                             }
-                        }
+                            if(user is UserTypes.IsCurrentMaster){
 
-                        is UserTypes.IsCurrentUser -> {
-                            Column(
-                                modifier = Modifier.fillMaxSize(),
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Center
-                            ) {
-                                Text("Я клиент")
                             }
                         }
+
+
 
                         is UserTypes.IsOtherMaster -> {
                             Column(
@@ -169,6 +164,7 @@ fun UserInfo(userInfoViewModel: UserInfoViewModel, navController: NavController)
                                 )
                             }
                         }
+
                     }
 
                 }
