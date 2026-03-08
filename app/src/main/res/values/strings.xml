@@ -60,10 +60,13 @@
     <string name="password">password</string>
     <string name="sign_up">Зарегистрироваться</string>
     <string name="to_sign_up">Регистрация</string>
+    <string name="resend_email">Запросить код повторно</string>
     <string name="input_email">Введите почту:</string>
     <string name="email_example">your_email@mail.ru</string>
     <string name="input_password">Введите пароль:</string>
     <string name="password_example">mypassword23213</string>
+    <string name="wrong_code">Неверный код подтверждения</string>
+    <string name="network_error">Ошибка сети</string>
 
     <string name="password_empty">Вы забыли ввести пароль</string>
     <string name="email_empty">Вы забыли ввести почту</string>

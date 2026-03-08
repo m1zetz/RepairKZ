@@ -43,87 +43,68 @@ import com.example.repairkz.ui.features.auth.signUp.SignUpViewModel
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun SignUpEmail(signUpViewModel: SignUpViewModel, navController: NavController){
-    val state by signUpViewModel.state.collectAsState()
-    val snackbarHostState = remember { SnackbarHostState() }
-    LaunchedEffect(Unit) {
-        signUpViewModel.channel.collect {effect ->
-            when(effect){
-                SignUpEffect.NavigateToConfirmation -> {
-                    navController.navigate(SIGN_UP_CODE)
-                }
-                is SignUpEffect.ShowSnackBar -> {
-                    snackbarHostState.showSnackbar(effect.message)
-                }
-            }
+    SignUpLayout(
+        signUpViewModel,
+        navController
+    ){ state ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(
+                8.dp,
+                alignment = Alignment.CenterVertically
+            )
 
-        }
-    }
-    Surface(
-        color = MaterialTheme.colorScheme.background,
-        modifier = Modifier.fillMaxSize()
-    ) {
-        Scaffold(
-            snackbarHost = {
-                SnackbarHost(snackbarHostState)
-            }
-        ){
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(8.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(
-                    8.dp,
-                    alignment = Alignment.CenterVertically
-                )
+        ) {
 
-            ) {
-
-                Text(
-                    stringResource(R.string.registration),
-                    fontSize = 24.sp
-                )
-                Spacer(modifier = Modifier.size(8.dp))
-                OutlinedTextField(
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    value = state.email,
-                    onValueChange = { newValue ->
-                        signUpViewModel.handleIntent(SignUpIntent.ChangeEmail(newValue))
-                    },
-                    shape = MaterialTheme.shapes.medium,
-                    placeholder = {
+            Text(
+                stringResource(R.string.registration),
+                fontSize = 24.sp
+            )
+            Spacer(modifier = Modifier.size(8.dp))
+            OutlinedTextField(
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                value = state.email,
+                onValueChange = { newValue ->
+                    signUpViewModel.handleIntent(SignUpIntent.ChangeEmail(newValue))
+                },
+                shape = MaterialTheme.shapes.medium,
+                placeholder = {
+                    Text(
+                        stringResource(R.string.email_example),
+                        style = TextStyle(color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f))
+                    )
+                },
+                leadingIcon = {
+                    Icon(Icons.Default.Email, null)
+                },
+                supportingText = {
+                    state.emailError?.let { stringResource ->
                         Text(
-                            stringResource(R.string.email_example),
-                            style = TextStyle(color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f))
+                            stringResource(stringResource),
+                            style = TextStyle(color = MaterialTheme.colorScheme.error)
                         )
-                    },
-                    leadingIcon = {
-                        Icon(Icons.Default.Email, null)
-                    },
-                    supportingText = {
-                        state.emailError?.let { stringResource ->
-                            Text(
-                                stringResource(stringResource),
-                                style = TextStyle(color = MaterialTheme.colorScheme.error)
-                            )
-                        }
-                    },
-                    isError = state.emailError != null
-                )
-                if(!state.isLoading){
-                    Button(
-                        modifier = Modifier.fillMaxWidth(),
-                        onClick = {
-                            signUpViewModel.handleIntent(SignUpIntent.SendEmail(state.email))
-                        }
-                    ) {
-                        Text(stringResource(R.string.get_code))
                     }
-                } else {
-                    CircularProgressIndicator()
+                },
+                isError = state.emailError != null
+            )
+            if(!state.isLoading){
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = {
+                        signUpViewModel.handleIntent(SignUpIntent.SendEmail(state.email))
+                    }
+                ) {
+                    Text(stringResource(R.string.get_code))
                 }
+            } else {
+                CircularProgressIndicator()
             }
         }
     }
+
+
 }
