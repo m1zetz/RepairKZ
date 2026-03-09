@@ -32,4 +32,12 @@ object Validator {
             else -> ValidationResult.Success
         }
     }
+
+    fun validateCode(code: String): ValidationResult {
+        return when {
+            code.isEmpty() -> ValidationResult.Error(R.string.code_empty)
+            else -> ValidationResult.Success
+        }
+    }
+
 }

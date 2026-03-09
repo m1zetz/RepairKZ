@@ -94,7 +94,15 @@ fun SignUpCode(signUpViewModel: SignUpViewModel, navController: NavController) {
                 leadingIcon = {
                     Icon(Icons.Default.Lock, null)
                 },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword)
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
+                supportingText = {
+                    state.codeError?.let { stringResource ->
+                        Text(
+                            stringResource(stringResource),
+                            style = TextStyle(color = MaterialTheme.colorScheme.error)
+                        )
+                    }
+                }
             )
             if (!state.isLoading) {
                 Button(

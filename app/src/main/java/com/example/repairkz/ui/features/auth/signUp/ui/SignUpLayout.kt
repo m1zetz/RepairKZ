@@ -32,6 +32,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.repairkz.Navigation.Routes.MAIN_WINDOW
 import com.example.repairkz.Navigation.Routes.SIGN_UP_CODE
 import com.example.repairkz.Navigation.Routes.SIGN_UP_DATA
 import com.example.repairkz.R
@@ -60,8 +61,12 @@ fun SignUpLayout(
                     snackbarHostState.showSnackbar(effect.message)
                 }
 
-                SignUpEffect.NavigateToFillingData -> {
+                is SignUpEffect.NavigateToFillingData -> {
                     navController.navigate(SIGN_UP_DATA)
+                }
+
+                is SignUpEffect.NavigateToMainWindow -> {
+                    navController.navigate(MAIN_WINDOW)
                 }
             }
 
