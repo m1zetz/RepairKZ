@@ -14,6 +14,11 @@ fun SignUpData(signUpViewModel: SignUpViewModel,navController: NavController){
         navController.navigate(SIGN_UP_EMAIL){
             popUpTo(SIGN_UP_EMAIL){inclusive = true}
         }
+    }
+    SignUpLayout(
+        signUpViewModel,
+        navController
+    ){ state ->
 
     }
 }

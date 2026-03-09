@@ -21,8 +21,8 @@ import javax.inject.Inject
 @HiltViewModel
 class SignUpViewModel @Inject constructor(
     private val getCodeUseCase: GetCodeUseCase,
-    private val sendCodeUseCase: SendCodeUseCase
-)  : ViewModel() {
+    private val sendCodeUseCase: SendCodeUseCase,
+) : ViewModel() {
     private val _uiState = MutableStateFlow(SignUpState())
     val state = _uiState.asStateFlow()
 
@@ -30,7 +30,7 @@ class SignUpViewModel @Inject constructor(
     val channel = _channel.receiveAsFlow()
 
     private var timerJob: Job? = null
-    private fun validationEmail(email:String) : Boolean{
+    private fun validationEmail(email: String): Boolean {
         var newState = _uiState.value.copy(emailError = null)
 
         val checkEmail = Validator.validateEmail(email)
@@ -39,24 +39,38 @@ class SignUpViewModel @Inject constructor(
         newState = newState.copy(
             emailError = (checkEmail as? ValidationResult.Error)?.messageRes,
 
-        )
+            )
         _uiState.value = newState
         return checkEmail is ValidationResult.Success
     }
 
-    fun handleIntent(intent: SignUpIntent){
-        when(intent){
+    private fun validationCode(code: String): Boolean {
+        var newState = _uiState.value.copy(codeError = null)
+
+        val checkCode = Validator.validateCode(code)
+
+        newState = newState.copy(
+            codeError = (checkCode as? ValidationResult.Error)?.messageRes
+        )
+        _uiState.value = newState
+        return checkCode is ValidationResult.Success
+    }
+
+    fun handleIntent(intent: SignUpIntent) {
+        when (intent) {
             is SignUpIntent.ChangeEmail -> {
                 _uiState.value = _uiState.value.copy(email = intent.emailChar, emailError = null)
             }
+
             is SignUpIntent.ChangeCode -> {
-                if(intent.codeChar.length <= 6){
-                    _uiState.value = _uiState.value.copy(code = intent.codeChar)
+                if (intent.codeChar.length <= 6) {
+                    _uiState.value = _uiState.value.copy(code = intent.codeChar, codeError = null)
                 }
             }
+
             is SignUpIntent.SendEmail -> {
                 val isValid = validationEmail(_uiState.value.email)
-                if(isValid){
+                if (isValid) {
                     viewModelScope.launch {
                         _uiState.value = _uiState.value.copy(
                             isLoading = true,
@@ -66,35 +80,38 @@ class SignUpViewModel @Inject constructor(
                         response.onSuccess {
                             _channel.send(NavigateToConfirmation)
                             timer()
-                        }.onFailure {error ->
-                            _channel.send(ShowSnackBar(error.message?: "Ошибка сети"))
+                        }.onFailure { error ->
+                            _channel.send(ShowSnackBar(error.message ?: "Ошибка сети"))
+                        }
+                        _uiState.value = _uiState.value.copy(
+                            isLoading = false
+                        )
+                    }
+                }
+            }
+
+            is SignUpIntent.SendCode -> {
+                val isValid = validationCode(_uiState.value.code)
+                if (isValid) {
+                    viewModelScope.launch {
+                        _uiState.value = _uiState.value.copy(
+                            isLoading = true
+                        )
+                        delay(3000)
+                        val code = intent.code.toInt()
+                        val response = sendCodeUseCase(code, _uiState.value.email)
+                        response.onSuccess {
+                            _channel.send(NavigateToFillingData)
+                        }.onFailure { error ->
+                            _channel.send(ShowSnackBar(error.message ?: "Ошибка сети"))
                         }
                         _uiState.value = _uiState.value.copy(
                             isLoading = false
                         )
 
                     }
-
                 }
-            }
 
-            is SignUpIntent.SendCode -> {
-                viewModelScope.launch {
-                    _uiState.value = _uiState.value.copy(
-                        isLoading = true
-                    )
-                    val code = intent.code.toInt()
-                    val response = sendCodeUseCase(code, _uiState.value.email)
-                    response.onSuccess {
-                        _channel.send(NavigateToFillingData)
-                    }.onFailure {error ->
-                        _channel.send(ShowSnackBar(error.message?: "Ошибка сети"))
-                    }
-                    _uiState.value = _uiState.value.copy(
-                        isLoading = false
-                    )
-
-                }
             }
 
             SignUpIntent.ResetRegistrationData -> {
@@ -107,14 +124,14 @@ class SignUpViewModel @Inject constructor(
         }
     }
 
-    fun timer(){
+    fun timer() {
         _uiState.update { it.copy(timerSeconds = 8) }
         timerJob?.cancel()
         timerJob = viewModelScope.launch {
-            while (_uiState.value.timerSeconds > 0){
+            while (_uiState.value.timerSeconds > 0) {
                 delay(1000)
                 _uiState.update {
-                    it.copy(timerSeconds = it.timerSeconds-1)
+                    it.copy(timerSeconds = it.timerSeconds - 1)
                 }
             }
         }

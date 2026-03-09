@@ -70,6 +70,7 @@
 
     <string name="password_empty">Вы забыли ввести пароль</string>
     <string name="email_empty">Вы забыли ввести почту</string>
+    <string name="code_empty">Вы забыли ввести код</string>
     <string name="email_invalid_format">Недопустимый формат почты</string>
     <string name="short_password">Пароль должен содержать больше 6 символов</string>
     <string name="no_numbers">Пароль должен содержать цифры</string>
