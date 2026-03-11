@@ -1,7 +1,6 @@
 package com.example.RepairKZ_Backend.service
 
 import com.example.RepairKZ_Backend.common.PHOTO_DIRECTORY
-import com.example.RepairKZ_Backend.repository.FileRepository
 import org.springframework.stereotype.Service
 import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.multipart.MultipartFile

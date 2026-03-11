@@ -17,13 +17,10 @@ data class User(
     val userPhotoUrl: String? = null,
 
     @Column(nullable = false)
-    var name: String,
+    var firstName: String,
 
     @Column(nullable = false)
     val lastName: String,
-
-    @Column(nullable = false, unique = true)
-    val email: String,
 
     @Column(nullable = false)
     val phoneNumber: String,
@@ -33,5 +30,12 @@ data class User(
 
     @Column(nullable = false)
     val city: String,
+
+    @Column(nullable = false, unique = true)
+    val email: String,
+
+    @Column(nullable = false)
+    val password: String
+
 
 )
