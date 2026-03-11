@@ -27,13 +27,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.repairkz.R
+import com.example.repairkz.common.ui.UserPhoto
 import com.example.repairkz.ui.features.UserInfo.CommonInfo
 import com.example.repairkz.ui.features.UserInfo.UserIntent
 
 @Composable
 fun Cap(
     commonInfo: CommonInfo,
-    changeAvatarIntent: (UserIntent) -> Unit
+    changeAvatarIntent: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -57,25 +58,12 @@ fun Cap(
                     modifier = Modifier.size(140.dp),
                     contentAlignment = Alignment.BottomEnd
                 ){
-                    AsyncImage(
-                        model = commonInfo.photoUrl.ifEmpty { R.drawable.ic_launcher_background },
-                        contentDescription = "UserPhoto",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .clip(CircleShape)
+                    UserPhoto(
+                        commonInfo.photoUrl,
+                        commonInfo.isMe,
+                        {changeAvatarIntent()}
                     )
-                    if(commonInfo.isMe){
-                        IconButton(
-                            onClick = {changeAvatarIntent(UserIntent.OpenSheet)}
-                        ) {
-                            Icon(
-                                Icons.Outlined.CameraAlt,
-                                null,
-                                modifier = Modifier.size(40.dp)
-                            )
-                        }
-                    }
+
                 }
 
 

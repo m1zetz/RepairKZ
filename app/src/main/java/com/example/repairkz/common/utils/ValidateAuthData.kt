@@ -40,4 +40,18 @@ object Validator {
         }
     }
 
+    fun validateFirstName(firstName: String): ValidationResult {
+        return when {
+            firstName.isEmpty() -> ValidationResult.Error(R.string.field_empty)
+            else -> ValidationResult.Success
+        }
+    }
+
+    fun validateLastName(lastName: String): ValidationResult {
+        return when {
+            lastName.isEmpty() -> ValidationResult.Error(R.string.field_empty)
+            else -> ValidationResult.Success
+        }
+    }
+
 }

@@ -1,11 +1,17 @@
 package com.example.repairkz.ui.features.auth.signUp
 
+import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.repairkz.common.utils.ValidationResult
 import com.example.repairkz.common.utils.Validator
 import com.example.repairkz.domain.useCases.registration.GetCodeUseCase
 import com.example.repairkz.domain.useCases.registration.SendCodeUseCase
+import com.example.repairkz.ui.features.CameraX.CameraCapable
+import com.example.repairkz.ui.features.UserInfo.UserEffects
+import com.example.repairkz.ui.features.UserInfo.UserEffects.OpenPhotoPicker
+import com.example.repairkz.ui.features.UserInfo.UserState
 import com.example.repairkz.ui.features.auth.signUp.SignUpEffect.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -17,16 +23,17 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.compareTo
 
 @HiltViewModel
 class SignUpViewModel @Inject constructor(
     private val getCodeUseCase: GetCodeUseCase,
     private val sendCodeUseCase: SendCodeUseCase,
-) : ViewModel() {
+) : ViewModel(), CameraCapable {
     private val _uiState = MutableStateFlow(SignUpState())
     val state = _uiState.asStateFlow()
 
-    private val _channel = Channel<SignUpEffect>(Channel.BUFFERED)
+    private val _channel = Channel<SignUpEffect>(Channel.CONFLATED)
     val channel = _channel.receiveAsFlow()
 
     private var timerJob: Job? = null
@@ -54,6 +61,39 @@ class SignUpViewModel @Inject constructor(
         )
         _uiState.value = newState
         return checkCode is ValidationResult.Success
+    }
+
+    private fun validationFirstName(firstName: String): Boolean {
+        var newState =
+            _uiState.value.copy(userInfo = _uiState.value.userInfo.copy(firstNameError = null))
+
+        val checkFirstName = Validator.validateFirstName(firstName)
+
+        newState = newState.copy(
+            userInfo = newState.userInfo.copy(
+                firstNameError = (checkFirstName as? ValidationResult.Error)?.messageRes
+            )
+        )
+
+        _uiState.value = newState
+
+        return checkFirstName is ValidationResult.Success
+    }
+
+    private fun validationLastName(lastName: String): Boolean {
+        var newState =
+            _uiState.value.copy(userInfo = _uiState.value.userInfo.copy(lastNameError = null))
+
+        val checkLastName = Validator.validateLastName(lastName)
+
+        newState = newState.copy(
+            userInfo = newState.userInfo.copy(
+                lastNameError = (checkLastName as? ValidationResult.Error)?.messageRes
+            )
+        )
+        _uiState.value = newState
+
+        return checkLastName is ValidationResult.Success
     }
 
     fun handleIntent(intent: SignUpIntent) {
@@ -121,9 +161,79 @@ class SignUpViewModel @Inject constructor(
                     error = null
                 )
             }
+
+            is SignUpIntent.ChangeFirstName -> {
+                _uiState.value = _uiState.value.copy(
+                    userInfo = _uiState.value.userInfo.copy(
+                        firstName = intent.firstName,
+                        firstNameError = null
+                    )
+                )
+            }
+
+            is SignUpIntent.ChangeLastName -> {
+                _uiState.value = _uiState.value.copy(
+                    userInfo = _uiState.value.userInfo.copy(
+                        lastName = intent.lastName,
+                        lastNameError = null
+                    )
+                )
+            }
+
+            SignUpIntent.NavigateToMainWindow -> {
+                val isFirstNameValid = validationFirstName(_uiState.value.userInfo.firstName)
+                val isLastNameValid = validationLastName(_uiState.value.userInfo.lastName)
+                if (isFirstNameValid && isLastNameValid) {
+                    //отправка на бд
+                    viewModelScope.launch {
+                        _channel.send(NavigateToMainWindow)
+                    }
+                }
+
+            }
+
+            is SignUpIntent.ChangeAvatar -> {
+                viewModelScope.launch {
+                    _channel.send(SignUpEffect.OpenPhotoPicker(intent.typeOfSelect))
+                }
+            }
+
+            SignUpIntent.CloseSheet -> {
+                _uiState.update {
+                    it.copy(
+                        avatarSheetState = false
+                    )
+                }
+            }
+
+            SignUpIntent.OpenSheet -> {
+                _uiState.update {
+                    it.copy(
+                        avatarSheetState = true
+                    )
+                }
+            }
+
+            is SignUpIntent.GetPhotoFromMedia -> {
+                _uiState.value = _uiState.value.copy(
+                    userInfo = _uiState.value.userInfo.copy(
+                        photoUri = intent.uri
+                    )
+                )
+                viewModelScope.launch {
+                    _channel.send(NavigateToPreview)
+                }
+            }
+
+            is SignUpIntent.SelectedPhoto -> {
+                _uiState.value = _uiState.value.copy(
+                    userInfo = _uiState.value.userInfo.copy(
+                        photoUri = intent.uri
+                    )
+                )
+            }
         }
     }
-
     fun timer() {
         _uiState.update { it.copy(timerSeconds = 8) }
         timerJob?.cancel()
@@ -139,5 +249,15 @@ class SignUpViewModel @Inject constructor(
 
     }
 
+    override fun onPhotoSelected(uri: Uri) {
+        handleIntent(SignUpIntent.SelectedPhoto(uri))
+    }
 
+    override fun getPreviewUri(): Uri? {
+        return _uiState.value.userInfo.photoUri
+    }
 }
+
+
+
+
