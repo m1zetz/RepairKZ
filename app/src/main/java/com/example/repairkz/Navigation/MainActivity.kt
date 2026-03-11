@@ -10,16 +10,21 @@ import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.repairkz.Navigation.Routes.PROFILE_GROUP
 import com.example.repairkz.Navigation.profile.profileGraph
+
 import com.example.repairkz.Navigation.registration.registrationGraph
 
 import com.example.repairkz.ui.MainWindow
+import com.example.repairkz.ui.features.UserInfo.UserInfo
+import com.example.repairkz.ui.features.UserInfo.UserInfoViewModel
 import com.example.repairkz.ui.features.search.SearchScreen
 import com.example.repairkz.ui.theme.RepairkzTheme
 import com.example.repairkz.ui.features.main.MainViewModel
@@ -54,11 +59,12 @@ class MainActivity : ComponentActivity() {
                         navController = navController,
                         startDestination = Routes.REG_GROUP
                     ) {
+                        registrationGraph(navController)
+                        profileGraph(navController)
                         composable(Routes.SIGN_IN){
                             val signInViewModel: SignInViewModel = hiltViewModel()
                             SignIn(signInViewModel,navController)
                         }
-                        registrationGraph(navController)
                         composable(Routes.MAIN_WINDOW) {
                             val mainViewModel: MainViewModel = hiltViewModel()
                             val notificationViewModel: NotificationViewModel = hiltViewModel()
@@ -82,7 +88,7 @@ class MainActivity : ComponentActivity() {
                             val searchViewModel: SearchViewModel = hiltViewModel()
                             SearchScreen(navController, searchViewModel)
                         }
-                        profileGraph(navController)
+
 
                     }
                 }
