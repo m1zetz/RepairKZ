@@ -9,6 +9,7 @@ import com.example.repairkz.domain.useCases.files.SaveToInternalUseCase
 import com.example.repairkz.domain.useCases.userData.GetProfileTypeUseCase
 import com.example.repairkz.domain.useCases.userData.GetUserDataUseCase
 import com.example.repairkz.domain.useCases.userData.UpdateUserDataUseCase
+import com.example.repairkz.ui.features.CameraX.CameraCapable
 import com.example.repairkz.ui.features.UserInfo.UserEffects.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
@@ -26,7 +27,7 @@ class UserInfoViewModel @Inject constructor(
     private val getProfileTypeUseCase: GetProfileTypeUseCase,
     private val updateUserDataUseCase: UpdateUserDataUseCase,
     private val saveToInternalUseCase: SaveToInternalUseCase
-) : ViewModel() {
+) : ViewModel(), CameraCapable {
 
 
     private val _uiState = MutableStateFlow<UserState>(UserState.Loading)
@@ -64,7 +65,6 @@ class UserInfoViewModel @Inject constructor(
             }
 
             is UserIntent.SelectedPhoto -> {
-
                 saveAvatar(intent.uri)
             }
 
@@ -90,13 +90,14 @@ class UserInfoViewModel @Inject constructor(
             }
 
             is UserIntent.GetPhotoFromMedia -> {
-                if (_uiState.value is UserState.Success){
-
-                }
                 _uiState.update { state ->
                     if(state is UserState.Success) state.copy(
                         newAvatarData = intent.uri) else state
                 }
+                viewModelScope.launch {
+                    _channel.send(UserEffects.MapsToPreview)
+                }
+
             }
         }
 
@@ -110,7 +111,6 @@ class UserInfoViewModel @Inject constructor(
                 if(state is UserState.Success) state.copy(
                     newAvatarData = uri) else state
             }
-            _channel.send(NavigateToPreview)
             getUserDataUseCase().onSuccess { user ->
                 val newUser = user.copy(
                     userPhotoUrl = internalUri.toString()
@@ -141,6 +141,19 @@ class UserInfoViewModel @Inject constructor(
             )
         }
 
+    }
+
+    override fun onPhotoSelected(uri: Uri) {
+        handleIntent(UserIntent.SelectedPhoto(uri))
+    }
+
+    override fun getPreviewUri(): Uri? {
+        val currentState = uiState.value
+        return if (currentState is UserState.Success) {
+            currentState.newAvatarData
+        } else {
+            null
+        }
     }
 }
 

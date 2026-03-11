@@ -10,6 +10,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.example.repairkz.Navigation.Routes
 import com.example.repairkz.Navigation.Routes.PROFILE_GROUP
+import com.example.repairkz.Navigation.photoGraph
 import com.example.repairkz.ui.features.CameraX.Camera
 import com.example.repairkz.ui.features.CameraX.PhotoPreview
 import com.example.repairkz.ui.features.UserInfo.UserInfo
@@ -35,58 +36,12 @@ fun NavGraphBuilder.profileGraph(navController: NavController){
 
             UserInfo(userInfoViewModel, navController)
         }
-        composable(Routes.CAMERA) {nbse ->
-            val parrentEntry = remember(nbse) {
-                navController.getBackStackEntry(PROFILE_GROUP)
-            }
-            val userInfoViewModel: UserInfoViewModel = hiltViewModel(parrentEntry)
-            val context = LocalContext.current
-            Camera(
-                context = context,
-                takeNewPhoto = { uri ->
-                    uri?.let {
-                        userInfoViewModel.handleIntent(
-                            UserIntent.SelectedPhoto(it)
-                        )
-                        navController.popBackStack()
-                    }
-
-                }
-            )
-        }
-        composable(Routes.PHOTO_PREVIEW) {it
-            val context = LocalContext.current
-            val parentEntry = remember(it) {
-                try {
-                    navController.getBackStackEntry(PROFILE_GROUP)
-                } catch (e: Exception) {
-                    it
-                }
-            }
-            val userInfoViewModel: UserInfoViewModel = hiltViewModel(parentEntry)
-            val state = userInfoViewModel.uiState.collectAsState()
-
-            val currentState = state.value
-            if (currentState is UserState.Success) {
-                val uri = currentState.newAvatarData
-                uri?.let{ nonNullUri ->
-                    PhotoPreview(
-                        context,
-                        uri = nonNullUri,
-                        onDismissRequest = {
-                            navController.popBackStack()
-                        },
-                    ) { uri ->
-                        userInfoViewModel.handleIntent(
-                            UserIntent.SelectedPhoto(
-                                uri,
-                            )
-                        )
-
-                    }
-                }
-            }
-        }
+        photoGraph(
+            navController = navController,
+            parentRoute = PROFILE_GROUP,
+            route = Routes.PROFILE_PHOTO_GROUP,
+            getViewModel = { parentEntry -> hiltViewModel<UserInfoViewModel>(parentEntry) }
+        )
 
     }
 }

@@ -8,6 +8,8 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -47,41 +49,44 @@ class MainActivity : ComponentActivity() {
 
             RepairkzTheme {
                 val navController = rememberNavController()
-                NavHost(
-                    navController = navController,
-                    startDestination = Routes.SIGN_IN
-                ) {
-                    composable(Routes.SIGN_IN){
-                        val signInViewModel: SignInViewModel = hiltViewModel()
-                        SignIn(signInViewModel,navController)
-                    }
-                    registrationGraph(navController)
-                    composable(Routes.MAIN_WINDOW) {
-                        val mainViewModel: MainViewModel = hiltViewModel()
-                        val notificationViewModel: NotificationViewModel = hiltViewModel()
-                        val settingsViewModel: SettingsViewModel = hiltViewModel()
-                        MainWindow(
-                            mainViewModel,
-                            navController,
-                            notificationViewModel,
-                            settingsViewModel
-                        )
-                    }
-                    composable(
-                        route = "${Routes.SEARCH}?pattern={pattern}",
-                        arguments = listOf(
-                            navArgument("pattern") {
-                                type = NavType.IntType
-                                defaultValue = 0
-                            }
-                        )
+                Surface(color = MaterialTheme.colorScheme.background){
+                    NavHost(
+                        navController = navController,
+                        startDestination = Routes.REG_GROUP
                     ) {
-                        val searchViewModel: SearchViewModel = hiltViewModel()
-                        SearchScreen(navController, searchViewModel)
-                    }
-                    profileGraph(navController)
+                        composable(Routes.SIGN_IN){
+                            val signInViewModel: SignInViewModel = hiltViewModel()
+                            SignIn(signInViewModel,navController)
+                        }
+                        registrationGraph(navController)
+                        composable(Routes.MAIN_WINDOW) {
+                            val mainViewModel: MainViewModel = hiltViewModel()
+                            val notificationViewModel: NotificationViewModel = hiltViewModel()
+                            val settingsViewModel: SettingsViewModel = hiltViewModel()
+                            MainWindow(
+                                mainViewModel,
+                                navController,
+                                notificationViewModel,
+                                settingsViewModel
+                            )
+                        }
+                        composable(
+                            route = "${Routes.SEARCH}?pattern={pattern}",
+                            arguments = listOf(
+                                navArgument("pattern") {
+                                    type = NavType.IntType
+                                    defaultValue = 0
+                                }
+                            )
+                        ) {
+                            val searchViewModel: SearchViewModel = hiltViewModel()
+                            SearchScreen(navController, searchViewModel)
+                        }
+                        profileGraph(navController)
 
+                    }
                 }
+
             }
         }
     }

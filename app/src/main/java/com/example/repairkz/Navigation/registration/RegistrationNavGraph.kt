@@ -14,6 +14,7 @@ import com.example.repairkz.Navigation.Routes.REG_GROUP
 import com.example.repairkz.Navigation.Routes.SIGN_UP_CODE
 import com.example.repairkz.Navigation.Routes.SIGN_UP_DATA
 import com.example.repairkz.Navigation.Routes.SIGN_UP_EMAIL
+import com.example.repairkz.Navigation.photoGraph
 import com.example.repairkz.ui.features.CameraX.Camera
 import com.example.repairkz.ui.features.CameraX.PhotoPreview
 import com.example.repairkz.ui.features.UserInfo.UserInfo
@@ -27,7 +28,7 @@ import com.example.repairkz.ui.features.auth.signUp.ui.SignUpEmail
 
 fun NavGraphBuilder.registrationGraph(navController: NavController){
     navigation(
-        startDestination = SIGN_UP_EMAIL,
+        startDestination = SIGN_UP_DATA,
         route = REG_GROUP
     ) {
         composable(
@@ -59,6 +60,11 @@ fun NavGraphBuilder.registrationGraph(navController: NavController){
             SignUpData(signUpViewModel,navController)
 
         }
-
     }
+    photoGraph(
+        navController = navController,
+        parentRoute = REG_GROUP,
+        route = Routes.REG_PHOTO_GROUP,
+        getViewModel = { parentEntry -> hiltViewModel<SignUpViewModel>(parentEntry) }
+    )
 }

@@ -22,7 +22,6 @@ data class CommonInfo(
     val firstName: String,
     val lastName: String,
     val isMe: Boolean,
-
     )
 
 sealed class UserTypes {
@@ -52,7 +51,7 @@ sealed class UserIntent {
 }
 
 sealed interface UserEffects {
-    object NavigateToPreview: UserEffects
+    object MapsToPreview: UserEffects
 
     data class OpenPhotoPicker(val typeOfSelect: PhotoSourceEnum) : UserEffects
 }

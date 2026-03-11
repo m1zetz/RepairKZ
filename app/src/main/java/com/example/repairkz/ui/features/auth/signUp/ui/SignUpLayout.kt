@@ -27,15 +27,20 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.repairkz.Navigation.Routes
 import com.example.repairkz.Navigation.Routes.MAIN_WINDOW
 import com.example.repairkz.Navigation.Routes.SIGN_UP_CODE
 import com.example.repairkz.Navigation.Routes.SIGN_UP_DATA
 import com.example.repairkz.R
+import com.example.repairkz.common.enums.PhotoSourceEnum
+import com.example.repairkz.common.handlers.photoPickerHandler
+import com.example.repairkz.ui.features.UserInfo.UserIntent
 import com.example.repairkz.ui.features.auth.signUp.SignUpEffect
 import com.example.repairkz.ui.features.auth.signUp.SignUpIntent
 import com.example.repairkz.ui.features.auth.signUp.SignUpState
@@ -48,15 +53,26 @@ fun SignUpLayout(
     navController: NavController,
     content: @Composable (SignUpState) -> Unit,
 ) {
+    val context = LocalContext.current
     val state by signUpViewModel.state.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
+
+    val action = photoPickerHandler(
+        getPhotoFromMedia = { uri ->
+            if (uri!= null)
+                signUpViewModel.handleIntent(SignUpIntent.GetPhotoFromMedia(uri))
+        },
+        navController = navController,
+        context = context
+    )
+
     LaunchedEffect(Unit) {
         signUpViewModel.channel.collect { effect ->
+            val currentRoute = navController.currentBackStackEntry?.destination?.route
             when (effect) {
                 SignUpEffect.NavigateToConfirmation -> {
                     navController.navigate(SIGN_UP_CODE)
                 }
-
                 is SignUpEffect.ShowSnackBar -> {
                     snackbarHostState.showSnackbar(effect.message)
                 }
@@ -67,6 +83,21 @@ fun SignUpLayout(
 
                 is SignUpEffect.NavigateToMainWindow -> {
                     navController.navigate(MAIN_WINDOW)
+                }
+
+                is SignUpEffect.OpenPhotoPicker -> {
+                    if (currentRoute != Routes.CAMERA && currentRoute != Routes.PHOTO_PREVIEW) {
+                        when (effect.typeOfSelect) {
+                            PhotoSourceEnum.CAMERA -> action.launchCamera()
+                            PhotoSourceEnum.GALLERY -> action.launchGallery()
+                        }
+                    }
+                }
+
+                SignUpEffect.NavigateToPreview -> {
+                    if (currentRoute != Routes.PHOTO_PREVIEW) {
+                        navController.navigate(Routes.PHOTO_PREVIEW)
+                    }
                 }
             }
 

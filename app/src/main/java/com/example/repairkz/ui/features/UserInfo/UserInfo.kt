@@ -29,74 +29,51 @@ import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import com.example.repairkz.Navigation.Routes
 import com.example.repairkz.common.enums.PhotoSourceEnum
+import com.example.repairkz.common.handlers.photoPickerHandler
+import com.example.repairkz.common.ui.PhotoSourceBottomSheet
 import com.example.repairkz.common.ui.StandartString
 import com.example.repairkz.ui.features.profile.common.Cap
 import com.example.repairkz.ui.features.profile.master.MasterBar
 
-private val CAMERAX_PERMISSIONS = arrayOf(
-    Manifest.permission.CAMERA,
-)
 
-private fun hasRequiredPermissions(context: Context): Boolean {
-    return CAMERAX_PERMISSIONS.all {
-        ContextCompat.checkSelfPermission(
-            context,
-            it
-        ) == PackageManager.PERMISSION_GRANTED
-    }
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserInfo(userInfoViewModel: UserInfoViewModel, navController: NavController) {
     val context = LocalContext.current
-    val sheetState = rememberModalBottomSheetState()
     val uiState = userInfoViewModel.uiState.collectAsState()
 
-    val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {
-
-    }
-
-    val mediaLauncher =
-        rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) {
-            if (it!= null){
-                userInfoViewModel.handleIntent(UserIntent.GetPhotoFromMedia(uri = it))
-                navController.navigate(Routes.PHOTO_PREVIEW)
-            }
-
-        }
-
+    val action = photoPickerHandler(
+        getPhotoFromMedia = {uri ->
+            if (uri!= null)
+            userInfoViewModel.handleIntent(UserIntent.GetPhotoFromMedia(uri))
+        },
+        navController = navController,
+        context = context
+    )
 
     LaunchedEffect(userInfoViewModel) {
         userInfoViewModel.channel.collect { effect ->
             when (effect) {
                 is UserEffects.OpenPhotoPicker -> {
                     when (effect.typeOfSelect) {
-
                         PhotoSourceEnum.CAMERA -> {
-                            if (hasRequiredPermissions(context)){
-                                navController.navigate(Routes.CAMERA)
-                            }else{
-                                permissionLauncher.launch(
-                                    CAMERAX_PERMISSIONS[0]
-                                )
-                            }
+                            action.launchCamera()
                         }
                         PhotoSourceEnum.GALLERY -> {
-                            mediaLauncher.launch(
-                                PickVisualMediaRequest(mediaType = ActivityResultContracts.PickVisualMedia.ImageOnly, )
-                            )
+                            action.launchGallery()
                         }
                     }
 
                 }
-
-                UserEffects.NavigateToPreview -> {
-
+                UserEffects.MapsToPreview -> {
+                    navController.navigate(Routes.PHOTO_PREVIEW)
                 }
             }
         }
     }
+
+
 
 
 
@@ -133,7 +110,7 @@ fun UserInfo(userInfoViewModel: UserInfoViewModel, navController: NavController)
                 ) {
                     Cap(
                         commonInfo = user.commonInfo,
-                        changeAvatarIntent = { intent -> userInfoViewModel.handleIntent(intent) })
+                        changeAvatarIntent = {userInfoViewModel.handleIntent(UserIntent.OpenSheet)})
                     when (user) {
                         is UserTypes.IsCurrentUser, is UserTypes.IsCurrentMaster -> {
                             Column(
@@ -170,35 +147,25 @@ fun UserInfo(userInfoViewModel: UserInfoViewModel, navController: NavController)
                 }
             }
             if (state.avatarSheetState) {
-                ModalBottomSheet(
-                    onDismissRequest = {
+                PhotoSourceBottomSheet(
+                    closeSheet = {
                         userInfoViewModel.handleIntent(UserIntent.CloseSheet)
                     },
-                    sheetState = sheetState
-                ) {
-                    StandartString(
-                        R.string.from_camera,
-                        intent = {
-                            userInfoViewModel.handleIntent(
-                                UserIntent.ChangeAvatar(
-                                    PhotoSourceEnum.CAMERA
-                                )
+                    fromCamera = {
+                        userInfoViewModel.handleIntent(
+                            UserIntent.ChangeAvatar(
+                                PhotoSourceEnum.CAMERA
                             )
-                        },
-                        icon = Icons.Default.Camera
-                    )
-                    StandartString(
-                        R.string.from_gallery,
-                        intent = {
-                            userInfoViewModel.handleIntent(
-                                UserIntent.ChangeAvatar(
-                                    PhotoSourceEnum.GALLERY
-                                )
+                        )
+                    },
+                    fromGallery = {
+                        userInfoViewModel.handleIntent(
+                            UserIntent.ChangeAvatar(
+                                PhotoSourceEnum.GALLERY
                             )
-                        },
-                        icon = Icons.Default.PermMedia
-                    )
-                }
+                        )
+                    }
+                )
             }
         }
     }
