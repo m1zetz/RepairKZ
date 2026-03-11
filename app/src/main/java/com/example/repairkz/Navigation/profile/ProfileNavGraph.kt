@@ -1,5 +1,6 @@
 package com.example.repairkz.Navigation.profile
 
+import android.annotation.SuppressLint
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
@@ -18,6 +19,7 @@ import com.example.repairkz.ui.features.UserInfo.UserInfoViewModel
 import com.example.repairkz.ui.features.UserInfo.UserIntent
 import com.example.repairkz.ui.features.UserInfo.UserState
 
+@SuppressLint("UnrememberedGetBackStackEntry")
 fun NavGraphBuilder.profileGraph(navController: NavController){
     navigation(
         startDestination = "${Routes.USERINFO}?userId={userId}",
@@ -38,9 +40,10 @@ fun NavGraphBuilder.profileGraph(navController: NavController){
         }
         photoGraph(
             navController = navController,
-            parentRoute = PROFILE_GROUP,
-            route = Routes.PROFILE_PHOTO_GROUP,
-            getViewModel = { parentEntry -> hiltViewModel<UserInfoViewModel>(parentEntry) }
+            getViewModel = {
+                val entry = navController.getBackStackEntry(PROFILE_GROUP)
+                hiltViewModel<UserInfoViewModel>(entry)
+            }
         )
 
     }

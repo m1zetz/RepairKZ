@@ -1,5 +1,6 @@
 package com.example.repairkz.Navigation.registration
 
+import android.annotation.SuppressLint
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
@@ -26,11 +27,12 @@ import com.example.repairkz.ui.features.auth.signUp.ui.SignUpCode
 import com.example.repairkz.ui.features.auth.signUp.ui.SignUpData
 import com.example.repairkz.ui.features.auth.signUp.ui.SignUpEmail
 
+@SuppressLint("UnrememberedGetBackStackEntry")
 fun NavGraphBuilder.registrationGraph(navController: NavController){
     navigation(
         startDestination = SIGN_UP_DATA,
         route = REG_GROUP
-    ) {
+    ){
         composable(
             route = SIGN_UP_EMAIL
         ) { nbse ->
@@ -60,11 +62,14 @@ fun NavGraphBuilder.registrationGraph(navController: NavController){
             SignUpData(signUpViewModel,navController)
 
         }
+        photoGraph(
+            navController = navController,
+            getViewModel = {
+                val entry = navController.getBackStackEntry(REG_GROUP)
+                hiltViewModel<SignUpViewModel>(entry)
+            }
+        )
     }
-    photoGraph(
-        navController = navController,
-        parentRoute = REG_GROUP,
-        route = Routes.REG_PHOTO_GROUP,
-        getViewModel = { parentEntry -> hiltViewModel<SignUpViewModel>(parentEntry) }
-    )
+
+
 }

@@ -3,9 +3,11 @@ package com.example.repairkz.ui.features.auth.signUp.ui
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material3.Button
@@ -65,6 +67,7 @@ fun SignUpData(signUpViewModel: SignUpViewModel, navController: NavController) {
                     signUpViewModel.handleIntent(SignUpIntent.OpenSheet)
                 }
             )
+            Spacer(modifier = Modifier.size(8.dp))
             SignTextField(
                 state.userInfo.firstName,
                 { newValue ->
