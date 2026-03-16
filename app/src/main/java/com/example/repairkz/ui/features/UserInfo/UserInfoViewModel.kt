@@ -9,7 +9,6 @@ import com.example.repairkz.domain.useCases.files.SaveToInternalUseCase
 import com.example.repairkz.domain.useCases.userData.GetProfileTypeUseCase
 import com.example.repairkz.domain.useCases.userData.GetUserDataUseCase
 import com.example.repairkz.domain.useCases.userData.UpdateUserDataUseCase
-import com.example.repairkz.ui.features.CameraX.CameraCapable
 import com.example.repairkz.ui.features.UserInfo.UserEffects.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
@@ -27,7 +26,7 @@ class UserInfoViewModel @Inject constructor(
     private val getProfileTypeUseCase: GetProfileTypeUseCase,
     private val updateUserDataUseCase: UpdateUserDataUseCase,
     private val saveToInternalUseCase: SaveToInternalUseCase
-) : ViewModel(), CameraCapable {
+) : ViewModel() {
 
 
     private val _uiState = MutableStateFlow<UserState>(UserState.Loading)
@@ -143,17 +142,5 @@ class UserInfoViewModel @Inject constructor(
 
     }
 
-    override fun onPhotoSelected(uri: Uri) {
-        handleIntent(UserIntent.SelectedPhoto(uri))
-    }
-
-    override fun getPreviewUri(): Uri? {
-        val currentState = uiState.value
-        return if (currentState is UserState.Success) {
-            currentState.newAvatarData
-        } else {
-            null
-        }
-    }
 }
 

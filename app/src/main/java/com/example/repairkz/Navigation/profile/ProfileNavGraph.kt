@@ -38,13 +38,7 @@ fun NavGraphBuilder.profileGraph(navController: NavController){
 
             UserInfo(userInfoViewModel, navController)
         }
-        photoGraph(
-            navController = navController,
-            getViewModel = {
-                val entry = navController.getBackStackEntry(PROFILE_GROUP)
-                hiltViewModel<UserInfoViewModel>(entry)
-            }
-        )
+
 
     }
 }

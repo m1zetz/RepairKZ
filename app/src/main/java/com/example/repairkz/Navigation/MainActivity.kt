@@ -60,7 +60,8 @@ class MainActivity : ComponentActivity() {
                         startDestination = Routes.REG_GROUP
                     ) {
                         registrationGraph(navController)
-                        profileGraph(navController)
+//                        profileGraph(navController)
+                        photoGraph(navController)
                         composable(Routes.SIGN_IN){
                             val signInViewModel: SignInViewModel = hiltViewModel()
                             SignIn(signInViewModel,navController)

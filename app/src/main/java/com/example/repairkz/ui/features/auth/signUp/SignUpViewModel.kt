@@ -6,9 +6,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.repairkz.common.utils.ValidationResult
 import com.example.repairkz.common.utils.Validator
+import com.example.repairkz.domain.useCases.files.SaveToInternalUseCase
 import com.example.repairkz.domain.useCases.registration.GetCodeUseCase
 import com.example.repairkz.domain.useCases.registration.SendCodeUseCase
-import com.example.repairkz.ui.features.CameraX.CameraCapable
 import com.example.repairkz.ui.features.UserInfo.UserEffects
 import com.example.repairkz.ui.features.UserInfo.UserEffects.OpenPhotoPicker
 import com.example.repairkz.ui.features.UserInfo.UserState
@@ -29,11 +29,12 @@ import kotlin.compareTo
 class SignUpViewModel @Inject constructor(
     private val getCodeUseCase: GetCodeUseCase,
     private val sendCodeUseCase: SendCodeUseCase,
-) : ViewModel(), CameraCapable {
+    private val saveToInternalUseCase: SaveToInternalUseCase
+) : ViewModel(){
     private val _uiState = MutableStateFlow(SignUpState())
     val state = _uiState.asStateFlow()
 
-    private val _channel = Channel<SignUpEffect>(Channel.CONFLATED)
+    private val _channel = Channel<SignUpEffect>(Channel.BUFFERED)
     val channel = _channel.receiveAsFlow()
 
     private var timerJob: Job? = null
@@ -215,22 +216,21 @@ class SignUpViewModel @Inject constructor(
             }
 
             is SignUpIntent.GetPhotoFromMedia -> {
-                _uiState.value = _uiState.value.copy(
-                    userInfo = _uiState.value.userInfo.copy(
-                        photoUri = intent.uri
-                    )
-                )
                 viewModelScope.launch {
                     _channel.send(NavigateToPreview)
                 }
             }
 
             is SignUpIntent.SelectedPhoto -> {
-                _uiState.value = _uiState.value.copy(
-                    userInfo = _uiState.value.userInfo.copy(
-                        photoUri = intent.uri
+                viewModelScope.launch {
+                    val localUri = saveToInternalUseCase(intent.uri)
+                    _uiState.value = _uiState.value.copy(
+                        userInfo = _uiState.value.userInfo.copy(
+                            photoUri = localUri
+                        )
                     )
-                )
+                }
+
             }
         }
     }
@@ -249,13 +249,7 @@ class SignUpViewModel @Inject constructor(
 
     }
 
-    override fun onPhotoSelected(uri: Uri) {
-        handleIntent(SignUpIntent.SelectedPhoto(uri))
-    }
 
-    override fun getPreviewUri(): Uri? {
-        return _uiState.value.userInfo.photoUri
-    }
 }
 
 

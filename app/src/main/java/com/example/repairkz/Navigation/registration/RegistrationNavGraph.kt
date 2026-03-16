@@ -62,13 +62,7 @@ fun NavGraphBuilder.registrationGraph(navController: NavController){
             SignUpData(signUpViewModel,navController)
 
         }
-        photoGraph(
-            navController = navController,
-            getViewModel = {
-                val entry = navController.getBackStackEntry(REG_GROUP)
-                hiltViewModel<SignUpViewModel>(entry)
-            }
-        )
+
     }
 
 

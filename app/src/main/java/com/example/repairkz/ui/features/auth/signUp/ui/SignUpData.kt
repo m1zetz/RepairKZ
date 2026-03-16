@@ -1,6 +1,8 @@
 package com.example.repairkz.ui.features.auth.signUp.ui
 
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -8,38 +10,89 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Email
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.repairkz.Navigation.Routes
 import com.example.repairkz.Navigation.Routes.SIGN_UP_DATA
 import com.example.repairkz.Navigation.Routes.SIGN_UP_EMAIL
 import com.example.repairkz.R
 import com.example.repairkz.common.enums.PhotoSourceEnum
+import com.example.repairkz.common.handlers.photoPickerHandler
 import com.example.repairkz.common.ui.PhotoSourceBottomSheet
 import com.example.repairkz.common.ui.UserPhoto
-import com.example.repairkz.ui.features.UserInfo.UserIntent
+import com.example.repairkz.ui.features.CameraX.CameraIntent
+import com.example.repairkz.ui.features.CameraX.CameraViewModel
+import com.example.repairkz.ui.features.auth.signUp.SignUpEffect
 import com.example.repairkz.ui.features.auth.signUp.SignUpIntent
 import com.example.repairkz.ui.features.auth.signUp.SignUpViewModel
 
 @Composable
 fun SignUpData(signUpViewModel: SignUpViewModel, navController: NavController) {
+    val activity = LocalActivity.current as ComponentActivity
+    val cameraViewModel: CameraViewModel = hiltViewModel(viewModelStoreOwner = activity)
+
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val isCurrentScreen = currentBackStackEntry?.destination?.route == SIGN_UP_DATA
+    val context = LocalContext.current
+
+    val action = photoPickerHandler(
+        getPhotoFromMedia = { uri ->
+            if (uri != null){
+                cameraViewModel.handleIntent(CameraIntent.SetPhoto(uri))
+                signUpViewModel.handleIntent(SignUpIntent.GetPhotoFromMedia(uri)) //nav to preview
+
+            }
+
+        },
+        navController = navController,
+        context = context
+    )
+
+    LaunchedEffect(Unit) {
+        cameraViewModel.state.collect { state ->
+            if (state.isConfirmed && state.uri != null) {
+                signUpViewModel.handleIntent(SignUpIntent.SelectedPhoto(state.uri))
+                cameraViewModel.handleIntent(CameraIntent.ClearPhoto)
+            }
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        signUpViewModel.channel.collect { effect ->
+            when (effect) {
+                is SignUpEffect.NavigateToPreview -> {
+                    navController.navigate(Routes.PHOTO_PREVIEW)
+
+                }
+                is SignUpEffect.OpenPhotoPicker -> {
+                    when (effect.typeOfSelect) {
+                        PhotoSourceEnum.CAMERA -> action.launchCamera()
+                        PhotoSourceEnum.GALLERY -> action.launchGallery()
+                    }
+                }
+                is SignUpEffect.NavigateToMainWindow -> {
+                    navController.navigate(Routes.MAIN_WINDOW)
+                }
+                else -> {}
+            }
+        }
+    }
 
     BackHandler(enabled = isCurrentScreen) {
         signUpViewModel.handleIntent(SignUpIntent.ResetRegistrationData)
