@@ -17,6 +17,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,176 +36,158 @@ import com.example.repairkz.R
 import com.example.repairkz.common.enums.PhotoSourceEnum
 import com.example.repairkz.common.handlers.photoPickerHandler
 import com.example.repairkz.common.ui.PhotoSourceBottomSheet
+import com.example.repairkz.common.ui.SignTextField
 import com.example.repairkz.common.ui.UserPhoto
 import com.example.repairkz.ui.features.CameraX.CameraIntent
 import com.example.repairkz.ui.features.CameraX.CameraViewModel
+import com.example.repairkz.ui.features.CameraX.PhotoPreview
 import com.example.repairkz.ui.features.auth.signUp.SignUpEffect
 import com.example.repairkz.ui.features.auth.signUp.SignUpIntent
 import com.example.repairkz.ui.features.auth.signUp.SignUpViewModel
 
 @Composable
 fun SignUpData(signUpViewModel: SignUpViewModel, navController: NavController) {
-    val activity = LocalActivity.current as ComponentActivity
-    val cameraViewModel: CameraViewModel = hiltViewModel(viewModelStoreOwner = activity)
 
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val isCurrentScreen = currentBackStackEntry?.destination?.route == SIGN_UP_DATA
     val context = LocalContext.current
+    val activity = LocalActivity.current as ComponentActivity
+    val cameraViewModel: CameraViewModel = hiltViewModel(viewModelStoreOwner = activity)
+    val state by signUpViewModel.state.collectAsState()
 
+    LaunchedEffect("photo") {
+        cameraViewModel.state.collect { state ->
+            state.uri?.let {
+                signUpViewModel.handleIntent(SignUpIntent.ConfirmPhoto(it))
+                cameraViewModel.handleIntent(CameraIntent.ClearPhoto)
+            }
+        }
+    }
     val action = photoPickerHandler(
         getPhotoFromMedia = { uri ->
-            if (uri != null){
-                cameraViewModel.handleIntent(CameraIntent.SetPhoto(uri))
-                signUpViewModel.handleIntent(SignUpIntent.GetPhotoFromMedia(uri)) //nav to preview
+            if (uri != null) {
+                signUpViewModel.handleIntent(SignUpIntent.GetPhotoFromMedia(uri))
 
             }
-
         },
         navController = navController,
         context = context
     )
 
-    LaunchedEffect(Unit) {
-        cameraViewModel.state.collect { state ->
-            if (state.isConfirmed && state.uri != null) {
-                signUpViewModel.handleIntent(SignUpIntent.SelectedPhoto(state.uri))
-                cameraViewModel.handleIntent(CameraIntent.ClearPhoto)
-            }
-        }
-    }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect("effects") {
         signUpViewModel.channel.collect { effect ->
             when (effect) {
-                is SignUpEffect.NavigateToPreview -> {
-                    navController.navigate(Routes.PHOTO_PREVIEW)
-
-                }
                 is SignUpEffect.OpenPhotoPicker -> {
                     when (effect.typeOfSelect) {
                         PhotoSourceEnum.CAMERA -> action.launchCamera()
                         PhotoSourceEnum.GALLERY -> action.launchGallery()
                     }
                 }
+
                 is SignUpEffect.NavigateToMainWindow -> {
-                    navController.navigate(Routes.MAIN_WINDOW)
+                    navController.navigate(Routes.MAIN_WINDOW){
+                        popUpTo(0) { inclusive = true }
+                    }
+
                 }
+
                 else -> {}
             }
         }
     }
 
     BackHandler(enabled = isCurrentScreen) {
-        signUpViewModel.handleIntent(SignUpIntent.ResetRegistrationData)
-        navController.navigate(SIGN_UP_EMAIL) {
-            popUpTo(SIGN_UP_EMAIL) { inclusive = true }
+        if (state.userInfo.pendingPhotoUri != null) {
+            signUpViewModel.handleIntent(SignUpIntent.CancelPhoto)
+        } else {
+            signUpViewModel.handleIntent(SignUpIntent.ResetRegistrationData)
+            navController.navigate(SIGN_UP_EMAIL) {
+                popUpTo(SIGN_UP_EMAIL) { inclusive = true }
+            }
         }
+
     }
     SignUpLayout(
         signUpViewModel,
         navController
     ) { state ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(
-                8.dp,
-                alignment = Alignment.CenterVertically
-            )
-        ) {
-            UserPhoto(
-                state.userInfo.photoUri?.toString(),
-                changeAvatarIntent = {
-                    signUpViewModel.handleIntent(SignUpIntent.OpenSheet)
+        if (state.userInfo.pendingPhotoUri != null) {
+            PhotoPreview(
+                context,
+                uri = state.userInfo.pendingPhotoUri,
+                onDismissRequest = { signUpViewModel.handleIntent(SignUpIntent.CancelPhoto) },
+            ) { uri ->
+                uri?.let {
+                    signUpViewModel.handleIntent(SignUpIntent.ConfirmPhoto(it))
                 }
-            )
-            Spacer(modifier = Modifier.size(8.dp))
-            SignTextField(
-                state.userInfo.firstName,
-                { newValue ->
-                    signUpViewModel.handleIntent(SignUpIntent.ChangeFirstName(newValue))
-                },
-                state.userInfo.firstNameError,
-                placeholder = R.string.enter_first_name
-            )
-            SignTextField(
-                state.userInfo.lastName,
-                { newValue ->
-                    signUpViewModel.handleIntent(SignUpIntent.ChangeLastName(newValue))
-                },
-                state.userInfo.lastNameError,
-                placeholder = R.string.enter_last_name
-            )
-            Button(
-                modifier = Modifier.fillMaxWidth(),
-                onClick = {
-                    signUpViewModel.handleIntent(SignUpIntent.NavigateToMainWindow)
-                }
-            ) {
-                Text(stringResource(R.string.sign_up))
             }
-            if (state.avatarSheetState) {
-                PhotoSourceBottomSheet(
-                    closeSheet = {
-                        signUpViewModel.handleIntent(SignUpIntent.CloseSheet)
-                    },
-                    fromCamera = {
-                        signUpViewModel.handleIntent(
-                            SignUpIntent.ChangeAvatar(
-                                PhotoSourceEnum.CAMERA
-                            )
-                        )
-                    },
-                    fromGallery = {
-                        signUpViewModel.handleIntent(
-                            SignUpIntent.ChangeAvatar(
-                                PhotoSourceEnum.GALLERY
-                            )
-                        )
+        } else {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(
+                    8.dp,
+                    alignment = Alignment.CenterVertically
+                )
+            ) {
+                UserPhoto(
+                    state.userInfo.photoUri?.toString(),
+                    changeAvatarIntent = {
+                        signUpViewModel.handleIntent(SignUpIntent.OpenSheet)
                     }
                 )
+                Spacer(modifier = Modifier.size(8.dp))
+                SignTextField(
+                    state.userInfo.firstName,
+                    { newValue ->
+                        signUpViewModel.handleIntent(SignUpIntent.ChangeFirstName(newValue))
+                    },
+                    state.userInfo.firstNameError,
+                    placeholder = R.string.enter_first_name
+                )
+                SignTextField(
+                    state.userInfo.lastName,
+                    { newValue ->
+                        signUpViewModel.handleIntent(SignUpIntent.ChangeLastName(newValue))
+                    },
+                    state.userInfo.lastNameError,
+                    placeholder = R.string.enter_last_name
+                )
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = {
+                        signUpViewModel.handleIntent(SignUpIntent.NavigateToMainWindow)
+                    }
+                ) {
+                    Text(stringResource(R.string.sign_up))
+                }
+                if (state.avatarSheetState) {
+                    PhotoSourceBottomSheet(
+                        closeSheet = {
+                            signUpViewModel.handleIntent(SignUpIntent.CloseSheet)
+                        },
+                        fromCamera = {
+                            signUpViewModel.handleIntent(
+                                SignUpIntent.ChangeAvatar(
+                                    PhotoSourceEnum.CAMERA
+                                )
+                            )
+                        },
+                        fromGallery = {
+                            signUpViewModel.handleIntent(
+                                SignUpIntent.ChangeAvatar(
+                                    PhotoSourceEnum.GALLERY
+                                )
+                            )
+                        }
+                    )
+                }
             }
         }
     }
+
 }
 
-@Composable
-fun SignTextField(
-    value: String,
-    onValueChange: (newValue: String) -> Unit,
-    errorMessage: Int?,
-    leadingIcon: ImageVector? = null,
-    placeholder: Int,
-) {
-    OutlinedTextField(
-        modifier = Modifier.fillMaxWidth(),
-        singleLine = true,
-        value = value,
-        onValueChange = { newValue ->
-            onValueChange(newValue)
-        },
-        shape = MaterialTheme.shapes.medium,
-        placeholder = {
-            Text(
-                stringResource(placeholder),
-                style = TextStyle(color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f))
-            )
-        },
-        leadingIcon = {
-            leadingIcon?.let {
-                Icon(leadingIcon, null)
-            }
-        },
-        supportingText = {
-            errorMessage?.let { stringResource ->
-                Text(
-                    stringResource(stringResource),
-                    style = TextStyle(color = MaterialTheme.colorScheme.error)
-                )
-            }
-        },
-        isError = errorMessage != null
-    )
-}

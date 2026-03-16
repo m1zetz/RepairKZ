@@ -1,12 +1,9 @@
-package com.example.repairkz.data.repository
-
-import com.example.repairkz.R
+package com.example.repairkz.data.registration
 
 import com.example.repairkz.data.remote.api.RegistrationApi
 import com.example.repairkz.data.remote.dto.CodeDTO
 import com.example.repairkz.data.remote.dto.EmailDTO
 import com.example.repairkz.domain.repository.RegistrationRepository
-import retrofit2.Response
 import javax.inject.Inject
 
 class RegistrationRepositoryImpl @Inject constructor(

@@ -4,11 +4,17 @@ import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.repairkz.common.enums.CitiesEnum
+import com.example.repairkz.common.enums.StatusOfUser
+import com.example.repairkz.common.models.User
 import com.example.repairkz.common.utils.ValidationResult
 import com.example.repairkz.common.utils.Validator
+import com.example.repairkz.data.userData.UserRepository
 import com.example.repairkz.domain.useCases.files.SaveToInternalUseCase
 import com.example.repairkz.domain.useCases.registration.GetCodeUseCase
 import com.example.repairkz.domain.useCases.registration.SendCodeUseCase
+import com.example.repairkz.domain.useCases.userData.GetUserDataUseCase
+import com.example.repairkz.domain.useCases.userData.UpdateUserDataUseCase
 import com.example.repairkz.ui.features.UserInfo.UserEffects
 import com.example.repairkz.ui.features.UserInfo.UserEffects.OpenPhotoPicker
 import com.example.repairkz.ui.features.UserInfo.UserState
@@ -29,8 +35,11 @@ import kotlin.compareTo
 class SignUpViewModel @Inject constructor(
     private val getCodeUseCase: GetCodeUseCase,
     private val sendCodeUseCase: SendCodeUseCase,
-    private val saveToInternalUseCase: SaveToInternalUseCase
-) : ViewModel(){
+    private val saveToInternalUseCase: SaveToInternalUseCase,
+    private val updateUserDataUseCase: UpdateUserDataUseCase,
+) : ViewModel() {
+
+
     private val _uiState = MutableStateFlow(SignUpState())
     val state = _uiState.asStateFlow()
 
@@ -182,13 +191,29 @@ class SignUpViewModel @Inject constructor(
             }
 
             SignUpIntent.NavigateToMainWindow -> {
-                val isFirstNameValid = validationFirstName(_uiState.value.userInfo.firstName)
-                val isLastNameValid = validationLastName(_uiState.value.userInfo.lastName)
+                val firstName = _uiState.value.userInfo.firstName
+                val lastName = _uiState.value.userInfo.lastName
+                val photo = _uiState.value.userInfo.photoUri
+                val isFirstNameValid = validationFirstName(firstName)
+                val isLastNameValid = validationLastName(lastName)
                 if (isFirstNameValid && isLastNameValid) {
-                    //отправка на бд
                     viewModelScope.launch {
+
+                        updateUserDataUseCase(
+                            User(
+                                userId = 1,
+                                firstName = firstName,
+                                lastName = lastName,
+                                userPhotoUrl = photo?.toString(),
+                                email = _uiState.value.email,
+                                phoneNumber = "",
+                                status = StatusOfUser.CLIENT,
+                                city = CitiesEnum.ALMATY
+                            )
+                        )
                         _channel.send(NavigateToMainWindow)
                     }
+
                 }
 
             }
@@ -216,9 +241,8 @@ class SignUpViewModel @Inject constructor(
             }
 
             is SignUpIntent.GetPhotoFromMedia -> {
-                viewModelScope.launch {
-                    _channel.send(NavigateToPreview)
-                }
+                _uiState.update { it.copy(userInfo = it.userInfo.copy(pendingPhotoUri = intent.uri)) }
+
             }
 
             is SignUpIntent.SelectedPhoto -> {
@@ -231,8 +255,31 @@ class SignUpViewModel @Inject constructor(
                     )
                 }
 
+
+            }
+
+            SignUpIntent.CancelPhoto -> {
+                _uiState.update { it.copy(userInfo = it.userInfo.copy(pendingPhotoUri = null))}
+
+            }
+
+
+            is SignUpIntent.ConfirmPhoto -> {
+
+                viewModelScope.launch {
+                    val localUri = saveToInternalUseCase(intent.uri)
+                    _uiState.value = _uiState.value.copy(
+                        userInfo = _uiState.value.userInfo.copy(
+                            photoUri = localUri,
+                            pendingPhotoUri = null
+                        )
+                    )
+                }
             }
         }
+
+
+
     }
     fun timer() {
         _uiState.update { it.copy(timerSeconds = 8) }
@@ -248,10 +295,6 @@ class SignUpViewModel @Inject constructor(
 
 
     }
-
-
 }
-
-
 
 

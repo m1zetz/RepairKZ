@@ -1,6 +1,6 @@
 package com.example.repairkz.domain.useCases.registration
 
-import com.example.repairkz.data.repository.RegistrationRepositoryImpl
+import com.example.repairkz.data.registration.RegistrationRepositoryImpl
 import jakarta.inject.Inject
 
 class SendCodeUseCase @Inject constructor(

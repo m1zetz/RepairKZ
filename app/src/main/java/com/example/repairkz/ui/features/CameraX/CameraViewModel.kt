@@ -1,38 +1,29 @@
 package com.example.repairkz.ui.features.CameraX
 
+
 import android.net.Uri
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import jakarta.inject.Inject
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 
 @HiltViewModel
-class CameraViewModel @Inject constructor() : ViewModel(){
+class CameraViewModel @Inject constructor(
+
+) : ViewModel(){
     private val _state = MutableStateFlow(CameraState())
     val state = _state.asStateFlow()
 
-    fun setPhoto(uri: Uri){
-        _state.update {cameraState ->
-            cameraState.copy(uri)
-        }
-    }
-
-    fun clearPhoto(){
-        _state.update {cameraState ->
-            cameraState.copy(isConfirmed = false)
-        }
-    }
     fun handleIntent(intent: CameraIntent) {
         when (intent) {
-            is CameraIntent.SetPhoto -> setPhoto(intent.uri)
-            CameraIntent.ClearPhoto -> clearPhoto()
-            CameraIntent.ConfirmPhoto -> {
-                _state.update {cameraState ->
-                    cameraState.copy(isConfirmed = true)
-                }
-            }
+            is CameraIntent.SetPhoto -> _state.update { it.copy(uri = intent.uri) }
+            CameraIntent.ClearPhoto -> _state.update { it.copy(uri = null) }
         }
     }
 }

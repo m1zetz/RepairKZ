@@ -21,6 +21,7 @@ data class SignUpState(
 
 data class MinimalUserInfo(
     val photoUri: Uri? = null,
+    val pendingPhotoUri: Uri? = null,
     val firstName: String = "",
     val lastName: String = "",
     val firstNameError: Int? = null,
@@ -41,14 +42,15 @@ sealed class SignUpIntent{
     data class ChangeAvatar(val typeOfSelect: PhotoSourceEnum) : SignUpIntent()
     object OpenSheet : SignUpIntent()
     object CloseSheet: SignUpIntent()
-
+    data class ConfirmPhoto(val uri: Uri) : SignUpIntent()
+    object CancelPhoto : SignUpIntent()
     data class SelectedPhoto(val uri: Uri) : SignUpIntent()
     data class GetPhotoFromMedia(val uri: Uri?) : SignUpIntent()
 }
 
 sealed class SignUpEffect{
     object NavigateToConfirmation : SignUpEffect()
-    object NavigateToPreview : SignUpEffect()
+
     object NavigateToFillingData : SignUpEffect()
     object NavigateToMainWindow : SignUpEffect()
     data class ShowSnackBar(val message: String) : SignUpEffect()

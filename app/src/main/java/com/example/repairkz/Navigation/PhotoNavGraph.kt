@@ -27,34 +27,9 @@ fun NavGraphBuilder.photoGraph(
             takeNewPhoto = { uri ->
                 uri?.let {
                     vm.handleIntent(CameraIntent.SetPhoto(it))
-                    vm.handleIntent(CameraIntent.ConfirmPhoto)
                     navController.popBackStack()
                 }
             }
         )
     }
-    composable(Routes.PHOTO_PREVIEW) {
-        val activity = LocalActivity.current as ComponentActivity
-        val vm: CameraViewModel = hiltViewModel(viewModelStoreOwner = activity)
-        val state by vm.state.collectAsState()
-        val context = LocalContext.current
-        state.uri?.let { nonNullUri ->
-            PhotoPreview(
-                context,
-                uri = nonNullUri,
-                onDismissRequest = { navController.popBackStack() },
-            ) { uri ->
-                uri?.let {
-                    vm.handleIntent(CameraIntent.SetPhoto(it))
-                    vm.handleIntent(CameraIntent.ConfirmPhoto)
-                    navController.popBackStack()
-                }
-            }
-        }
-        if (state.uri == null){
-            Log.d("null", "null")
-        }
-
-    }
-
 }
