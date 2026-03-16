@@ -3,8 +3,8 @@ package com.example.repairkz.data.userData
 import com.example.repairkz.common.enums.CitiesEnum
 import com.example.repairkz.common.enums.StatusOfUser
 import com.example.repairkz.common.models.User
-import jakarta.inject.Inject
-import jakarta.inject.Singleton
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -34,6 +34,10 @@ class UserRepositoryImpl @Inject constructor() : UserRepository {
         }
     }
 
+    override suspend fun updateUserData(user: User) {
+        _userData.value = user
+    }
+
     override suspend fun updateUserStatus(statusOfUser: StatusOfUser) {
         when (statusOfUser) {
             StatusOfUser.CLIENT -> {
@@ -50,7 +54,4 @@ class UserRepositoryImpl @Inject constructor() : UserRepository {
         }
     }
 
-    override suspend fun updateUserData(user: User) {
-        _userData.value = user
-    }
 }

@@ -84,7 +84,7 @@ fun SignUpData(signUpViewModel: SignUpViewModel, navController: NavController) {
                         PhotoSourceEnum.GALLERY -> action.launchGallery()
                     }
                 }
-
+                //d
                 is SignUpEffect.NavigateToMainWindow -> {
                     navController.navigate(Routes.MAIN_WINDOW){
                         popUpTo(0) { inclusive = true }

@@ -30,6 +30,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -93,6 +94,45 @@ fun ProfileString(
             }
         }
     }
+}
+
+@Composable
+fun SignTextField(
+    value: String,
+    onValueChange: (newValue: String) -> Unit,
+    errorMessage: Int?,
+    leadingIcon: ImageVector? = null,
+    placeholder: Int,
+) {
+    OutlinedTextField(
+        modifier = Modifier.fillMaxWidth(),
+        singleLine = true,
+        value = value,
+        onValueChange = { newValue ->
+            onValueChange(newValue)
+        },
+        shape = MaterialTheme.shapes.medium,
+        placeholder = {
+            Text(
+                stringResource(placeholder),
+                style = TextStyle(color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f))
+            )
+        },
+        leadingIcon = {
+            leadingIcon?.let {
+                Icon(leadingIcon, null)
+            }
+        },
+        supportingText = {
+            errorMessage?.let { stringResource ->
+                Text(
+                    stringResource(stringResource),
+                    style = TextStyle(color = MaterialTheme.colorScheme.error)
+                )
+            }
+        },
+        isError = errorMessage != null
+    )
 }
 
 @Composable
