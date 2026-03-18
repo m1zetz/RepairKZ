@@ -1,7 +1,7 @@
 package com.example.repairkz.ui.features.auth.signUp
 
-import android.net.Uri
-import android.util.Log
+import android.content.Context
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.repairkz.common.enums.CitiesEnum
@@ -9,17 +9,15 @@ import com.example.repairkz.common.enums.StatusOfUser
 import com.example.repairkz.common.models.User
 import com.example.repairkz.common.utils.ValidationResult
 import com.example.repairkz.common.utils.Validator
-import com.example.repairkz.data.userData.UserRepository
 import com.example.repairkz.domain.useCases.files.SaveToInternalUseCase
+import com.example.repairkz.domain.useCases.registration.CreateUserUseCase
 import com.example.repairkz.domain.useCases.registration.GetCodeUseCase
 import com.example.repairkz.domain.useCases.registration.SendCodeUseCase
-import com.example.repairkz.domain.useCases.userData.GetUserDataUseCase
 import com.example.repairkz.domain.useCases.userData.UpdateUserDataUseCase
-import com.example.repairkz.ui.features.UserInfo.UserEffects
-import com.example.repairkz.ui.features.UserInfo.UserEffects.OpenPhotoPicker
-import com.example.repairkz.ui.features.UserInfo.UserState
 import com.example.repairkz.ui.features.auth.signUp.SignUpEffect.*
+import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
@@ -28,8 +26,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
+import java.io.File
+import java.io.FileOutputStream
 import javax.inject.Inject
-import kotlin.compareTo
 
 @HiltViewModel
 class SignUpViewModel @Inject constructor(
@@ -37,6 +41,8 @@ class SignUpViewModel @Inject constructor(
     private val sendCodeUseCase: SendCodeUseCase,
     private val saveToInternalUseCase: SaveToInternalUseCase,
     private val updateUserDataUseCase: UpdateUserDataUseCase,
+    private val createUserUseCase: CreateUserUseCase,
+    @ApplicationContext private val context: Context
 ) : ViewModel() {
 
 
@@ -104,6 +110,21 @@ class SignUpViewModel @Inject constructor(
         _uiState.value = newState
 
         return checkLastName is ValidationResult.Success
+    }
+
+    private fun validationPassword(password: String): Boolean {
+        var newState =
+            _uiState.value.copy(passwordError = null)
+
+        val checkPassword = Validator.validatePassword(password)
+
+        newState = newState.copy(
+            passwordError = (checkPassword as? ValidationResult.Error)?.messageRes
+        )
+
+        _uiState.value = newState
+
+        return checkPassword is ValidationResult.Success
     }
 
     fun handleIntent(intent: SignUpIntent) {
@@ -193,25 +214,59 @@ class SignUpViewModel @Inject constructor(
             SignUpIntent.NavigateToMainWindow -> {
                 val firstName = _uiState.value.userInfo.firstName
                 val lastName = _uiState.value.userInfo.lastName
+                val password = _uiState.value.password
                 val photo = _uiState.value.userInfo.photoUri
                 val isFirstNameValid = validationFirstName(firstName)
                 val isLastNameValid = validationLastName(lastName)
-                if (isFirstNameValid && isLastNameValid) {
+                val isPasswordValid = validationPassword(password)
+                if (isFirstNameValid && isLastNameValid && isPasswordValid) {
+                    var user = User(
+                        id = 0,
+                        firstName = firstName.replaceFirstChar { it.uppercase() },
+                        lastName = lastName.replaceFirstChar { it.uppercase() },
+                        userPhotoUrl = photo?.toString(),
+                        email = _uiState.value.email,
+                        password = password,
+                        phoneNumber = "",
+                        status = StatusOfUser.CLIENT,
+                        city = CitiesEnum.ALMATY
+                    )
                     viewModelScope.launch {
+                        _uiState.update { state ->
+                            state.copy(isLoading = true)
+                        }
+                        try {
+                            val file = File(context.cacheDir, "temp_photo.jpg")
+                            val photoPart = _uiState.value.userInfo.photoUri?.let{uri ->
+                                context.contentResolver.openInputStream(uri).use {inputStream ->
+                                    FileOutputStream(file).use {outputStream ->
+                                        inputStream!!.copyTo(outputStream)
+                                    }
+                                }
+                                val requestBodyFile = file.asRequestBody("image/*".toMediaTypeOrNull())
+                                MultipartBody.Part.createFormData("file",file.name, requestBodyFile)
+                            }
+                            val userPart = Gson().toJson(user.toCreateUserDTO()).toRequestBody("application/json".toMediaTypeOrNull())
+                            val response = createUserUseCase(userPart,photoPart )
+                            response.onSuccess {id ->
+                                user = user.copy(userId = id)
+                                updateUserDataUseCase(
+                                    user
+                                )
 
-                        updateUserDataUseCase(
-                            User(
-                                userId = 100500,
-                                firstName = firstName,
-                                lastName = lastName,
-                                userPhotoUrl = photo?.toString(),
-                                email = _uiState.value.email,
-                                phoneNumber = "",
-                                status = StatusOfUser.CLIENT,
-                                city = CitiesEnum.ALMATY
-                            )
-                        )
-                        _channel.send(NavigateToMainWindow)
+                                _channel.send(NavigateToMainWindow)
+                            }.onFailure { error ->
+                                _uiState.update { it.copy(error = error.message) }
+                            }
+
+                        } catch(e: Exception){
+                            _uiState.update { it.copy(error = "Ошибка сети") }
+                        } finally {
+                            _uiState.update { state ->
+                                state.copy(isLoading = false)
+                            }
+                        }
+
                     }
 
                 }
@@ -245,19 +300,6 @@ class SignUpViewModel @Inject constructor(
 
             }
 
-            is SignUpIntent.SelectedPhoto -> {
-//                viewModelScope.launch {
-//                    val localUri = saveToInternalUseCase(intent.uri)
-//                    _uiState.value = _uiState.value.copy(
-//                        userInfo = _uiState.value.userInfo.copy(
-//                            photoUri = localUri
-//                        )
-//                    )
-//                }
-
-
-            }
-
             SignUpIntent.CancelPhoto -> {
                 _uiState.update { it.copy(userInfo = it.userInfo.copy(pendingPhotoUri = null)) }
 
@@ -275,6 +317,13 @@ class SignUpViewModel @Inject constructor(
                         )
                     )
                 }
+            }
+
+            is SignUpIntent.ChangePassword -> {
+                _uiState.value = _uiState.value.copy(
+                    password = intent.password,
+                    passwordError = null
+                )
             }
         }
 

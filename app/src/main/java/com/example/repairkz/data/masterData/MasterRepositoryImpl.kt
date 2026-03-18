@@ -4,7 +4,6 @@ import com.example.repairkz.common.enums.CitiesEnum
 import com.example.repairkz.common.enums.MasterSpetializationsEnum
 import com.example.repairkz.common.enums.StatusOfUser
 import com.example.repairkz.common.models.Master
-import com.example.repairkz.common.models.User
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
@@ -17,7 +16,7 @@ class MasterRepositoryImpl @Inject constructor() : MasterRepository {
     override suspend fun getMasters(): Result<List<Master>> {
         val mastersList = listOf(
             Master(
-                userId = 67,
+                id = 67,
                 userPhotoUrl = null,
                 firstName = "Илья",
                 lastName = "Иванов",
@@ -30,7 +29,7 @@ class MasterRepositoryImpl @Inject constructor() : MasterRepository {
                 masterSpecialization = MasterSpetializationsEnum.ELECTRIC
             ),
             Master(
-                userId = 2,
+                id = 2,
                 userPhotoUrl = null,
                 firstName = "Арман",
                 lastName = "Сериков",
@@ -43,7 +42,7 @@ class MasterRepositoryImpl @Inject constructor() : MasterRepository {
                 masterSpecialization = MasterSpetializationsEnum.PLUMBER
             ),
             Master(
-                userId = 3,
+                id = 3,
                 userPhotoUrl = null,
                 firstName = "Дмитрий",
                 lastName = "Соколов",
@@ -56,7 +55,7 @@ class MasterRepositoryImpl @Inject constructor() : MasterRepository {
                 masterSpecialization = MasterSpetializationsEnum.FURNITURE
             ),
             Master(
-                userId = 4,
+                id = 4,
                 userPhotoUrl = null,
                 firstName = "Сергей",
                 lastName = "Ли",
@@ -69,7 +68,7 @@ class MasterRepositoryImpl @Inject constructor() : MasterRepository {
                 masterSpecialization = MasterSpetializationsEnum.ELECTRIC
             ),
             Master(
-                userId = 5,
+                id = 5,
                 userPhotoUrl = null,
                 firstName = "Александр",
                 lastName = "Петров",
@@ -82,7 +81,7 @@ class MasterRepositoryImpl @Inject constructor() : MasterRepository {
                 masterSpecialization = MasterSpetializationsEnum.PLUMBER
             ),
             Master(
-                userId = 6,
+                id = 6,
                 userPhotoUrl = null,
                 firstName = "Берик",
                 lastName = "Ахметов",
@@ -104,7 +103,7 @@ class MasterRepositoryImpl @Inject constructor() : MasterRepository {
             getMasters()
         }
 
-        val master = _masters.value?.find { it.userId == id }
+        val master = _masters.value?.find { it.id == id }
         return if (master != null) {
             Result.success(master)
         } else {

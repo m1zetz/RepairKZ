@@ -41,17 +41,21 @@ object Validator {
     }
 
     fun validateFirstName(firstName: String): ValidationResult {
+        val clearFirstName = firstName.replace(" ", "")
         return when {
-            firstName.isEmpty() -> ValidationResult.Error(R.string.field_empty)
+            clearFirstName.isEmpty() -> ValidationResult.Error(R.string.field_empty)
+            clearFirstName.length < 2 -> ValidationResult.Error(R.string.short_first_name)
             else -> ValidationResult.Success
         }
     }
 
     fun validateLastName(lastName: String): ValidationResult {
+        val clearLastName = lastName.replace(" ", "")
         return when {
-            lastName.isEmpty() -> ValidationResult.Error(R.string.field_empty)
+            clearLastName.isEmpty() -> ValidationResult.Error(R.string.field_empty)
+            clearLastName.length < 2 -> ValidationResult.Error(R.string.short_last_name)
             else -> ValidationResult.Success
         }
     }
-
 }
+

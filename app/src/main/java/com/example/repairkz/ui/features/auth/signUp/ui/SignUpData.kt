@@ -155,6 +155,14 @@ fun SignUpData(signUpViewModel: SignUpViewModel, navController: NavController) {
                     state.userInfo.lastNameError,
                     placeholder = R.string.enter_last_name
                 )
+                SignTextField(
+                    state.password,
+                    { newValue ->
+                        signUpViewModel.handleIntent(SignUpIntent.ChangePassword(newValue))
+                    },
+                    state.passwordError,
+                    placeholder = R.string.come_up_with_password
+                )
                 Button(
                     modifier = Modifier.fillMaxWidth(),
                     onClick = {

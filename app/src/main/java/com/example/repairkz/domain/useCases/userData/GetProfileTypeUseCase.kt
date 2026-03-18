@@ -1,13 +1,9 @@
 package com.example.repairkz.domain.useCases.userData
 
-import com.example.repairkz.common.enums.StatusOfUser
 import com.example.repairkz.common.models.Master
 import com.example.repairkz.data.masterData.MasterRepository
 import com.example.repairkz.data.userData.UserRepository
-import com.example.repairkz.ui.features.UserInfo.CommonInfo
-import com.example.repairkz.ui.features.UserInfo.UserState
 import com.example.repairkz.ui.features.UserInfo.UserTypes
-import java.lang.Exception
 import javax.inject.Inject
 
 class GetProfileTypeUseCase @Inject constructor(
@@ -17,7 +13,7 @@ class GetProfileTypeUseCase @Inject constructor(
     suspend operator fun invoke(comingId: Int?): Result<UserTypes> {
         val user =  userRepository.fetchUserData()
         user?.let{
-            if (user.userId == comingId || comingId == null) {
+            if (user.id == comingId || comingId == null) {
                 if(user is Master){
                     return Result.success(UserTypes.IsCurrentMaster(user, user.getCommonInfo(isMe = true)))
                 }

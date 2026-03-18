@@ -42,7 +42,6 @@ sealed class UserIntent {
     object OpenSheet : UserIntent()
     object CloseSheet : UserIntent()
     data class ChangeAvatar(val typeOfSelect: PhotoSourceEnum) : UserIntent()
-    data class SelectedPhoto(val uri: Uri?) : UserIntent()
 
     data class ConfirmPhoto(val uri: Uri) : UserIntent()
     object CancelPhoto : UserIntent()

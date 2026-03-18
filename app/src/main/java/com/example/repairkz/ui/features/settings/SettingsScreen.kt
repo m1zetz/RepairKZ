@@ -11,7 +11,6 @@ import androidx.compose.material.icons.filled.BackHand
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.InvertColors
-import androidx.compose.material.icons.filled.Money
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -52,7 +51,7 @@ fun SettingsScreen(settingsViewModel: SettingsViewModel, navController: NavContr
                     ProfileString(
                         state.userData,
                         descriptionPrefix = stringResource(R.string.your_status),
-                        intent = { settingsViewModel.handleIntent(SettingIntent.toUserScreen(state.userData.userId)) },
+                        intent = { settingsViewModel.handleIntent(SettingIntent.toUserScreen(state.userData.id)) },
 
                     )
                     StandartString(

@@ -63,10 +63,6 @@ class UserInfoViewModel @Inject constructor(
 
             }
 
-            is UserIntent.SelectedPhoto -> {
-
-
-            }
 
 
             UserIntent.CloseSheet -> {
@@ -136,25 +132,6 @@ class UserInfoViewModel @Inject constructor(
 
     }
 
-    private fun saveAvatar(uri: Uri?) {
-        viewModelScope.launch {
-            val internalUri = saveToInternalUseCase(uri) ?: return@launch
-            _uiState.update { state ->
-                if (state is UserState.Success) state.copy(
-                    newAvatarData = uri
-                ) else state
-            }
-            val user = getUserDataUseCase()
-            user?.let {
-                val newUser = user.copy(
-                    userPhotoUrl = internalUri.toString()
-                )
-                updateUserDataUseCase(newUser)
-                defineUser(comingId)
-            }
-        }
-
-    }
 
     init {
         defineUser(comingId)

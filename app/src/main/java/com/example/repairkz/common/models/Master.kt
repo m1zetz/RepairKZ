@@ -6,7 +6,7 @@ import com.example.repairkz.common.enums.MasterSpetializationsEnum
 import com.example.repairkz.common.enums.StatusOfUser
 
 data class Master(
-    override val userId: Int,
+    override val id: Int,
     override val userPhotoUrl: String?,
     override val firstName: String,
     override val lastName: String,
@@ -18,10 +18,10 @@ data class Master(
     val description: String? = null,
     val masterSpecialization: MasterSpetializationsEnum? = null
 
-) : User(userId, userPhotoUrl, firstName, lastName, email, phoneNumber, status, city){
+) : User(id, userPhotoUrl, firstName, lastName, email, phoneNumber, status, city){
     override fun toUser(): User {
         return User(
-            userId = this.userId,
+            id = this.id,
             userPhotoUrl = this.userPhotoUrl,
             firstName = this.firstName,
             lastName = this.lastName,

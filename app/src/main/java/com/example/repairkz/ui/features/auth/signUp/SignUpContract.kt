@@ -8,6 +8,8 @@ import com.example.repairkz.ui.features.UserInfo.UserIntent
 data class SignUpState(
     val email: String = "",
     val code: String = "",
+    val password: String = "",
+    val passwordError: Int? = null,
     val emailError: Int? = null,
     val codeError: Int? = null,
     val isLoading: Boolean = false,
@@ -33,6 +35,7 @@ sealed class SignUpIntent{
     data class SendCode(val code: String) : SignUpIntent()
     data class ChangeEmail(val emailChar: String) : SignUpIntent()
     data class ChangeCode(val codeChar: String) : SignUpIntent()
+    data class ChangePassword(val password: String) : SignUpIntent()
 
     data class ChangeFirstName(val firstName: String) : SignUpIntent()
     data class ChangeLastName(val lastName: String) : SignUpIntent()
@@ -44,7 +47,6 @@ sealed class SignUpIntent{
     object CloseSheet: SignUpIntent()
     data class ConfirmPhoto(val uri: Uri) : SignUpIntent()
     object CancelPhoto : SignUpIntent()
-    data class SelectedPhoto(val uri: Uri) : SignUpIntent()
     data class GetPhotoFromMedia(val uri: Uri?) : SignUpIntent()
 }
 

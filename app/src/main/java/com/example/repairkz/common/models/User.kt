@@ -2,20 +2,23 @@ package com.example.repairkz.common.models
 
 import com.example.repairkz.common.enums.CitiesEnum
 import com.example.repairkz.common.enums.StatusOfUser
+import com.example.repairkz.data.remote.dto.CreateUserDTO
 import com.example.repairkz.ui.features.UserInfo.CommonInfo
 
 open class User(
-    open val userId: Int,
+    open val id: Int,
     open val userPhotoUrl: String?,
     open val firstName: String,
     open val lastName: String,
     open val email: String,
+
     open val phoneNumber: String,
     open val status: StatusOfUser,
-    open val city: CitiesEnum
+    open val city: CitiesEnum,
+    open val password: String? = null,
 ){
     fun copy(
-        userId: Int = this.userId,
+        userId: Int = this.id,
         userPhotoUrl: String? = this.userPhotoUrl,
         firstName: String = this.firstName,
         lastName: String = this.lastName,
@@ -29,7 +32,7 @@ open class User(
     }
 
     fun getCommonInfo(
-        id: Int = this.userId,
+        id: Int = this.id,
         userPhotoUrl: String? = this.userPhotoUrl,
         firstName: String = this.firstName,
         lastName: String = this.lastName,
@@ -45,7 +48,7 @@ open class User(
     }
 
     fun toMaster(
-        userId: Int = this.userId,
+        userId: Int = this.id,
         userPhotoUrl: String? = this.userPhotoUrl,
         firstName: String = this.firstName,
         lastName: String = this.lastName,
@@ -71,6 +74,17 @@ open class User(
     open fun toUser() : User{
         return this
     }
+
+    fun toCreateUserDTO() = CreateUserDTO(
+        firstName = firstName,
+        lastName = lastName,
+        userPhotoUrl = userPhotoUrl,
+        email = email,
+        password = password,
+        phone = phoneNumber,
+        status = status,
+        city = city
+    )
 
     open val displayDescriptionRes: Int
         get() = this.status.resID

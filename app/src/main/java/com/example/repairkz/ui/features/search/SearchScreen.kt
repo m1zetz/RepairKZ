@@ -29,18 +29,15 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.repairkz.Navigation.Routes.userInfoRoute
 import com.example.repairkz.common.enums.CitiesEnum
@@ -127,7 +124,7 @@ fun SearchScreen(navController: NavController, searchViewModel: SearchViewModel)
                                         intent = {
                                             searchViewModel.handleIntent(
                                                 SearchIntents.NavigateToUserInfo(
-                                                    master.userId
+                                                    master.id
                                                 )
                                             )
                                         })

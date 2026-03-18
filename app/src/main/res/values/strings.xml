@@ -79,6 +79,9 @@
     <string name="no_numbers">Пароль должен содержать цифры</string>
     <string name="no_uppercase">Пароль должен содержать хотя бы одну заглавную букву</string>
     <string name="no_lowercase">Пароль должен содержать хотя бы одну букву</string>
+    <string name="short_last_name">Фамилия должна содержать больше двух букв</string>
+    <string name="short_first_name">Имя должно содержать больше двух букв</string>
+    <string name="come_up_with_password">Придумайте пароль</string>
 
 
 </resources>

@@ -30,7 +30,7 @@ import com.example.repairkz.ui.features.auth.signUp.ui.SignUpEmail
 @SuppressLint("UnrememberedGetBackStackEntry")
 fun NavGraphBuilder.registrationGraph(navController: NavController){
     navigation(
-        startDestination = SIGN_UP_DATA,
+        startDestination = SIGN_UP_EMAIL,
         route = REG_GROUP
     ){
         composable(

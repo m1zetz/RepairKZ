@@ -41,8 +41,12 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.repairkz.Navigation.Routes
+import com.example.repairkz.Navigation.Routes.MAIN_WINDOW
 import com.example.repairkz.Navigation.Routes.SIGN_UP_CODE
+import com.example.repairkz.Navigation.Routes.SIGN_UP_DATA
 import com.example.repairkz.R
+import com.example.repairkz.common.enums.PhotoSourceEnum
 import com.example.repairkz.ui.features.auth.signIn.SignInIntent
 import com.example.repairkz.ui.features.auth.signUp.SignUpEffect
 import com.example.repairkz.ui.features.auth.signUp.SignUpIntent
@@ -52,6 +56,24 @@ import kotlinx.coroutines.flow.MutableStateFlow
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun SignUpCode(signUpViewModel: SignUpViewModel, navController: NavController) {
+    LaunchedEffect(Unit) {
+        signUpViewModel.channel.collect { effect ->
+
+            when (effect) {
+
+                is SignUpEffect.NavigateToFillingData -> {
+                    navController.navigate(SIGN_UP_DATA)
+                }
+
+                else -> {
+
+                }
+
+
+            }
+
+        }
+    }
     SignUpLayout(
         signUpViewModel,
         navController
@@ -126,7 +148,7 @@ fun SignUpCode(signUpViewModel: SignUpViewModel, navController: NavController) {
                         ) {
                             Text(stringResource(R.string.resend_email))
                             Spacer(modifier = Modifier.size(8.dp))
-                            if (state.timerSeconds != 0){
+                            if (state.timerSeconds != 0) {
                                 Text(state.timerSeconds.toString())
                             }
 

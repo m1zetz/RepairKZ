@@ -34,8 +34,12 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.repairkz.Navigation.Routes
+import com.example.repairkz.Navigation.Routes.MAIN_WINDOW
 import com.example.repairkz.Navigation.Routes.SIGN_UP_CODE
+import com.example.repairkz.Navigation.Routes.SIGN_UP_DATA
 import com.example.repairkz.R
+import com.example.repairkz.common.enums.PhotoSourceEnum
 import com.example.repairkz.ui.features.auth.signUp.SignUpEffect
 import com.example.repairkz.ui.features.auth.signUp.SignUpIntent
 import com.example.repairkz.ui.features.auth.signUp.SignUpViewModel
@@ -43,9 +47,27 @@ import com.example.repairkz.ui.features.auth.signUp.SignUpViewModel
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun SignUpEmail(signUpViewModel: SignUpViewModel, navController: NavController){
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(Unit) {
+        signUpViewModel.channel.collect { effect ->
+            when (effect) {
+                SignUpEffect.NavigateToConfirmation -> {
+                    navController.navigate(SIGN_UP_CODE)
+                }
+                is SignUpEffect.ShowSnackBar -> {
+                    snackbarHostState.showSnackbar(effect.message)
+                }
+                else -> {}
+            }
+
+        }
+    }
+
     SignUpLayout(
         signUpViewModel,
-        navController
+        navController,
+        snackbarHostState
     ){ state ->
         Column(
             modifier = Modifier

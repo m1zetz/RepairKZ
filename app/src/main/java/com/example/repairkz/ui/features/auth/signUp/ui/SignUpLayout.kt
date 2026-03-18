@@ -51,20 +51,12 @@ import com.example.repairkz.ui.features.auth.signUp.SignUpViewModel
 fun SignUpLayout(
     signUpViewModel: SignUpViewModel,
     navController: NavController,
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     content: @Composable (SignUpState) -> Unit,
+
 ) {
     val context = LocalContext.current
     val state by signUpViewModel.state.collectAsState()
-    val snackbarHostState = remember { SnackbarHostState() }
-
-    val action = photoPickerHandler(
-        getPhotoFromMedia = { uri ->
-            if (uri!= null)
-                signUpViewModel.handleIntent(SignUpIntent.GetPhotoFromMedia(uri))
-        },
-        navController = navController,
-        context = context
-    )
 
 //    LaunchedEffect(Unit) {
 //        signUpViewModel.channel.collect { effect ->
@@ -103,6 +95,10 @@ fun SignUpLayout(
 //
 //        }
 //    }
+
+
+
+
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
