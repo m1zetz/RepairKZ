@@ -31,6 +31,7 @@ fun PhotoSourceBottomSheet(
             R.string.from_camera,
             intent = {
                 fromCamera()
+                closeSheet()
             },
             icon = Icons.Default.Camera
         )
@@ -38,6 +39,7 @@ fun PhotoSourceBottomSheet(
             R.string.from_gallery,
             intent = {
                 fromGallery()
+                closeSheet()
             },
             icon = Icons.Default.PermMedia
         )

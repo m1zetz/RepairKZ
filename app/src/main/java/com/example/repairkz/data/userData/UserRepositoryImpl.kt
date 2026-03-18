@@ -14,24 +14,9 @@ class UserRepositoryImpl @Inject constructor() : UserRepository {
     private val _userData = MutableStateFlow<User?>(null)
     override val userData = _userData.asStateFlow()
 
-    override suspend fun fetchUserData(): Result<User> {
+    override suspend fun fetchUserData(): User? {
         val currentState = userData.value
-        if (currentState != null) {
-            return Result.success(currentState)
-        } else {
-            val user = User(
-                userId = 1,
-                userPhotoUrl = null,
-                firstName = "Maxim",
-                lastName = "Ius",
-                email = "iusmaxim@gmail.com",
-                phoneNumber = "+77071234567",
-                status = StatusOfUser.CLIENT,
-                city = CitiesEnum.ALMATY
-            )
-            _userData.value = user
-            return Result.success(user)
-        }
+        return currentState
     }
 
     override suspend fun updateUserData(user: User) {

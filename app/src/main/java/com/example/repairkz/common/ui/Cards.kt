@@ -47,9 +47,9 @@ fun ProfileString(
     descriptionPrefix: String = "",
 ) {
 
-    val displayDescription = if(descriptionPrefix.isNotEmpty()){
+    val displayDescription = if (descriptionPrefix.isNotEmpty()) {
         "${descriptionPrefix} ${stringResource(user.status.resID)}"
-    }else{
+    } else {
         stringResource(user.displayDescriptionRes)
     }
 
@@ -118,8 +118,8 @@ fun SignTextField(
                 style = TextStyle(color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f))
             )
         },
-        leadingIcon = {
-            leadingIcon?.let {
+        leadingIcon = leadingIcon?.let {
+            {
                 Icon(leadingIcon, null)
             }
         },
@@ -165,7 +165,7 @@ fun ShortInputCard(
     changeValue: (newValue: String) -> Unit,
     keyboardType: KeyboardType = KeyboardType.Text,
 
-) {
+    ) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
     Card(

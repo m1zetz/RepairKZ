@@ -15,25 +15,22 @@ class GetProfileTypeUseCase @Inject constructor(
     val masterRepository: MasterRepository,
 ) {
     suspend operator fun invoke(comingId: Int?): Result<UserTypes> {
-        return userRepository.fetchUserData().fold(
-            onSuccess = { user ->
-                if (user.userId == comingId || comingId == null) {
-                    if(user is Master){
-                        Result.success(UserTypes.IsCurrentMaster(user, user.getCommonInfo(isMe = true)))
-                    }
-                    else{
-                        Result.success(UserTypes.IsCurrentUser(user, user.getCommonInfo(isMe = true)))
-                    }
-                } else {
-                    val masterResult = masterRepository.fetchMasterById(comingId)
-                    masterResult.map { master ->
-                        UserTypes.IsOtherMaster(master, master.getCommonInfo(isMe = false))
-                    }
+        val user =  userRepository.fetchUserData()
+        user?.let{
+            if (user.userId == comingId || comingId == null) {
+                if(user is Master){
+                    return Result.success(UserTypes.IsCurrentMaster(user, user.getCommonInfo(isMe = true)))
                 }
-            },
-            onFailure = {
-                Result.failure(it)
+                else{
+                    return Result.success(UserTypes.IsCurrentUser(user, user.getCommonInfo(isMe = true)))
+                }
+            } else {
+                val masterResult = masterRepository.fetchMasterById(comingId)
+                return masterResult.map { master ->
+                    UserTypes.IsOtherMaster(master, master.getCommonInfo(isMe = false))
+                }
             }
-        )
+        }
+        return Result.failure(kotlin.Exception("null_id"))
     }
 }

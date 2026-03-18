@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.StateFlow
 
 interface UserRepository {
     val userData: StateFlow<User?>
-    suspend fun fetchUserData() : Result<User>
+    suspend fun fetchUserData() : User?
     suspend fun updateUserStatus(statusOfUser: StatusOfUser)
 
     suspend fun updateUserData(user: User)

@@ -25,7 +25,7 @@ class UserInfoViewModel @Inject constructor(
     private val getUserDataUseCase: GetUserDataUseCase,
     private val getProfileTypeUseCase: GetProfileTypeUseCase,
     private val updateUserDataUseCase: UpdateUserDataUseCase,
-    private val saveToInternalUseCase: SaveToInternalUseCase
+    private val saveToInternalUseCase: SaveToInternalUseCase,
 ) : ViewModel() {
 
 
@@ -64,7 +64,8 @@ class UserInfoViewModel @Inject constructor(
             }
 
             is UserIntent.SelectedPhoto -> {
-                saveAvatar(intent.uri)
+
+
             }
 
 
@@ -89,35 +90,68 @@ class UserInfoViewModel @Inject constructor(
             }
 
             is UserIntent.GetPhotoFromMedia -> {
-                _uiState.update { state ->
-                    if(state is UserState.Success) state.copy(
-                        newAvatarData = intent.uri) else state
-                }
-                viewModelScope.launch {
-                    _channel.send(UserEffects.MapsToPreview)
-                }
+                _uiState.update { currentState ->
+                    if (currentState is UserState.Success) {
+                        currentState.copy(
+                            pendingUri = intent.uri
+                        )
+                    } else {
+                        currentState
+                    }
 
+                }
+            }
+
+            UserIntent.CancelPhoto -> {
+                val currentState = _uiState.value
+                if (currentState is UserState.Success){
+                    _uiState.value = currentState.copy(
+                        pendingUri = null
+                    )
+                }
+            }
+            is UserIntent.ConfirmPhoto -> {
+                viewModelScope.launch {
+                    val localUri = saveToInternalUseCase(intent.uri)
+                    val currentState = _uiState.value
+                    if (currentState is UserState.Success){
+                        _uiState.value = currentState.copy(
+                            newAvatarData = localUri,
+                            pendingUri = null
+                        )
+                        val user = getUserDataUseCase()
+                        user?.let {
+                            val newUser = user.copy(
+                                userPhotoUrl = localUri.toString()
+                            )
+                            updateUserDataUseCase(newUser)
+                            defineUser(comingId)
+                        }
+                    }
+
+                }
             }
         }
 
 
     }
 
-    private fun saveAvatar(uri: Uri?){
+    private fun saveAvatar(uri: Uri?) {
         viewModelScope.launch {
             val internalUri = saveToInternalUseCase(uri) ?: return@launch
             _uiState.update { state ->
-                if(state is UserState.Success) state.copy(
-                    newAvatarData = uri) else state
+                if (state is UserState.Success) state.copy(
+                    newAvatarData = uri
+                ) else state
             }
-            getUserDataUseCase().onSuccess { user ->
+            val user = getUserDataUseCase()
+            user?.let {
                 val newUser = user.copy(
                     userPhotoUrl = internalUri.toString()
                 )
                 updateUserDataUseCase(newUser)
                 defineUser(comingId)
             }
-
         }
 
     }

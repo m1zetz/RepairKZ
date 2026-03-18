@@ -3,6 +3,8 @@ package com.example.repairkz.ui.features.UserInfo
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.LocalActivity
 import com.example.repairkz.R
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -26,12 +28,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.repairkz.Navigation.Routes
 import com.example.repairkz.common.enums.PhotoSourceEnum
 import com.example.repairkz.common.handlers.photoPickerHandler
 import com.example.repairkz.common.ui.PhotoSourceBottomSheet
 import com.example.repairkz.common.ui.StandartString
+import com.example.repairkz.ui.features.CameraX.CameraIntent
+import com.example.repairkz.ui.features.CameraX.CameraViewModel
+import com.example.repairkz.ui.features.CameraX.PhotoPreview
+import com.example.repairkz.ui.features.auth.signUp.SignUpIntent
 import com.example.repairkz.ui.features.profile.common.Cap
 import com.example.repairkz.ui.features.profile.master.MasterBar
 
@@ -42,7 +49,8 @@ import com.example.repairkz.ui.features.profile.master.MasterBar
 fun UserInfo(userInfoViewModel: UserInfoViewModel, navController: NavController) {
     val context = LocalContext.current
     val uiState = userInfoViewModel.uiState.collectAsState()
-
+    val activity = LocalActivity.current as ComponentActivity
+    val cameraViewModel: CameraViewModel = hiltViewModel(viewModelStoreOwner = activity)
     val action = photoPickerHandler(
         getPhotoFromMedia = {uri ->
             if (uri!= null)
@@ -51,6 +59,15 @@ fun UserInfo(userInfoViewModel: UserInfoViewModel, navController: NavController)
         navController = navController,
         context = context
     )
+
+    LaunchedEffect("photo") {
+        cameraViewModel.state.collect { state ->
+            state.uri?.let {
+                userInfoViewModel.handleIntent(UserIntent.ConfirmPhoto(it))
+                cameraViewModel.handleIntent(CameraIntent.ClearPhoto)
+            }
+        }
+    }
 
     LaunchedEffect(userInfoViewModel) {
         userInfoViewModel.channel.collect { effect ->
@@ -108,41 +125,52 @@ fun UserInfo(userInfoViewModel: UserInfoViewModel, navController: NavController)
                     modifier = Modifier.fillMaxSize(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Cap(
-                        commonInfo = user.commonInfo,
-                        changeAvatarIntent = {userInfoViewModel.handleIntent(UserIntent.OpenSheet)})
-                    when (user) {
-                        is UserTypes.IsCurrentUser, is UserTypes.IsCurrentMaster -> {
-                            Column(
-                                modifier = Modifier.fillMaxSize(),
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Center
-                            ) {
-                                Text("Я мастер")
-                            }
-                            if(user is UserTypes.IsCurrentMaster){
-
+                    if (state.pendingUri != null) {
+                        PhotoPreview(
+                            context,
+                            uri = state.pendingUri,
+                            onDismissRequest = { userInfoViewModel.handleIntent(UserIntent.CancelPhoto) },
+                        ) { uri ->
+                            uri?.let {
+                                userInfoViewModel.handleIntent(UserIntent.ConfirmPhoto(it))
                             }
                         }
-
-
-
-                        is UserTypes.IsOtherMaster -> {
-                            Column(
-                                modifier = Modifier.fillMaxSize(),
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Top
-                            ) {
-                                MasterBar(
-                                    { intent ->
-                                        userInfoViewModel.handleIntent(intent)
-                                    },
-                                    masterId = user.commonInfo.id,
-                                )
-                            }
-                        }
-
                     }
+                    else{
+                        Cap(
+                            commonInfo = user.commonInfo,
+                            changeAvatarIntent = {userInfoViewModel.handleIntent(UserIntent.OpenSheet)})
+                        when (user) {
+                            is UserTypes.IsCurrentUser, is UserTypes.IsCurrentMaster -> {
+                                Column(
+                                    modifier = Modifier.fillMaxSize(),
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.Center
+                                ) {
+                                    Text("Я мастер")
+                                }
+                                if(user is UserTypes.IsCurrentMaster){
+
+                                }
+                            }
+                            is UserTypes.IsOtherMaster -> {
+                                Column(
+                                    modifier = Modifier.fillMaxSize(),
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.Top
+                                ) {
+                                    MasterBar(
+                                        { intent ->
+                                            userInfoViewModel.handleIntent(intent)
+                                        },
+                                        masterId = user.commonInfo.id,
+                                    )
+                                }
+                            }
+
+                        }
+                    }
+
 
                 }
             }

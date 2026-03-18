@@ -201,7 +201,7 @@ class SignUpViewModel @Inject constructor(
 
                         updateUserDataUseCase(
                             User(
-                                userId = 1,
+                                userId = 100500,
                                 firstName = firstName,
                                 lastName = lastName,
                                 userPhotoUrl = photo?.toString(),
@@ -246,20 +246,20 @@ class SignUpViewModel @Inject constructor(
             }
 
             is SignUpIntent.SelectedPhoto -> {
-                viewModelScope.launch {
-                    val localUri = saveToInternalUseCase(intent.uri)
-                    _uiState.value = _uiState.value.copy(
-                        userInfo = _uiState.value.userInfo.copy(
-                            photoUri = localUri
-                        )
-                    )
-                }
+//                viewModelScope.launch {
+//                    val localUri = saveToInternalUseCase(intent.uri)
+//                    _uiState.value = _uiState.value.copy(
+//                        userInfo = _uiState.value.userInfo.copy(
+//                            photoUri = localUri
+//                        )
+//                    )
+//                }
 
 
             }
 
             SignUpIntent.CancelPhoto -> {
-                _uiState.update { it.copy(userInfo = it.userInfo.copy(pendingPhotoUri = null))}
+                _uiState.update { it.copy(userInfo = it.userInfo.copy(pendingPhotoUri = null)) }
 
             }
 
@@ -279,8 +279,8 @@ class SignUpViewModel @Inject constructor(
         }
 
 
-
     }
+
     fun timer() {
         _uiState.update { it.copy(timerSeconds = 8) }
         timerJob?.cancel()

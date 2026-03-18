@@ -4,6 +4,7 @@ import android.net.Uri
 import com.example.repairkz.common.enums.PhotoSourceEnum
 import com.example.repairkz.common.models.Master
 import com.example.repairkz.common.models.User
+import com.example.repairkz.ui.features.auth.signUp.SignUpIntent
 
 sealed class UserState {
     object Loading : UserState()
@@ -11,6 +12,7 @@ sealed class UserState {
         val userTypes: UserTypes,
         val avatarSheetState: Boolean = false,
         val newAvatarData: Uri? = null,
+        val pendingUri: Uri? = null
     ) : UserState()
 
     data class Error(val message: String) : UserState()
@@ -42,6 +44,8 @@ sealed class UserIntent {
     data class ChangeAvatar(val typeOfSelect: PhotoSourceEnum) : UserIntent()
     data class SelectedPhoto(val uri: Uri?) : UserIntent()
 
+    data class ConfirmPhoto(val uri: Uri) : UserIntent()
+    object CancelPhoto : UserIntent()
     data class GetPhotoFromMedia(val uri: Uri) : UserIntent()
     sealed class MasterProfileIntent : UserIntent() {
         data class DoOrder(val masterId: Int) : MasterProfileIntent()
