@@ -1,7 +1,10 @@
 package com.example.RepairKZ_Backend.entity
 
+import com.example.RepairKZ_Backend.common.enums.StatusOfUser
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
@@ -26,7 +29,8 @@ data class User(
     val phoneNumber: String,
 
     @Column(nullable = false)
-    val status: String,
+    @Enumerated(EnumType.STRING)
+    val status: StatusOfUser,
 
     @Column(nullable = false)
     val city: String,

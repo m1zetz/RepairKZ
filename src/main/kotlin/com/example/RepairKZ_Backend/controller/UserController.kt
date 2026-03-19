@@ -35,16 +35,6 @@ class UserController(
     }
 
 
-
-    @PostMapping
-    fun createUser(
-        @RequestPart("user") user: UserRegistrationDTO,
-        @RequestPart("file") file: MultipartFile?
-    ): UserResponseDTO {
-
-        return userService.createUser(user, file)
-    }
-
     @PostMapping("/get-code")
     fun emailResieve(
         @RequestBody requestDTO: EmailRequestDTO,

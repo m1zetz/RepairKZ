@@ -62,37 +62,10 @@ class UserService(
         return Result.failure(Exception("Wrong code"))
     }
 
-    @Transactional
-    fun createUser(user: UserRegistrationDTO, file: MultipartFile?): UserResponseDTO {
-        if (userRepository.findByEmail(user.email) != null) {
-            throw IllegalArgumentException("User with email ${user.email} already exists")
-        }
 
-        val hashPassword = passwordEncoder.encode(user.password)
-        val newUser = User(
-            firstName = user.firstName,
-            email = user.email,
-            phoneNumber = user.phone,
-            lastName = user.lastName,
-            city = user.city,
-            id = null,
-            userPhotoUrl = null,
-            status = user.status,
-            password = hashPassword!!
-        )
-
-        val url = fileService.updateUserPhoto(file)
-
-        return userRepository.save(
-            newUser.copy(
-                userPhotoUrl = url ?: ""
-            )
-        ).toResponseDTO()
-
-
-
+    fun findById(id: Long): User? {
+        return userRepository.findByIdOrNull(id)
     }
-
     @Transactional
     fun deleteUser(id: Long) {
         userRepository.deleteById(id)
