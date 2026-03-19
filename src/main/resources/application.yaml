@@ -30,3 +30,5 @@ spring:
           use_jdbc_metadata_defaults: false
   application:
     name: RepairKZ-Backend
+security:
+  key: mySecretKeyForRepairKZApplicationJWT2024

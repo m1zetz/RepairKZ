@@ -9,6 +9,7 @@ import com.example.RepairKZ_Backend.model.UserResponseDTO
 import com.example.RepairKZ_Backend.repository.EmailVerificationRepository
 import com.example.RepairKZ_Backend.repository.UserRepository
 import jakarta.transaction.Transactional
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile

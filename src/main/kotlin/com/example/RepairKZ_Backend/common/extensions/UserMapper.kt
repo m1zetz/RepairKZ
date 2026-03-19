@@ -18,6 +18,8 @@ fun User.toDTO(): UserRegistrationDTO {
 
 fun User.toResponseDTO(): UserResponseDTO {
     return UserResponseDTO(
+        id = this.id!!,
+        userPhotoUrl = this.userPhotoUrl,
         firstName = this.firstName,
         lastName = this.lastName,
         email = this.email,

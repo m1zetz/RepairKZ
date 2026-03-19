@@ -1,5 +1,6 @@
 package com.example.RepairKZ_Backend.model
 
+import com.example.RepairKZ_Backend.common.enums.CitiesEnum
 import com.example.RepairKZ_Backend.common.enums.StatusOfUser
 
 data class UserResponseDTO(
@@ -9,6 +10,6 @@ data class UserResponseDTO(
     val lastName: String,
     val phone: String,
     val status: StatusOfUser,
-    val city: String,
+    val city: CitiesEnum,
     val email: String,
 )
