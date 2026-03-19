@@ -1,18 +1,34 @@
 package com.example.repairkz.ui.features.auth.signIn
 
+import android.util.Log
 import com.example.repairkz.R
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.repairkz.common.constants.EMAIL_ADDRESS_PATTERN
+import com.example.repairkz.common.enums.StatusOfUser
+import com.example.repairkz.common.models.Master
+import com.example.repairkz.common.models.User
 import com.example.repairkz.common.utils.ValidationResult
 import com.example.repairkz.common.utils.Validator
+import com.example.repairkz.data.remote.dto.LoginDTO
+import com.example.repairkz.data.remote.dto.UserResponseDTO
+import com.example.repairkz.domain.useCases.auth.LoginUseCase
+import com.example.repairkz.domain.useCases.userData.UpdateUserDataUseCase
+import com.example.repairkz.ui.features.auth.signUp.SignUpEffect.ShowSnackBar
+import dagger.hilt.android.lifecycle.HiltViewModel
+import jakarta.inject.Inject
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class SignInViewModel : ViewModel() {
+@HiltViewModel
+class SignInViewModel @Inject constructor(
+    private val loginUseCase: LoginUseCase,
+    private val updateUserDataUseCase : UpdateUserDataUseCase
+)  : ViewModel() {
     private val _signInState = MutableStateFlow(SignInState())
     val signInState = _signInState.asStateFlow()
 
@@ -32,7 +48,57 @@ class SignInViewModel : ViewModel() {
 
                 val isValid = validateFields(_signInState.value.email, _signInState.value.password)
                 if(isValid){
-                    // вход
+                    viewModelScope.launch {
+                        try {
+                            _signInState.update {
+                                it.copy(
+                                    isLoading = true
+                                )
+                            }
+                            val response = loginUseCase(LoginDTO(_signInState.value.email, _signInState.value.password))
+                            response.onSuccess {loginResponseDTO ->
+                                val dto = loginResponseDTO.user
+                                val user = User(
+                                    id = loginResponseDTO.id.toInt(),
+                                    userPhotoUrl = dto.userPhotoUrl,
+                                    firstName = dto.firstName,
+                                    lastName = dto.lastName,
+                                    email = dto.email,
+                                    phoneNumber = dto.phone,
+                                    status = dto.status,
+                                    city = dto.city
+                                )
+                                updateUserDataUseCase(
+                                    when(loginResponseDTO.user.status){
+                                        StatusOfUser.CLIENT -> {
+                                            user
+                                        }
+                                        StatusOfUser.MASTER -> {
+                                            user.toMaster().copy(
+                                                masterSpecialization = loginResponseDTO.master?.masterSpecialization,
+                                                description = loginResponseDTO.master?.description,
+                                                experienceInYears = loginResponseDTO.master?.experienceInYears
+                                            )
+                                        }
+                                    }
+
+                                )
+                                _channel.send(SignInEffects.NavigateToMainWindow)
+                            }.onFailure {error ->
+                                _channel.send(SignInEffects.ShowSnackBar(error.message ?: "Ошибка сети"))
+                            }
+                        } catch (e: Exception){
+
+                            _signInState.update { it.copy(error = "Ошибка сети") }
+
+                        } finally {
+                            _signInState.update {
+                                it.copy(
+                                    isLoading = false
+                                )
+                            }
+                        }
+                    }
                 }
             }
             SignInIntent.NavigateToRegistration -> {

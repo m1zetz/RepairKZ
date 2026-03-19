@@ -1,7 +1,6 @@
 package com.example.repairkz.ui.features.auth.signUp
 
 import android.content.Context
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.repairkz.common.enums.CitiesEnum
@@ -10,9 +9,9 @@ import com.example.repairkz.common.models.User
 import com.example.repairkz.common.utils.ValidationResult
 import com.example.repairkz.common.utils.Validator
 import com.example.repairkz.domain.useCases.files.SaveToInternalUseCase
-import com.example.repairkz.domain.useCases.registration.CreateUserUseCase
-import com.example.repairkz.domain.useCases.registration.GetCodeUseCase
-import com.example.repairkz.domain.useCases.registration.SendCodeUseCase
+import com.example.repairkz.domain.useCases.auth.CreateUserUseCase
+import com.example.repairkz.domain.useCases.auth.GetCodeUseCase
+import com.example.repairkz.domain.useCases.auth.SendCodeUseCase
 import com.example.repairkz.domain.useCases.userData.UpdateUserDataUseCase
 import com.example.repairkz.ui.features.auth.signUp.SignUpEffect.*
 import com.google.gson.Gson
@@ -28,7 +27,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
-import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
@@ -168,7 +166,6 @@ class SignUpViewModel @Inject constructor(
                         _uiState.value = _uiState.value.copy(
                             isLoading = true
                         )
-                        delay(3000)
                         val code = intent.code.toInt()
                         val response = sendCodeUseCase(code, _uiState.value.email)
                         response.onSuccess {
@@ -248,12 +245,11 @@ class SignUpViewModel @Inject constructor(
                             }
                             val userPart = Gson().toJson(user.toCreateUserDTO()).toRequestBody("application/json".toMediaTypeOrNull())
                             val response = createUserUseCase(userPart,photoPart )
-                            response.onSuccess {id ->
-                                user = user.copy(userId = id)
+                            response.onSuccess {dto ->
+                                user = user.copy(userId = dto.id.toInt())
                                 updateUserDataUseCase(
                                     user
                                 )
-
                                 _channel.send(NavigateToMainWindow)
                             }.onFailure { error ->
                                 _uiState.update { it.copy(error = error.message) }

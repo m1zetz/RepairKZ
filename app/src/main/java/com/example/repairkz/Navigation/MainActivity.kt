@@ -57,7 +57,7 @@ class MainActivity : ComponentActivity() {
                 Surface(color = MaterialTheme.colorScheme.background){
                     NavHost(
                         navController = navController,
-                        startDestination = Routes.REG_GROUP
+                        startDestination = Routes.SIGN_IN
                     ) {
                         registrationGraph(navController)
                         profileGraph(navController)

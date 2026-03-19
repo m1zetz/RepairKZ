@@ -56,6 +56,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun SignUpCode(signUpViewModel: SignUpViewModel, navController: NavController) {
+    val snackbarHostState = remember { SnackbarHostState() }
     LaunchedEffect(Unit) {
         signUpViewModel.channel.collect { effect ->
 
@@ -64,9 +65,8 @@ fun SignUpCode(signUpViewModel: SignUpViewModel, navController: NavController) {
                 is SignUpEffect.NavigateToFillingData -> {
                     navController.navigate(SIGN_UP_DATA)
                 }
-
+                is SignUpEffect.ShowSnackBar -> snackbarHostState.showSnackbar(effect.message)
                 else -> {
-
                 }
 
 
@@ -76,7 +76,7 @@ fun SignUpCode(signUpViewModel: SignUpViewModel, navController: NavController) {
     }
     SignUpLayout(
         signUpViewModel,
-        navController
+        snackbarHostState
     ) { state ->
         Column(
             modifier = Modifier

@@ -1,11 +1,11 @@
 package com.example.repairkz.data.remote.api
 
-import com.example.repairkz.common.models.User
 import com.example.repairkz.data.remote.dto.CodeDTO
-import com.example.repairkz.data.remote.dto.CreateUserDTO
 import com.example.repairkz.data.remote.dto.EmailDTO
+import com.example.repairkz.data.remote.dto.LoginDTO
+import com.example.repairkz.data.remote.dto.LoginResponseDTO
+import com.example.repairkz.data.remote.dto.RegistrationResponseDTO
 import okhttp3.MultipartBody
-import okhttp3.Request
 import okhttp3.RequestBody
 import retrofit2.Response
 import retrofit2.http.Body
@@ -21,9 +21,14 @@ interface RegistrationApi {
     suspend fun sendCode(@Body codeDTO: CodeDTO) : Response<Unit>
 
     @Multipart
-    @POST("api/users/create-user")
-    suspend fun createUser(
+    @POST("api/register")
+    suspend fun register(
         @Part("user") user: RequestBody,
         @Part photo: MultipartBody.Part?
-        ) : Response<Int>
+        ) : Response<RegistrationResponseDTO>
+
+    @POST("api/login")
+    suspend fun login(
+        @Body loginDTO: LoginDTO
+    ) : Response<LoginResponseDTO>
 }

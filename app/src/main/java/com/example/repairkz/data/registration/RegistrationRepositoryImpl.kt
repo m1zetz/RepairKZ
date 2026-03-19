@@ -1,10 +1,11 @@
 package com.example.repairkz.data.registration
 
-import com.example.repairkz.common.models.User
 import com.example.repairkz.data.remote.api.RegistrationApi
 import com.example.repairkz.data.remote.dto.CodeDTO
-import com.example.repairkz.data.remote.dto.CreateUserDTO
 import com.example.repairkz.data.remote.dto.EmailDTO
+import com.example.repairkz.data.remote.dto.LoginDTO
+import com.example.repairkz.data.remote.dto.LoginResponseDTO
+import com.example.repairkz.data.remote.dto.RegistrationResponseDTO
 import com.example.repairkz.domain.repository.RegistrationRepository
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -39,14 +40,30 @@ class RegistrationRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun createUser(user: RequestBody, photo: MultipartBody.Part?): Result<Int> {
+    override suspend fun registration(user: RequestBody, photo: MultipartBody.Part?): Result<RegistrationResponseDTO> {
         return try{
-            val response = registrationApi.createUser(user, photo)
+            val response = registrationApi.register(user, photo)
             if (response.isSuccessful) Result.success(response.body()!!)
             else{
                 val errorMsg = when(response.code()){
                     400 -> "wrong_code"
                     else -> "network_error"
+                }
+                Result.failure(Exception(errorMsg))
+            }
+        } catch (e: Exception){
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun login(loginDTO: LoginDTO): Result<LoginResponseDTO> {
+        return try{
+            val response = registrationApi.login(loginDTO)
+            if(response.isSuccessful) Result.success(response.body()!!)
+            else{
+                val errorMsg = when(response.code()){
+                    400 -> "wrong data"
+                    else -> "network error"
                 }
                 Result.failure(Exception(errorMsg))
             }

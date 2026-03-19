@@ -50,54 +50,11 @@ import com.example.repairkz.ui.features.auth.signUp.SignUpViewModel
 @Composable
 fun SignUpLayout(
     signUpViewModel: SignUpViewModel,
-    navController: NavController,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     content: @Composable (SignUpState) -> Unit,
 
 ) {
-    val context = LocalContext.current
     val state by signUpViewModel.state.collectAsState()
-
-//    LaunchedEffect(Unit) {
-//        signUpViewModel.channel.collect { effect ->
-//            val currentRoute = navController.currentBackStackEntry?.destination?.route
-//            when (effect) {
-//                SignUpEffect.NavigateToConfirmation -> {
-//                    navController.navigate(SIGN_UP_CODE)
-//                }
-//                is SignUpEffect.ShowSnackBar -> {
-//                    snackbarHostState.showSnackbar(effect.message)
-//                }
-//
-//                is SignUpEffect.NavigateToFillingData -> {
-//                    navController.navigate(SIGN_UP_DATA)
-//                }
-//
-//                is SignUpEffect.NavigateToMainWindow -> {
-//                    navController.navigate(MAIN_WINDOW)
-//                }
-//
-//                is SignUpEffect.OpenPhotoPicker -> {
-//                    if (currentRoute != Routes.CAMERA && currentRoute != Routes.PHOTO_PREVIEW) {
-//                        when (effect.typeOfSelect) {
-//                            PhotoSourceEnum.CAMERA -> action.launchCamera()
-//                            PhotoSourceEnum.GALLERY -> action.launchGallery()
-//                        }
-//                    }
-//                }
-//
-//                SignUpEffect.NavigateToPreview -> {
-//                    if (currentRoute != Routes.PHOTO_PREVIEW) {
-//                        navController.navigate(Routes.PHOTO_PREVIEW)
-//                    }
-//                }
-//            }
-//
-//        }
-//    }
-
-
-
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) }

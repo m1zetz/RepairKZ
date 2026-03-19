@@ -1,6 +1,5 @@
-package com.example.repairkz.domain.useCases.registration
+package com.example.repairkz.domain.useCases.auth
 
-import com.example.repairkz.data.remote.api.RegistrationApi
 import com.example.repairkz.domain.repository.RegistrationRepository
 import jakarta.inject.Inject
 

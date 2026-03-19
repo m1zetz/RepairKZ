@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -108,9 +109,9 @@ fun SignUpData(signUpViewModel: SignUpViewModel, navController: NavController) {
 
     }
     SignUpLayout(
-        signUpViewModel,
-        navController
+        signUpViewModel
     ) { state ->
+
         if (state.userInfo.pendingPhotoUri != null) {
             PhotoPreview(
                 context,
@@ -132,66 +133,72 @@ fun SignUpData(signUpViewModel: SignUpViewModel, navController: NavController) {
                     alignment = Alignment.CenterVertically
                 )
             ) {
-                UserPhoto(
-                    state.userInfo.photoUri?.toString(),
-                    changeAvatarIntent = {
-                        signUpViewModel.handleIntent(SignUpIntent.OpenSheet)
-                    }
-                )
-                Spacer(modifier = Modifier.size(8.dp))
-                SignTextField(
-                    state.userInfo.firstName,
-                    { newValue ->
-                        signUpViewModel.handleIntent(SignUpIntent.ChangeFirstName(newValue))
-                    },
-                    state.userInfo.firstNameError,
-                    placeholder = R.string.enter_first_name
-                )
-                SignTextField(
-                    state.userInfo.lastName,
-                    { newValue ->
-                        signUpViewModel.handleIntent(SignUpIntent.ChangeLastName(newValue))
-                    },
-                    state.userInfo.lastNameError,
-                    placeholder = R.string.enter_last_name
-                )
-                SignTextField(
-                    state.password,
-                    { newValue ->
-                        signUpViewModel.handleIntent(SignUpIntent.ChangePassword(newValue))
-                    },
-                    state.passwordError,
-                    placeholder = R.string.come_up_with_password
-                )
-                Button(
-                    modifier = Modifier.fillMaxWidth(),
-                    onClick = {
-                        signUpViewModel.handleIntent(SignUpIntent.NavigateToMainWindow)
-                    }
-                ) {
-                    Text(stringResource(R.string.sign_up))
+                if(state.isLoading){
+                    CircularProgressIndicator()
                 }
-                if (state.avatarSheetState) {
-                    PhotoSourceBottomSheet(
-                        closeSheet = {
-                            signUpViewModel.handleIntent(SignUpIntent.CloseSheet)
-                        },
-                        fromCamera = {
-                            signUpViewModel.handleIntent(
-                                SignUpIntent.ChangeAvatar(
-                                    PhotoSourceEnum.CAMERA
-                                )
-                            )
-                        },
-                        fromGallery = {
-                            signUpViewModel.handleIntent(
-                                SignUpIntent.ChangeAvatar(
-                                    PhotoSourceEnum.GALLERY
-                                )
-                            )
+                else{
+                    UserPhoto(
+                        state.userInfo.photoUri?.toString(),
+                        changeAvatarIntent = {
+                            signUpViewModel.handleIntent(SignUpIntent.OpenSheet)
                         }
                     )
+                    Spacer(modifier = Modifier.size(8.dp))
+                    SignTextField(
+                        state.userInfo.firstName,
+                        { newValue ->
+                            signUpViewModel.handleIntent(SignUpIntent.ChangeFirstName(newValue))
+                        },
+                        state.userInfo.firstNameError,
+                        placeholder = R.string.enter_first_name
+                    )
+                    SignTextField(
+                        state.userInfo.lastName,
+                        { newValue ->
+                            signUpViewModel.handleIntent(SignUpIntent.ChangeLastName(newValue))
+                        },
+                        state.userInfo.lastNameError,
+                        placeholder = R.string.enter_last_name
+                    )
+                    SignTextField(
+                        state.password,
+                        { newValue ->
+                            signUpViewModel.handleIntent(SignUpIntent.ChangePassword(newValue))
+                        },
+                        state.passwordError,
+                        placeholder = R.string.come_up_with_password
+                    )
+                    Button(
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = {
+                            signUpViewModel.handleIntent(SignUpIntent.NavigateToMainWindow)
+                        }
+                    ) {
+                        Text(stringResource(R.string.sign_up))
+                    }
+                    if (state.avatarSheetState) {
+                        PhotoSourceBottomSheet(
+                            closeSheet = {
+                                signUpViewModel.handleIntent(SignUpIntent.CloseSheet)
+                            },
+                            fromCamera = {
+                                signUpViewModel.handleIntent(
+                                    SignUpIntent.ChangeAvatar(
+                                        PhotoSourceEnum.CAMERA
+                                    )
+                                )
+                            },
+                            fromGallery = {
+                                signUpViewModel.handleIntent(
+                                    SignUpIntent.ChangeAvatar(
+                                        PhotoSourceEnum.GALLERY
+                                    )
+                                )
+                            }
+                        )
+                    }
                 }
+
             }
         }
     }

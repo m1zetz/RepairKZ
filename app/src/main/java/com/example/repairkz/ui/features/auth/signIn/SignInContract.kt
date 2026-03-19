@@ -5,7 +5,8 @@ data class SignInState(
     val password: String = "",
     val emailError: Int? = null,
     val passwordError: Int? = null,
-    val isLoading: Boolean = false
+    val isLoading: Boolean = false,
+    val error: String? = null
 )
 
 sealed class SignInIntent{
@@ -18,5 +19,7 @@ sealed class SignInIntent{
 }
 
 sealed class SignInEffects{
+    data class ShowSnackBar(val message: String) : SignInEffects()
+    object NavigateToMainWindow : SignInEffects()
     object NavigateToRegistration : SignInEffects()
 }

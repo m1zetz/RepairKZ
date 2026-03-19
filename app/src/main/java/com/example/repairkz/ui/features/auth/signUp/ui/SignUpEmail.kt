@@ -47,8 +47,8 @@ import com.example.repairkz.ui.features.auth.signUp.SignUpViewModel
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun SignUpEmail(signUpViewModel: SignUpViewModel, navController: NavController){
-    val snackbarHostState = remember { SnackbarHostState() }
 
+    val snackbarHostState = remember { SnackbarHostState() }
     LaunchedEffect(Unit) {
         signUpViewModel.channel.collect { effect ->
             when (effect) {
@@ -66,7 +66,6 @@ fun SignUpEmail(signUpViewModel: SignUpViewModel, navController: NavController){
 
     SignUpLayout(
         signUpViewModel,
-        navController,
         snackbarHostState
     ){ state ->
         Column(
