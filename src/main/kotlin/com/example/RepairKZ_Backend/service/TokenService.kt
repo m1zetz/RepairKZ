@@ -37,7 +37,4 @@ class TokenService(
         }
     }
 
-    fun refreshToken(user: User): String {
-
-    }
 }
