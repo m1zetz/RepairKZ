@@ -1,19 +1,16 @@
-package com.example.repairkz.Navigation
+package com.example.repairkz.Navigation.photo
 
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.LocalActivity
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import com.example.repairkz.Navigation.Routes
 import com.example.repairkz.ui.features.CameraX.Camera
 import com.example.repairkz.ui.features.CameraX.CameraIntent
 import com.example.repairkz.ui.features.CameraX.CameraViewModel
-import com.example.repairkz.ui.features.CameraX.PhotoPreview
 
 fun NavGraphBuilder.photoGraph(
     navController: NavController,

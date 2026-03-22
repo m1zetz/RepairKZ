@@ -1,27 +1,16 @@
 package com.example.repairkz.Navigation.registration
 
 import android.annotation.SuppressLint
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
-import com.example.repairkz.Navigation.Routes
-import com.example.repairkz.Navigation.Routes.PROFILE_GROUP
 import com.example.repairkz.Navigation.Routes.REG_GROUP
 import com.example.repairkz.Navigation.Routes.SIGN_UP_CODE
 import com.example.repairkz.Navigation.Routes.SIGN_UP_DATA
 import com.example.repairkz.Navigation.Routes.SIGN_UP_EMAIL
-import com.example.repairkz.Navigation.photoGraph
-import com.example.repairkz.ui.features.CameraX.Camera
-import com.example.repairkz.ui.features.CameraX.PhotoPreview
-import com.example.repairkz.ui.features.UserInfo.UserInfo
-import com.example.repairkz.ui.features.UserInfo.UserInfoViewModel
-import com.example.repairkz.ui.features.UserInfo.UserIntent
-import com.example.repairkz.ui.features.UserInfo.UserState
 import com.example.repairkz.ui.features.auth.signUp.SignUpViewModel
 import com.example.repairkz.ui.features.auth.signUp.ui.SignUpCode
 import com.example.repairkz.ui.features.auth.signUp.ui.SignUpData

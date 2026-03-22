@@ -1,6 +1,6 @@
 package com.example.repairkz.di
 
-import com.example.repairkz.data.remote.api.TestApi
+import com.example.repairkz.data.remote.api.TokenApi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -9,9 +9,9 @@ import retrofit2.Retrofit
 
 @InstallIn(SingletonComponent::class)
 @Module
-object TestModule{
+object TokenModule{
     @Provides
-    fun provideTestApi(retrofit: Retrofit) : TestApi{
-        return retrofit.create(TestApi::class.java)
+    fun provideTokenApi(retrofit: Retrofit) : TokenApi{
+        return retrofit.create(TokenApi::class.java)
     }
 }

@@ -9,6 +9,7 @@ import com.example.repairkz.data.notificationData.NotificationRepository
 import com.example.repairkz.data.notificationData.NotificationRepositoryImpl
 import com.example.repairkz.data.registration.RegistrationRepositoryImpl
 import com.example.repairkz.data.remote.api.RegistrationApi
+import com.example.repairkz.data.remote.api.TokenApi
 import com.example.repairkz.domain.repository.RegistrationRepository
 import dagger.Binds
 import dagger.Module
@@ -37,9 +38,10 @@ object RepositoryModule{
 
 
     @Provides
-    fun provideRegistrationRepository(registrationApi: RegistrationApi) : RegistrationRepository{
+    fun provideRegistrationRepository(registrationApi: RegistrationApi, tokenApi: TokenApi) : RegistrationRepository{
         return RegistrationRepositoryImpl(
-            registrationApi = registrationApi
+            registrationApi = registrationApi,
+            tokenApi = tokenApi
         )
     }
 
