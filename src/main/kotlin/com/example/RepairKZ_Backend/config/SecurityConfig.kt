@@ -30,6 +30,7 @@ class SecurityConfig(
         http.authorizeHttpRequests { auth ->
             auth.requestMatchers(HttpMethod.POST, "/api/login").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/register").permitAll()
+                .requestMatchers(HttpMethod.GET, "/refresh-token").authenticated()
 //                .requestMatchers("/api/**").authenticated()
                 .anyRequest().permitAll()
         }

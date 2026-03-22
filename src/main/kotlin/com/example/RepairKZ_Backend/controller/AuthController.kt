@@ -6,6 +6,7 @@ import com.example.RepairKZ_Backend.model.LoginResponseDTO
 import com.example.RepairKZ_Backend.model.RefreshResponseDTO
 import com.example.RepairKZ_Backend.model.UserRegistrationDTO
 import com.example.RepairKZ_Backend.service.AuthService
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -33,7 +34,7 @@ class AuthController(
         return authService.login(loginRequest)
     }
 
-    @PostMapping("/refresh-token")
+    @GetMapping("/refresh-token")
     fun refreshToken() : RefreshResponseDTO {
         return authService.refreshToken()
     }
