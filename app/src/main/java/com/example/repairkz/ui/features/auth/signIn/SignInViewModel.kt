@@ -10,6 +10,8 @@ import com.example.repairkz.common.models.Master
 import com.example.repairkz.common.models.User
 import com.example.repairkz.common.utils.ValidationResult
 import com.example.repairkz.common.utils.Validator
+import com.example.repairkz.data.local.dataStore.DataStoreManager
+import com.example.repairkz.data.remote.api.TestApi
 import com.example.repairkz.data.remote.dto.LoginDTO
 import com.example.repairkz.data.remote.dto.UserResponseDTO
 import com.example.repairkz.domain.useCases.auth.LoginUseCase
@@ -27,13 +29,33 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class SignInViewModel @Inject constructor(
     private val loginUseCase: LoginUseCase,
-    private val updateUserDataUseCase : UpdateUserDataUseCase
+    private val updateUserDataUseCase : UpdateUserDataUseCase,
+    private val dataStoreManager: DataStoreManager,
+    private val testApi: TestApi
 )  : ViewModel() {
     private val _signInState = MutableStateFlow(SignInState())
     val signInState = _signInState.asStateFlow()
 
     private val _channel = Channel<SignInEffects>(Channel.BUFFERED)
     val channel = _channel.receiveAsFlow()
+
+    init{
+        viewModelScope.launch {
+            try {
+                val response = testApi.hello()
+                if(response.isSuccessful){
+                    Log.d("",response.body() ?: "")
+                }
+                else{
+                    Log.d("Test", "Ошибка: ${response.code()}")
+                }
+            } catch (e: Exception){
+                Log.e("Test", "Exception: ${e.message} ${e.cause}")
+            }
+        }
+
+
+    }
 
     fun handleIntent(intent: SignInIntent){
         when(intent){
@@ -83,6 +105,7 @@ class SignInViewModel @Inject constructor(
                                     }
 
                                 )
+                                dataStoreManager.saveToken(loginResponseDTO.token)
                                 _channel.send(SignInEffects.NavigateToMainWindow)
                             }.onFailure {error ->
                                 _channel.send(SignInEffects.ShowSnackBar(error.message ?: "Ошибка сети"))

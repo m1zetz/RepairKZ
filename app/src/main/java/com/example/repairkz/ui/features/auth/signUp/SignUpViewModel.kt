@@ -8,6 +8,7 @@ import com.example.repairkz.common.enums.StatusOfUser
 import com.example.repairkz.common.models.User
 import com.example.repairkz.common.utils.ValidationResult
 import com.example.repairkz.common.utils.Validator
+import com.example.repairkz.data.local.dataStore.DataStoreManager
 import com.example.repairkz.domain.useCases.files.SaveToInternalUseCase
 import com.example.repairkz.domain.useCases.auth.CreateUserUseCase
 import com.example.repairkz.domain.useCases.auth.GetCodeUseCase
@@ -40,6 +41,7 @@ class SignUpViewModel @Inject constructor(
     private val saveToInternalUseCase: SaveToInternalUseCase,
     private val updateUserDataUseCase: UpdateUserDataUseCase,
     private val createUserUseCase: CreateUserUseCase,
+    private val dataStoreManager: DataStoreManager,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
@@ -250,6 +252,7 @@ class SignUpViewModel @Inject constructor(
                                 updateUserDataUseCase(
                                     user
                                 )
+                                dataStoreManager.saveToken(dto.token)
                                 _channel.send(NavigateToMainWindow)
                             }.onFailure { error ->
                                 _uiState.update { it.copy(error = error.message) }

@@ -8,6 +8,7 @@ import com.example.repairkz.data.masterData.MasterRepositoryImpl
 import com.example.repairkz.data.notificationData.NotificationRepository
 import com.example.repairkz.data.notificationData.NotificationRepositoryImpl
 import com.example.repairkz.data.registration.RegistrationRepositoryImpl
+import com.example.repairkz.data.remote.api.RegistrationApi
 import com.example.repairkz.domain.repository.RegistrationRepository
 import dagger.Binds
 import dagger.Module
@@ -18,25 +19,30 @@ import dagger.hilt.components.SingletonComponent
 
 @InstallIn(SingletonComponent::class)
 @Module
-abstract class RepositoryModule{
+object RepositoryModule{
 
-    companion object{
-        @Provides
-        fun provideNotificationRepository() : NotificationRepository{
-            return NotificationRepositoryImpl()
-        }
-        @Provides
-        fun provideMasterRepository() : MasterRepository {
-            return MasterRepositoryImpl()
-        }
-
-        @Provides
-        fun provideFileRepository(@ApplicationContext context: Context) : FileRepository {
-            return FileRepositoryImpl(context)
-        }
+    @Provides
+    fun provideNotificationRepository() : NotificationRepository{
+        return NotificationRepositoryImpl()
+    }
+    @Provides
+    fun provideMasterRepository() : MasterRepository {
+        return MasterRepositoryImpl()
     }
 
-    @Binds
-    abstract fun bindRegistrationRepository(impl: RegistrationRepositoryImpl) : RegistrationRepository
+    @Provides
+    fun provideFileRepository(@ApplicationContext context: Context) : FileRepository {
+        return FileRepositoryImpl(context)
+    }
+
+
+    @Provides
+    fun provideRegistrationRepository(registrationApi: RegistrationApi) : RegistrationRepository{
+        return RegistrationRepositoryImpl(
+            registrationApi = registrationApi
+        )
+    }
+
+    
 
 }
