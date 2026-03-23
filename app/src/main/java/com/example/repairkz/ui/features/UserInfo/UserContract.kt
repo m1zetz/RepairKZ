@@ -1,6 +1,7 @@
 package com.example.repairkz.ui.features.UserInfo
 
 import android.net.Uri
+import com.example.repairkz.common.enums.MasterSpetializationsEnum
 import com.example.repairkz.common.enums.PhotoSourceEnum
 import com.example.repairkz.common.models.Master
 import com.example.repairkz.common.models.User
@@ -12,7 +13,10 @@ sealed class UserState {
         val userTypes: UserTypes,
         val avatarSheetState: Boolean = false,
         val newAvatarData: Uri? = null,
-        val pendingUri: Uri? = null
+        val pendingUri: Uri? = null,
+        val descriptionDraft: String = "",
+        val experienceDraft: String = "",
+        val spec: MasterSpetializationsEnum = MasterSpetializationsEnum.UNKNOWN
     ) : UserState()
 
     data class Error(val message: String) : UserState()
@@ -39,6 +43,7 @@ sealed class UserTypes {
 
 sealed class UserIntent {
 
+
     object OpenSheet : UserIntent()
     object CloseSheet : UserIntent()
     data class ChangeAvatar(val typeOfSelect: PhotoSourceEnum) : UserIntent()
@@ -51,7 +56,19 @@ sealed class UserIntent {
         data class AddToFavorites(val masterId: Int) : MasterProfileIntent()
         data class Report(val masterId: Int) : MasterProfileIntent()
     }
+
+    sealed class CurrentMasterIntent : UserIntent() {
+        data class ChangeDescription(val description: String) : CurrentMasterIntent()
+        data class ChangeExperience(val experience: String) : CurrentMasterIntent()
+        data class ChangeSpecialization(val spec: MasterSpetializationsEnum) : CurrentMasterIntent()
+
+        object SaveDescription : CurrentMasterIntent()
+        object SaveExperience : CurrentMasterIntent()
+        object SaveSpecialization : CurrentMasterIntent()
+
+    }
 }
+
 
 sealed interface UserEffects {
     object MapsToPreview: UserEffects

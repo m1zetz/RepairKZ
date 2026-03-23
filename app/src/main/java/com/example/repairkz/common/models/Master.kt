@@ -14,9 +14,9 @@ data class Master(
     override val phoneNumber: String,
     override val status: StatusOfUser,
     override val city: CitiesEnum,
-    val experienceInYears: Int? = null,
-    val description: String? = null,
-    val masterSpecialization: MasterSpetializationsEnum? = null
+    val experienceInYears: Int = 0,
+    val description: String = "",
+    val masterSpecialization: MasterSpetializationsEnum = MasterSpetializationsEnum.UNKNOWN
 
 ) : User(id, userPhotoUrl, firstName, lastName, email, phoneNumber, status, city){
     override fun toUser(): User {
@@ -33,7 +33,7 @@ data class Master(
     }
 
     override val displayDescriptionRes : Int
-        get() = this.masterSpecialization?.resID?: R.string.not_specified
+        get() = this.masterSpecialization.resID
 
 
 }

@@ -12,9 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -22,10 +19,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -37,7 +32,7 @@ import com.example.repairkz.R
 import com.example.repairkz.common.enums.PhotoSourceEnum
 import com.example.repairkz.common.handlers.photoPickerHandler
 import com.example.repairkz.common.ui.PhotoSourceBottomSheet
-import com.example.repairkz.common.ui.SignTextField
+import com.example.repairkz.common.ui.UniversalTextField
 import com.example.repairkz.common.ui.UserPhoto
 import com.example.repairkz.ui.features.CameraX.CameraIntent
 import com.example.repairkz.ui.features.CameraX.CameraViewModel
@@ -144,7 +139,7 @@ fun SignUpData(signUpViewModel: SignUpViewModel, navController: NavController) {
                         }
                     )
                     Spacer(modifier = Modifier.size(8.dp))
-                    SignTextField(
+                    UniversalTextField(
                         state.userInfo.firstName,
                         { newValue ->
                             signUpViewModel.handleIntent(SignUpIntent.ChangeFirstName(newValue))
@@ -152,7 +147,7 @@ fun SignUpData(signUpViewModel: SignUpViewModel, navController: NavController) {
                         state.userInfo.firstNameError,
                         placeholder = R.string.enter_first_name
                     )
-                    SignTextField(
+                    UniversalTextField(
                         state.userInfo.lastName,
                         { newValue ->
                             signUpViewModel.handleIntent(SignUpIntent.ChangeLastName(newValue))
@@ -160,7 +155,7 @@ fun SignUpData(signUpViewModel: SignUpViewModel, navController: NavController) {
                         state.userInfo.lastNameError,
                         placeholder = R.string.enter_last_name
                     )
-                    SignTextField(
+                    UniversalTextField(
                         state.password,
                         { newValue ->
                             signUpViewModel.handleIntent(SignUpIntent.ChangePassword(newValue))

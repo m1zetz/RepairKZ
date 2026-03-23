@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Camera
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Handyman
 import androidx.compose.material.icons.filled.PermMedia
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -35,6 +37,7 @@ import com.example.repairkz.common.enums.PhotoSourceEnum
 import com.example.repairkz.common.handlers.photoPickerHandler
 import com.example.repairkz.common.ui.PhotoSourceBottomSheet
 import com.example.repairkz.common.ui.StandartString
+import com.example.repairkz.common.ui.UniversalTextField
 import com.example.repairkz.ui.features.CameraX.CameraIntent
 import com.example.repairkz.ui.features.CameraX.CameraViewModel
 import com.example.repairkz.ui.features.CameraX.PhotoPreview
@@ -147,11 +150,27 @@ fun UserInfo(userInfoViewModel: UserInfoViewModel, navController: NavController)
                                     horizontalAlignment = Alignment.CenterHorizontally,
                                     verticalArrangement = Arrangement.Center
                                 ) {
-                                    Text("Я мастер")
-                                }
-                                if(user is UserTypes.IsCurrentMaster){
 
+                                    //общий
+
+
+                                    if(user is UserTypes.IsCurrentMaster){
+                                        UniversalTextField(
+                                            value = state.descriptionDraft,
+                                            onValueChange = { description ->
+                                                userInfoViewModel.handleIntent(UserIntent.CurrentMasterIntent.ChangeDescription(description))
+                                            },
+                                            errorMessage = null,
+                                            leadingIcon = Icons.Default.Handyman,
+                                            placeholder = R.string.desc,
+                                            backIcon = if (state.descriptionDraft != user.master.description) Icons.Default.Check else null,
+                                            action = {
+                                                userInfoViewModel.handleIntent(UserIntent.CurrentMasterIntent.SaveDescription)
+                                            }
+                                        )
+                                    }
                                 }
+
                             }
                             is UserTypes.IsOtherMaster -> {
                                 Column(

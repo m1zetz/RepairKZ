@@ -48,6 +48,9 @@ configurations.all {
 }
 
 dependencies {
+    val room_version = "2.8.4"
+    ksp("androidx.room:room-compiler:$room_version")
+    implementation("androidx.room:room-runtime:$room_version")
     implementation("androidx.core:core-splashscreen:1.0.1")
     implementation("androidx.datastore:datastore-preferences:1.2.1")
     implementation("com.squareup.retrofit2:converter-scalars:2.9.0")

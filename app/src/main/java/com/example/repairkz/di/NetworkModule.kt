@@ -1,5 +1,6 @@
 package com.example.repairkz.di
 
+import com.example.repairkz.common.constants.SERVER_IP
 import com.example.repairkz.data.local.dataStore.DataStoreManager
 import com.example.repairkz.data.remote.api.RegistrationApi
 import dagger.Module
@@ -19,15 +20,15 @@ import retrofit2.converter.scalars.ScalarsConverterFactory
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
-    private const val BASE_URL = "http://192.168.0.4:8080/"
+    private const val BASE_URL = "http://$SERVER_IP:8080/"
 
     @Provides
     fun providesRetrofit(okHttpClient: OkHttpClient): Retrofit {
         return Retrofit
             .Builder()
             .baseUrl(BASE_URL)
-            .addConverterFactory(ScalarsConverterFactory.create())
             .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(ScalarsConverterFactory.create())
             .client(okHttpClient)
             .build()
 

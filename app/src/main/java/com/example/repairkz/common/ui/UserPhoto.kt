@@ -17,6 +17,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.repairkz.R
+import com.example.repairkz.common.constants.SERVER_IP
 import kotlin.text.ifEmpty
 
 @Composable
@@ -30,7 +31,11 @@ fun UserPhoto(
         contentAlignment = Alignment.BottomEnd
     ) {
         AsyncImage(
-            model = if (photoUri.isNullOrEmpty()) { R.drawable.ic_launcher_background } else photoUri,
+            model = when {
+                photoUri.isNullOrEmpty() -> R.drawable.ic_launcher_background
+                photoUri.startsWith("/photos/") -> "http://$SERVER_IP:8080$photoUri"
+                else -> photoUri
+            },
             contentDescription = "UserPhoto",
             contentScale = ContentScale.Crop,
             modifier = Modifier

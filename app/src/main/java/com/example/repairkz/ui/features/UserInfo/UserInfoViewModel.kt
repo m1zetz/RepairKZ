@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.repairkz.common.models.Master
 import com.example.repairkz.domain.useCases.files.SaveToInternalUseCase
 import com.example.repairkz.domain.useCases.userData.GetProfileTypeUseCase
 import com.example.repairkz.domain.useCases.userData.GetUserDataUseCase
@@ -127,6 +128,49 @@ class UserInfoViewModel @Inject constructor(
 
                 }
             }
+
+            is UserIntent.CurrentMasterIntent.ChangeDescription -> {
+                viewModelScope.launch {
+                    val state = _uiState.value
+                    if(state is UserState.Success){
+                        _uiState.value = state.copy(
+                            descriptionDraft = intent.description
+                        )
+//                        updateUserDataUseCase(master.copy(description = intent.description))
+//                        defineUser(comingId)
+
+                    }
+                }
+
+
+            }
+            is UserIntent.CurrentMasterIntent.ChangeExperience -> {
+
+            }
+            is UserIntent.CurrentMasterIntent.ChangeSpecialization -> {
+
+            }
+
+            UserIntent.CurrentMasterIntent.SaveDescription -> {
+                viewModelScope.launch {
+                    val state = _uiState.value
+                    if(state is UserState.Success){
+                        val user = state.userTypes
+                        if(user is UserTypes.IsCurrentMaster){
+                            updateUserDataUseCase(user.master.copy(description = state.descriptionDraft))
+                            defineUser(comingId)
+                        }
+                    }
+                }
+
+
+            }
+            UserIntent.CurrentMasterIntent.SaveExperience -> {
+
+            }
+            UserIntent.CurrentMasterIntent.SaveSpecialization -> {
+
+            }
         }
 
 
@@ -142,8 +186,10 @@ class UserInfoViewModel @Inject constructor(
             _uiState.value = UserState.Loading
             getProfileTypeUseCase(id).fold(
                 onSuccess = { type ->
+                    val initialDesc = if(type is UserTypes.IsCurrentMaster) type.master.description else ""
                     _uiState.value =
-                        UserState.Success(type)
+                        UserState.Success(type, descriptionDraft = initialDesc)
+
                 },
                 onFailure = {
                     _uiState.value = UserState.Error(it.message.toString())

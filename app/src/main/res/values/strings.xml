@@ -83,6 +83,10 @@
     <string name="short_first_name">Имя должно содержать больше двух букв</string>
     <string name="come_up_with_password">Придумайте пароль</string>
 
+    <string name="spec">Специализация</string>
+    <string name="exp">Опыт в годах</string>
+    <string name="desc">Описание</string>
+
 
 </resources>
 

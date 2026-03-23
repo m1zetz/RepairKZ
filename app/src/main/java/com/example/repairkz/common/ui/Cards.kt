@@ -16,6 +16,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -37,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.repairkz.R
+import com.example.repairkz.common.constants.SERVER_IP
 import com.example.repairkz.common.models.User
 import com.example.repairkz.ui.features.UserInfo.UserIntent
 
@@ -67,7 +69,13 @@ fun ProfileString(
                 .padding(12.dp)
         ) {
             AsyncImage(
-                model = user.userPhotoUrl ?: R.drawable.ic_launcher_background,
+                model = when {
+                    user.userPhotoUrl.isNullOrEmpty() -> R.drawable.ic_launcher_background
+                    user.userPhotoUrl.toString()
+                        .startsWith("/photos/") -> "http://$SERVER_IP:8080${user.userPhotoUrl}"
+
+                    else -> user.userPhotoUrl
+                },
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
@@ -97,12 +105,14 @@ fun ProfileString(
 }
 
 @Composable
-fun SignTextField(
+fun UniversalTextField(
     value: String,
     onValueChange: (newValue: String) -> Unit,
     errorMessage: Int?,
     leadingIcon: ImageVector? = null,
     placeholder: Int,
+    backIcon: ImageVector? = null,
+    action: (() -> Unit)? = null,
 ) {
     OutlinedTextField(
         modifier = Modifier.fillMaxWidth(),
@@ -131,7 +141,18 @@ fun SignTextField(
                 )
             }
         },
-        isError = errorMessage != null
+        isError = errorMessage != null,
+        trailingIcon = backIcon?.let {
+            {
+                IconButton(onClick = {
+                    action?.invoke()
+                }
+                ) {
+                    Icon(it, null)
+                }
+            }
+
+        }
     )
 }
 

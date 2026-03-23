@@ -3,6 +3,7 @@ package com.example.repairkz.ui.features.auth.signIn
 import com.example.repairkz.R
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.repairkz.common.enums.MasterSpetializationsEnum
 import com.example.repairkz.common.enums.StatusOfUser
 import com.example.repairkz.common.models.User
 import com.example.repairkz.common.utils.ValidationResult
@@ -10,6 +11,7 @@ import com.example.repairkz.common.utils.Validator
 import com.example.repairkz.data.local.dataStore.DataStoreManager
 import com.example.repairkz.data.remote.api.TokenApi
 import com.example.repairkz.data.remote.dto.LoginDTO
+import com.example.repairkz.data.userData.UserRepository
 import com.example.repairkz.domain.useCases.auth.LoginUseCase
 import com.example.repairkz.domain.useCases.userData.UpdateUserDataUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -26,6 +28,7 @@ class SignInViewModel @Inject constructor(
     private val loginUseCase: LoginUseCase,
     private val updateUserDataUseCase : UpdateUserDataUseCase,
     private val dataStoreManager: DataStoreManager,
+    private val userRepository: UserRepository
 )  : ViewModel() {
     private val _signInState = MutableStateFlow(SignInState())
     val signInState = _signInState.asStateFlow()
@@ -74,9 +77,12 @@ class SignInViewModel @Inject constructor(
                                         }
                                         StatusOfUser.MASTER -> {
                                             user.toMaster().copy(
-                                                masterSpecialization = loginResponseDTO.master?.masterSpecialization,
-                                                description = loginResponseDTO.master?.description,
+                                                masterSpecialization = loginResponseDTO.master?.masterSpecialization
+                                                    ?: MasterSpetializationsEnum.UNKNOWN,
+                                                description = loginResponseDTO.master?.description
+                                                    ?: "",
                                                 experienceInYears = loginResponseDTO.master?.experienceInYears
+                                                    ?: 0
                                             )
                                         }
                                     }
@@ -88,7 +94,6 @@ class SignInViewModel @Inject constructor(
                                 _channel.send(SignInEffects.ShowSnackBar(error.message ?: "Ошибка сети"))
                             }
                         } catch (e: Exception){
-
                             _signInState.update { it.copy(error = "Ошибка сети") }
 
                         } finally {
