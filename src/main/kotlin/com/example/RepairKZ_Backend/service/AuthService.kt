@@ -8,6 +8,7 @@ import com.example.RepairKZ_Backend.model.RegistrationResponseDTO
 import com.example.RepairKZ_Backend.model.LoginRequestDTO
 import com.example.RepairKZ_Backend.model.LoginResponseDTO
 import com.example.RepairKZ_Backend.model.MasterResponseDTO
+import com.example.RepairKZ_Backend.model.MasterShortInfoDTO
 import com.example.RepairKZ_Backend.model.RefreshResponseDTO
 import com.example.RepairKZ_Backend.model.UserRegistrationDTO
 import com.example.RepairKZ_Backend.repository.MasterRepository
@@ -49,7 +50,7 @@ class AuthService(
 
             StatusOfUser.MASTER -> {
                 baseResponse.copy(
-                    master = MasterResponseDTO(
+                    master = MasterShortInfoDTO(
                         masterData?.experienceInYears,
                         masterData?.description,
                         masterData?.masterSpecialization
@@ -64,7 +65,6 @@ class AuthService(
     @Transactional
     fun register(
         user: UserRegistrationDTO,
-        file: MultipartFile?
     ): RegistrationResponseDTO {
         if (userRepository.findByEmail(user.email) != null) {
             throw IllegalArgumentException("User with email ${user.email} already exists")
@@ -83,18 +83,15 @@ class AuthService(
             password = hashPassword!!
         )
 
-        val url = fileService.updateUserPhoto(file)
-
         val savedUser = userRepository.save(
-            newUser.copy(
-                userPhotoUrl = url ?: ""
-            )
+            newUser
         )
-
+        println("Saved user id: ${savedUser.id}")
         return RegistrationResponseDTO(
             id = savedUser.id!!,
-            token = tokenService.createToken(savedUser)
+            token = tokenService.createToken(savedUser),
         )
+
     }
 
     fun refreshToken(): RefreshResponseDTO {

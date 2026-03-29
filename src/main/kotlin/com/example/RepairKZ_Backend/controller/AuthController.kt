@@ -21,10 +21,9 @@ class AuthController(
 ) {
     @PostMapping("/register")
     fun register(
-        @RequestPart("user") user: UserRegistrationDTO,
-        @RequestPart("file") file: MultipartFile?
+        @RequestBody user: UserRegistrationDTO
     ): RegistrationResponseDTO {
-        return authService.register(user, file)
+        return authService.register(user)
     }
 
     @PostMapping("/login")

@@ -1,6 +1,12 @@
 package com.example.RepairKZ_Backend.service
 
+import com.cloudinary.Cloudinary
+
+import com.cloudinary.utils.ObjectUtils
 import com.example.RepairKZ_Backend.common.PHOTO_DIRECTORY
+import com.example.RepairKZ_Backend.common.PHOTO_URL_PATH
+
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.multipart.MultipartFile
@@ -8,17 +14,32 @@ import java.io.File
 import java.util.UUID
 
 @Service
-class FileService() {
+class FileService(
+    private val cloudinary: Cloudinary
+) {
 
-    fun updateUserPhoto(file : MultipartFile?) : String?{
-        if(file == null){
+//    fun savePhotoAndGetUrl(rawFile : MultipartFile?) : String?{
+//        return try {
+//            rawFile?.let{
+//                val fileName = UUID.randomUUID().toString()
+//                val response = cloudinary.uploader().upload(rawFile.bytes, ObjectUtils.asMap("public_id", fileName))
+//                val url = response["secure_url"] as? String
+//                url
+//            }
+//        } catch (e: Exception){
+//            null
+//        }
+//    }
+
+    fun savePhotoAndGetUrl(rawFile: MultipartFile?): String? {
+        if (rawFile == null) {
             return null
-        } else{
+        } else {
             val randomUUID = UUID.randomUUID()
-            val content = file.bytes
+            val content = rawFile.bytes
             val imageDirectory = File("$PHOTO_DIRECTORY$randomUUID.jpg")
             imageDirectory.writeBytes(content)
-            return imageDirectory.absolutePath
+            return "http://192.168.0.4:8080/$PHOTO_URL_PATH/$randomUUID.jpg"
         }
     }
 

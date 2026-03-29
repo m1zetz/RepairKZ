@@ -1,7 +1,10 @@
 package com.example.RepairKZ_Backend.entity
 
 import com.example.RepairKZ_Backend.common.enums.MasterSpetializationsEnum
+import jakarta.persistence.Column
 import jakarta.persistence.Entity
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
@@ -18,9 +21,12 @@ data class Master(
 
     @OneToOne
     @JoinColumn(name = "user_id")
-    val user: User,
+    val user: User? = null,
 
-    val experienceInYears: Int? = null,
-    val description: String? = null,
-    val masterSpecialization: MasterSpetializationsEnum? = null
+    @Column(name = "experience_in_years")
+    var experienceInYears: Int? = null,
+    var description: String? = null,
+
+    @Enumerated(EnumType.STRING)
+    var masterSpecialization: MasterSpetializationsEnum? = null
 )

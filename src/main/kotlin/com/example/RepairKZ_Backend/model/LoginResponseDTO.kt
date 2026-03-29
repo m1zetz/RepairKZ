@@ -5,5 +5,5 @@ data class LoginResponseDTO(
     val id: Long,
     val token: String,
     val user: UserResponseDTO,
-    val master: MasterResponseDTO? = null
+    val master: MasterShortInfoDTO? = null
 )

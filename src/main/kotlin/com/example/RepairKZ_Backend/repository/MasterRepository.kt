@@ -6,4 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository
 
 interface MasterRepository : JpaRepository<Master, Long> {
     fun findByUser(user: User): Master?
+    fun findByUserId(userId: Long): Master?
 }

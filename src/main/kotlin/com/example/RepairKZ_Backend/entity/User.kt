@@ -2,6 +2,7 @@ package com.example.RepairKZ_Backend.entity
 
 import com.example.RepairKZ_Backend.common.enums.CitiesEnum
 import com.example.RepairKZ_Backend.common.enums.StatusOfUser
+import com.example.RepairKZ_Backend.model.UserResponseDTO
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
@@ -18,30 +19,29 @@ data class User(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 
-    val userPhotoUrl: String? = null,
+    var userPhotoUrl: String? = null,
 
     @Column(nullable = false)
     var firstName: String = "",
 
     @Column(nullable = false)
-    val lastName: String = "",
+    var lastName: String = "",
 
     @Column(nullable = false)
-    val phoneNumber: String = "",
+    var phoneNumber: String = "",
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    val status: StatusOfUser = StatusOfUser.CLIENT,
+    var status: StatusOfUser = StatusOfUser.CLIENT,
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    val city: CitiesEnum = CitiesEnum.UNKNOWN,
+    var city: CitiesEnum = CitiesEnum.UNKNOWN,
 
     @Column(nullable = false, unique = true)
-    val email: String = "",
+    var email: String = "",
 
     @Column(nullable = false)
     val password: String = ""
-
 
 )

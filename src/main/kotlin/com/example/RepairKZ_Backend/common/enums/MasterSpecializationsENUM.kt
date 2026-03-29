@@ -5,6 +5,6 @@ enum class MasterSpetializationsEnum {
     ELECTRIC,
     PLUMBER,
     HANDYMAN,
-    СOMPUTER,
+    COMPUTER,
     FURNITURE
 }
