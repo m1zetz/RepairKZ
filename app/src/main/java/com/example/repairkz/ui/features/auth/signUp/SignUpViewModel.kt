@@ -1,6 +1,7 @@
 package com.example.repairkz.ui.features.auth.signUp
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.repairkz.common.enums.CitiesEnum
@@ -13,6 +14,8 @@ import com.example.repairkz.domain.useCases.files.SaveToInternalUseCase
 import com.example.repairkz.domain.useCases.auth.CreateUserUseCase
 import com.example.repairkz.domain.useCases.auth.GetCodeUseCase
 import com.example.repairkz.domain.useCases.auth.SendCodeUseCase
+import com.example.repairkz.domain.useCases.files.PreparePhotoPartUseCase
+import com.example.repairkz.domain.useCases.userData.SaveUserToLocalUseCase
 import com.example.repairkz.domain.useCases.userData.UpdateUserDataUseCase
 import com.example.repairkz.ui.features.auth.signUp.SignUpEffect.*
 import com.google.gson.Gson
@@ -39,9 +42,10 @@ class SignUpViewModel @Inject constructor(
     private val getCodeUseCase: GetCodeUseCase,
     private val sendCodeUseCase: SendCodeUseCase,
     private val saveToInternalUseCase: SaveToInternalUseCase,
-    private val updateUserDataUseCase: UpdateUserDataUseCase,
+    private val saveUserToLocalUseCase: SaveUserToLocalUseCase,
     private val createUserUseCase: CreateUserUseCase,
     private val dataStoreManager: DataStoreManager,
+    private val preparePhotoPartUseCase: PreparePhotoPartUseCase,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
@@ -235,24 +239,15 @@ class SignUpViewModel @Inject constructor(
                             state.copy(isLoading = true)
                         }
                         try {
-                            val file = File(context.cacheDir, "temp_photo.jpg")
-                            val photoPart = _uiState.value.userInfo.photoUri?.let{uri ->
-                                context.contentResolver.openInputStream(uri).use {inputStream ->
-                                    FileOutputStream(file).use {outputStream ->
-                                        inputStream!!.copyTo(outputStream)
-                                    }
-                                }
-                                val requestBodyFile = file.asRequestBody("image/*".toMediaTypeOrNull())
-                                MultipartBody.Part.createFormData("file",file.name, requestBodyFile)
-                            }
-                            val userPart = Gson().toJson(user.toCreateUserDTO()).toRequestBody("application/json".toMediaTypeOrNull())
+                            val uri = _uiState.value.userInfo.photoUri
+                            val photoPart = if(uri!=null) preparePhotoPartUseCase(context,uri) else null
+
+                            val userPart = user.toCreateUserDTO()
                             val response = createUserUseCase(userPart,photoPart )
-                            response.onSuccess {dto ->
-                                user = user.copy(userId = dto.id.toInt())
-                                updateUserDataUseCase(
-                                    user
-                                )
+                            response.onSuccess { dto ->
+                                val finalUser = user.copy(userId = dto.id.toInt())
                                 dataStoreManager.saveToken(dto.token)
+                                saveUserToLocalUseCase(finalUser)
                                 _channel.send(NavigateToMainWindow)
                             }.onFailure { error ->
                                 _uiState.update { it.copy(error = error.message) }

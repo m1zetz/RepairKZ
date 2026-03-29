@@ -3,7 +3,7 @@ package com.example.repairkz.data.remote.dto
 import com.example.repairkz.common.enums.CitiesEnum
 import com.example.repairkz.common.enums.StatusOfUser
 
-data class CreateUserDTO(
+data class UserRegistrationDTO(
     val firstName: String,
     val lastName: String,
     val userPhotoUrl: String?,

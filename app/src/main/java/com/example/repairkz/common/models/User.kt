@@ -3,7 +3,8 @@ package com.example.repairkz.common.models
 import com.example.repairkz.common.enums.CitiesEnum
 import com.example.repairkz.common.enums.StatusOfUser
 import com.example.repairkz.data.local.entity.UserEntity
-import com.example.repairkz.data.remote.dto.CreateUserDTO
+import com.example.repairkz.data.remote.dto.UserRegistrationDTO
+import com.example.repairkz.data.remote.dto.UserResponseDTO
 import com.example.repairkz.ui.features.UserInfo.CommonInfo
 
 open class User(
@@ -75,7 +76,16 @@ open class User(
     open fun toUser() : User{
         return this
     }
-
+    fun toResponseDTO() = UserResponseDTO(
+        id = this.id.toLong(),
+        userPhotoUrl = this.userPhotoUrl,
+        firstName = this.firstName,
+        lastName = this.lastName,
+        email = this.email,
+        city = this.city,
+        phone = this.phoneNumber,
+        status = this.status
+    )
     fun toEntity(): UserEntity {
         return UserEntity(
             id = this.id.toLong(),
@@ -88,7 +98,7 @@ open class User(
             city = this.city
         )
     }
-    fun toCreateUserDTO() = CreateUserDTO(
+    fun toCreateUserDTO() = UserRegistrationDTO(
         firstName = firstName,
         lastName = lastName,
         userPhotoUrl = userPhotoUrl,

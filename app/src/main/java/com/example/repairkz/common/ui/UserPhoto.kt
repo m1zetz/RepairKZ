@@ -33,7 +33,6 @@ fun UserPhoto(
         AsyncImage(
             model = when {
                 photoUri.isNullOrEmpty() -> R.drawable.ic_launcher_background
-                photoUri.startsWith("/photos/") -> "http://$SERVER_IP:8080$photoUri"
                 else -> photoUri
             },
             contentDescription = "UserPhoto",

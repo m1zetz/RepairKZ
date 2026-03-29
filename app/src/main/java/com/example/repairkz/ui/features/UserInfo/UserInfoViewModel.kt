@@ -1,24 +1,30 @@
 package com.example.repairkz.ui.features.UserInfo
 
+import android.content.Context
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.repairkz.common.models.Master
+import com.example.repairkz.domain.useCases.files.PreparePhotoPartUseCase
 import com.example.repairkz.domain.useCases.files.SaveToInternalUseCase
 import com.example.repairkz.domain.useCases.userData.GetProfileTypeUseCase
 import com.example.repairkz.domain.useCases.userData.GetUserDataUseCase
 import com.example.repairkz.domain.useCases.userData.UpdateUserDataUseCase
+import com.example.repairkz.domain.useCases.userData.UpdateUserPhotoUseCase
 import com.example.repairkz.ui.features.UserInfo.UserEffects.*
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @HiltViewModel
 class UserInfoViewModel @Inject constructor(
@@ -27,6 +33,9 @@ class UserInfoViewModel @Inject constructor(
     private val getProfileTypeUseCase: GetProfileTypeUseCase,
     private val updateUserDataUseCase: UpdateUserDataUseCase,
     private val saveToInternalUseCase: SaveToInternalUseCase,
+    private val updateUserPhotoUseCase: UpdateUserPhotoUseCase,
+    private val preparePhotoPartUseCase: PreparePhotoPartUseCase,
+    @ApplicationContext private val context: Context
 ) : ViewModel() {
 
 
@@ -121,8 +130,14 @@ class UserInfoViewModel @Inject constructor(
                             val newUser = user.copy(
                                 userPhotoUrl = localUri.toString()
                             )
-                            updateUserDataUseCase(newUser)
-                            defineUser(comingId)
+
+                            val photo = preparePhotoPartUseCase(context, intent.uri)
+                            photo?.let {
+                                withContext(NonCancellable) {
+                                    val result = updateUserPhotoUseCase(user.id.toLong(), photo)
+                                }
+
+                            }
                         }
                     }
 

@@ -13,6 +13,7 @@ import com.example.repairkz.data.remote.api.TokenApi
 import com.example.repairkz.data.remote.dto.LoginDTO
 import com.example.repairkz.data.userData.UserRepository
 import com.example.repairkz.domain.useCases.auth.LoginUseCase
+import com.example.repairkz.domain.useCases.userData.SaveUserToLocalUseCase
 import com.example.repairkz.domain.useCases.userData.UpdateUserDataUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
@@ -28,7 +29,7 @@ class SignInViewModel @Inject constructor(
     private val loginUseCase: LoginUseCase,
     private val updateUserDataUseCase : UpdateUserDataUseCase,
     private val dataStoreManager: DataStoreManager,
-    private val userRepository: UserRepository
+    private val saveUserToLocalUseCase: SaveUserToLocalUseCase
 )  : ViewModel() {
     private val _signInState = MutableStateFlow(SignInState())
     val signInState = _signInState.asStateFlow()
@@ -70,7 +71,7 @@ class SignInViewModel @Inject constructor(
                                     status = dto.status,
                                     city = dto.city
                                 )
-                                updateUserDataUseCase(
+                                saveUserToLocalUseCase(
                                     when(loginResponseDTO.user.status){
                                         StatusOfUser.CLIENT -> {
                                             user

@@ -32,6 +32,21 @@ data class Master(
         )
     }
 
+    fun copyMaster(userPhotoUrl: String? = this.userPhotoUrl): Master {
+        return Master(
+            id = this.id,
+            userPhotoUrl = userPhotoUrl,
+            firstName = this.firstName,
+            lastName = this.lastName,
+            email = this.email,
+            phoneNumber = this.phoneNumber,
+            status = this.status,
+            city = this.city,
+            experienceInYears = this.experienceInYears,
+            description = this.description,
+            masterSpecialization = this.masterSpecialization
+        )
+    }
     override val displayDescriptionRes : Int
         get() = this.masterSpecialization.resID
 

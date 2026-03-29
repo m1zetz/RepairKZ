@@ -1,5 +1,6 @@
 package com.example.repairkz.di
 
+import android.util.Log
 import com.example.repairkz.common.constants.SERVER_IP
 import com.example.repairkz.data.local.dataStore.DataStoreManager
 import com.example.repairkz.data.remote.api.RegistrationApi
@@ -13,9 +14,11 @@ import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
+import java.util.concurrent.TimeUnit
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -38,8 +41,14 @@ object NetworkModule {
     fun okHttpInterceptor(
         dataStoreManager: DataStoreManager,
     ): OkHttpClient {
-
-        return OkHttpClient().newBuilder()
+        val logging = HttpLoggingInterceptor { Log.d("OkHttp", it) }
+        logging.level = HttpLoggingInterceptor.Level.BODY
+        return OkHttpClient()
+            .newBuilder()
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(120, TimeUnit.SECONDS)
+            .writeTimeout(120, TimeUnit.SECONDS)
+            .addInterceptor(logging)
             .addInterceptor {chain ->
                 val token = runBlocking {
                     dataStoreManager.tokenFlow.first()

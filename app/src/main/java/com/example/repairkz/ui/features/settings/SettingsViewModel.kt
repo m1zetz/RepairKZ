@@ -2,6 +2,11 @@ package com.example.repairkz.ui.features.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.repairkz.common.enums.StatusOfUser
+import com.example.repairkz.common.models.Master
+import com.example.repairkz.data.remote.dto.ChangeStatusRequestDTO
+import com.example.repairkz.data.remote.dto.MasterDataResponseDTO
+import com.example.repairkz.data.remote.dto.MasterRequestDTO
 import com.example.repairkz.data.userData.UserRepository
 import com.example.repairkz.domain.useCases.userData.GetUserDataUseCase
 import com.example.repairkz.domain.useCases.userData.UpdateUserStatusUseCase
@@ -20,7 +25,7 @@ import kotlinx.coroutines.launch
 class SettingsViewModel @Inject constructor(
     private val getUserDataUseCase: GetUserDataUseCase,
     private val updateUserStatusUseCase: UpdateUserStatusUseCase,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
 ) : ViewModel() {
     private var _uiState = MutableStateFlow<SettingsState>(SettingsState.Loading)
     val uiState = _uiState.asStateFlow()
@@ -36,9 +41,9 @@ class SettingsViewModel @Inject constructor(
 
     init {
         userRepository.userData.onEach { user ->
-            if (user != null){
+            if (user != null) {
                 _uiState.value = SettingsState.Success(user, user.status, true)
-            } else{
+            } else {
                 _uiState.value = SettingsState.Error("Вы не зарегистрированы")
             }
         }.launchIn(viewModelScope)
@@ -53,10 +58,31 @@ class SettingsViewModel @Inject constructor(
                     _settingEffectsChannel.send(NavigateToUserInfo(intent.id))
                 }
             }
+
             is SettingIntent.SwitchStatus -> {
-                viewModelScope.launch {
-                    updateUserStatusUseCase(intent.status)
-                }
+                switchUserStatus(intent.status)
+            }
+        }
+    }
+
+    private fun switchUserStatus(newStatus: StatusOfUser) {
+        val currentState = _uiState.value
+        if (currentState is SettingsState.Success) {
+            viewModelScope.launch {
+                val user = currentState.userData
+
+                val request = ChangeStatusRequestDTO(
+                    statusOfUser = newStatus,
+                    masterData = if (user is Master) {
+                        MasterRequestDTO(
+                            experienceInYears = user.experienceInYears,
+                            description = user.description,
+                            masterSpecialization = user.masterSpecialization,
+                            userId = user.id.toLong()
+                        )
+                    } else null
+                )
+                updateUserStatusUseCase(id = user.id.toLong(), request)
             }
         }
     }

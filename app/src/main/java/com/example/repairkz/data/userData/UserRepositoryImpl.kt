@@ -1,6 +1,7 @@
 package com.example.repairkz.data.userData
 
 import android.util.Log
+import com.example.repairkz.common.enums.MasterSpetializationsEnum
 import com.example.repairkz.common.enums.StatusOfUser
 import com.example.repairkz.common.models.Master
 import com.example.repairkz.common.models.User
@@ -8,42 +9,51 @@ import com.example.repairkz.data.local.dao.MasterDao
 import com.example.repairkz.data.local.dao.UserDao
 import com.example.repairkz.data.local.entity.MasterEntity
 import com.example.repairkz.data.remote.api.UserApi
+import com.example.repairkz.data.remote.dto.ChangeStatusRequestDTO
+import com.example.repairkz.data.remote.dto.FullUserRequestDTO
+import com.example.repairkz.data.remote.dto.MasterResponseDTO
+import com.example.repairkz.data.remote.dto.StatusRequestDTO
+import com.example.repairkz.data.remote.dto.UpdatePhotoResponseDTO
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import okhttp3.MultipartBody
 
 @Singleton
 class UserRepositoryImpl @Inject constructor(
     private val userDao: UserDao,
     private val masterDao: MasterDao,
-    private val userApi: UserApi
+    private val userApi: UserApi,
 ) : UserRepository {
     private val _userData = MutableStateFlow<User?>(null)
     override val userData = _userData.asStateFlow()
 
     override suspend fun fetchUserData(): User? {
+
         val currentState = userData.value
         return currentState
     }
 
+    override suspend fun saveUserToLocal(user: User) {
 
-    override suspend fun updateUserData(user: User) {
         _userData.value = user
         userDao.saveUser(user.toEntity())
-        if(user is Master){
-            masterDao.saveMaster(MasterEntity(
+        if (user is Master){
+            val entity = MasterEntity(
                 userId = user.id.toLong(),
-                description = user.description,
                 experienceInYears = user.experienceInYears,
-                masterSpecialization = user.masterSpecialization
-
-            ))
+                masterSpecialization = user.masterSpecialization,
+                description = user.description
+            )
+            masterDao.saveMaster(entity)
         }
     }
 
+
     override suspend fun getRoomData() {
+
         val data = userDao.getUser()
         val userEntity = data?.user
         if (userEntity != null) {
@@ -58,31 +68,126 @@ class UserRepositoryImpl @Inject constructor(
 
     }
 
-    override suspend fun updateUserStatus(statusOfUser: StatusOfUser) {
-        when (statusOfUser) {
-            StatusOfUser.CLIENT -> {
-                _userData.update {
-                    it?.toUser()
+    override suspend fun updateUserData(user: User) {
+
+        val request = FullUserRequestDTO(
+            user.toResponseDTO(),
+            experienceInYears = (user as? Master)?.experienceInYears,
+            description = (user as? Master)?.description,
+            masterSpecialization = (user as? Master)?.masterSpecialization
+        )
+        val response = userApi.updateUser(request)
+
+        if (response.isSuccessful) {
+            val data = response.body()
+            if (data!=null) {
+                val userData = data.user
+
+                val finalUser = if (user is Master) {
+                    user.copy(
+                        firstName = userData.firstName,
+                        lastName = userData.lastName,
+                        email = userData.email,
+                        phoneNumber = userData.phone,
+                        city = userData.city,
+                        experienceInYears = data.experienceInYears ?: user.experienceInYears,
+                        description = data.description ?: user.description,
+                        masterSpecialization = data.masterSpecialization ?: user.masterSpecialization
+                    )
+                } else {
+                    user.copy(
+                        firstName = userData.firstName,
+                        lastName = userData.lastName,
+                        email = userData.email,
+                        phoneNumber = userData.phone,
+                        city = userData.city
+                    )
+                }
+                _userData.value = finalUser
+                userDao.saveUser(finalUser.toEntity())
+                if(finalUser is Master){
+                    masterDao.saveMaster(
+                        MasterEntity(
+                            userId = finalUser.id.toLong(),
+                            description =  finalUser.description,
+                            experienceInYears = finalUser.experienceInYears,
+                            masterSpecialization =  finalUser.masterSpecialization
+                        )
+                    )
                 }
             }
-            StatusOfUser.MASTER -> {
-                _userData.update {
-                    it?.toMaster()
+
+
+        }
+    }
+
+    override suspend fun updateUserPhoto(id: Long, file: MultipartBody.Part): Result<UpdatePhotoResponseDTO> {
+        return try {
+            val response = userApi.updateUserPhoto(id, file)
+            if(response.isSuccessful){
+                val body = response.body()!!
+                val currentUser = _userData.value
+                    ?: return Result.failure(Exception("User not found"))
+                val updatedUser = if (currentUser is Master) {
+                    currentUser.copyMaster(userPhotoUrl = body.photoUrl)
+                } else {
+                    currentUser.copy(userPhotoUrl = body.photoUrl)
+                }
+                _userData.value = updatedUser
+                _userData.value = updatedUser
+                userDao.updateUserPhoto(updatedUser.toEntity())
+                Result.success(body)
+            }else{
+                val errorMsg = response.errorBody()?.string()
+                Result.failure(Exception(errorMsg))
+            }
+        } catch(e: Exception){
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun updateUserStatus(id: Long, dto: ChangeStatusRequestDTO) {
+        val currentUser = _userData.value ?: return
+        val response = userApi.updateStatus(id, dto)
+        if(response.isSuccessful){
+            val data = response.body()
+            data?.let{masterDto ->
+                val updatedUser = if (dto.statusOfUser == StatusOfUser.MASTER) {
+                    currentUser.toMaster(
+                        statusOfUser = StatusOfUser.MASTER
+                    ).copy(
+                        experienceInYears = masterDto.experienceInYears ?: 0,
+                        description = masterDto.description ?: "",
+                        masterSpecialization = masterDto.masterSpecialization ?: MasterSpetializationsEnum.UNKNOWN
+                    )
+                } else {
+                    currentUser.copy(statusOfUser = StatusOfUser.CLIENT)
+                }
+                _userData.value = updatedUser
+
+                userDao.saveUser(updatedUser.toEntity())
+
+
+                if (updatedUser is Master) {
+                    masterDao.saveMaster(
+                        MasterEntity(
+                            userId = updatedUser.id.toLong(),
+                            description = updatedUser.description,
+                            experienceInYears = updatedUser.experienceInYears,
+                            masterSpecialization = updatedUser.masterSpecialization
+                        )
+                    )
                 }
             }
+
         }
-        val currentUser = _userData.value
-        userDao.saveUser(currentUser!!.toEntity())
-        if (currentUser is Master){
-            masterDao.saveMaster(
-                masterEntity = MasterEntity(
-                    userId = currentUser.id.toLong(),
-                    experienceInYears = currentUser.experienceInYears,
-                    masterSpecialization = currentUser.masterSpecialization
-                )
-            )
-        }
-        userApi.updateStatus(currentUser.id, currentUser.status)
+
+
+
+
+
+
+
     }
 
 }

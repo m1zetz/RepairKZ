@@ -1,5 +1,6 @@
 package com.example.repairkz.domain.useCases.userData
 
+import android.util.Log
 import com.example.repairkz.common.models.Master
 import com.example.repairkz.data.masterData.MasterRepository
 import com.example.repairkz.data.userData.UserRepository
@@ -12,6 +13,7 @@ class GetProfileTypeUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(comingId: Int?): Result<UserTypes> {
         val user =  userRepository.fetchUserData()
+
         user?.let{
             if (user.id == comingId || comingId == null) {
                 if(user is Master){

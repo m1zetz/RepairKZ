@@ -5,6 +5,7 @@ import com.example.repairkz.data.remote.dto.EmailDTO
 import com.example.repairkz.data.remote.dto.LoginDTO
 import com.example.repairkz.data.remote.dto.LoginResponseDTO
 import com.example.repairkz.data.remote.dto.RegistrationResponseDTO
+import com.example.repairkz.data.remote.dto.UserRegistrationDTO
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
@@ -20,11 +21,9 @@ interface RegistrationApi {
     @POST("api/users/check-code")
     suspend fun sendCode(@Body codeDTO: CodeDTO) : Response<Unit>
 
-    @Multipart
     @POST("api/register")
     suspend fun register(
-        @Part("user") user: RequestBody,
-        @Part photo: MultipartBody.Part?
+        @Body user: UserRegistrationDTO,
         ) : Response<RegistrationResponseDTO>
 
     @POST("api/login")

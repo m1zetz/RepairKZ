@@ -36,7 +36,6 @@ class MainActivityViewModel @Inject constructor(
                     dataStoreManager.saveToken(token)
                     userRepository.getRoomData()
                     _channel.send(ActivityEffects.NavigateToMainWindow)
-                    Log.d("token", token)
                 }.onFailure {
                     Log.e("RefreshToken", "Failed: ${it.cause}")
                     _channel.send(ActivityEffects.NavigateToLogin)
