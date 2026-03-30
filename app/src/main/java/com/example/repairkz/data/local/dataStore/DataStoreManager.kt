@@ -14,13 +14,23 @@ val Context.dataStore: DataStore<Preferences> by preferencesDataStore(PREFERENCE
 class DataStoreManager(
     private val context: Context
 ) {
-    suspend fun saveToken(exampleValue: String) {
+    suspend fun saveToken(token: String) {
         context.dataStore.edit { preferences ->
-            preferences[PreferencesKeys.AUTH_TOKEN_KEY] = exampleValue
+            preferences[PreferencesKeys.AUTH_TOKEN_KEY] = token
+        }
+    }
+
+    suspend fun saveThemeType(isDark: Boolean){
+        context.dataStore.edit { preferences ->
+            preferences[PreferencesKeys.IS_DARK_THEME_KEY] = isDark
         }
     }
     val tokenFlow: Flow<String> = context.dataStore.data
         .map { preferences ->
             preferences[PreferencesKeys.AUTH_TOKEN_KEY] ?: "-1"
+        }
+    val isDarkThemeFlow: Flow<Boolean> = context.dataStore.data
+        .map { preferences ->
+            preferences[PreferencesKeys.IS_DARK_THEME_KEY] ?: true
         }
 }

@@ -1,6 +1,15 @@
 package com.example.repairkz.Activity
 
-sealed class ActivityEffects{
-    object NavigateToLogin : ActivityEffects()
-    object NavigateToMainWindow : ActivityEffects()
+
+data class ActivityState(
+    val startDestination: StartDestination? = null,
+    val isDarkTheme: Boolean = true
+)
+
+sealed class ActivityIntent{
+    data class ChangeTheme(val isDark: Boolean) : ActivityIntent()
+}
+sealed class StartDestination{
+    object Login : StartDestination()
+    object MainWindow : StartDestination()
 }

@@ -239,25 +239,7 @@ fun ShortInputCard(
     }
 }
 
-@Composable
-fun ShortWithComposableCard(titleResID: Int, Сomposable: @Composable () -> Unit) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp)
 
-    ) {
-        Column(modifier = Modifier.padding(8.dp)) {
-            Text(
-                text = stringResource(titleResID),
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.secondary
-            )
-            Spacer(modifier = Modifier.size(8.dp))
-            Сomposable()
-        }
-    }
-}
 
 @Composable
 fun ProfileMainActions(
@@ -289,6 +271,26 @@ fun ProfileMainActions(
             )
             Spacer(Modifier.height(8.dp))
             Text(text = stringResource(titleResId))
+        }
+    }
+}
+
+@Composable
+fun ShortWithComposableCard(titleResID: Int, composable: @Composable () -> Unit) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp)
+
+    ) {
+        Column(modifier = Modifier.padding(8.dp)) {
+            Text(
+                text = stringResource(titleResID),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.secondary
+            )
+            Spacer(modifier = Modifier.size(8.dp))
+            composable()
         }
     }
 }

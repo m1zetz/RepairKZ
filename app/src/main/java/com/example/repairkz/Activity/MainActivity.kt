@@ -12,6 +12,7 @@ import androidx.annotation.RequiresApi
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -40,7 +41,6 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    @SuppressLint("UnrememberedGetBackStackEntry")
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashscreen = installSplashScreen()
@@ -52,29 +52,19 @@ class MainActivity : ComponentActivity() {
             )
         )
         setContent {
-            var startDestination by rememberSaveable { mutableStateOf("") }
-            splashscreen.setKeepOnScreenCondition { startDestination.isEmpty() }
             val viewModel: MainActivityViewModel = hiltViewModel()
-            LaunchedEffect(Unit) {
-                viewModel.channel.collect {effects ->
-                    when(effects){
-                        ActivityEffects.NavigateToLogin -> {
-                            startDestination = Routes.SIGN_IN
-                        }
-                        ActivityEffects.NavigateToMainWindow -> {
-                            startDestination = Routes.MAIN_WINDOW
-                        }
-                    }
-                }
-            }
+            val state by viewModel.state.collectAsState()
+            splashscreen.setKeepOnScreenCondition { state.startDestination == null }
 
-            RepairkzTheme {
+
+
+            RepairkzTheme(darkTheme = state.isDarkTheme) {
                 val navController = rememberNavController()
                 Surface(color = MaterialTheme.colorScheme.background) {
-                    if(startDestination.isNotEmpty()){
+                    if(state.startDestination != null){
                         NavHost(
                             navController = navController,
-                            startDestination = startDestination
+                            startDestination = if (state.startDestination == StartDestination.MainWindow) Routes.MAIN_WINDOW else Routes.SIGN_IN
                         ) {
                             registrationGraph(navController)
                             profileGraph(navController)
@@ -88,6 +78,7 @@ class MainActivity : ComponentActivity() {
                                 val notificationViewModel: NotificationViewModel = hiltViewModel()
                                 val settingsViewModel: SettingsViewModel = hiltViewModel()
                                 MainWindow(
+                                    viewModel,
                                     mainViewModel,
                                     navController,
                                     notificationViewModel,

@@ -10,6 +10,7 @@ import com.example.repairkz.data.remote.dto.MasterRequestDTO
 import com.example.repairkz.data.userData.UserRepository
 import com.example.repairkz.domain.useCases.userData.GetUserDataUseCase
 import com.example.repairkz.domain.useCases.userData.UpdateUserStatusUseCase
+import com.example.repairkz.ui.features.UserInfo.UserState
 import com.example.repairkz.ui.features.settings.SettingsEffects.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
@@ -19,6 +20,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @HiltViewModel
@@ -62,6 +64,7 @@ class SettingsViewModel @Inject constructor(
             is SettingIntent.SwitchStatus -> {
                 switchUserStatus(intent.status)
             }
+
         }
     }
 

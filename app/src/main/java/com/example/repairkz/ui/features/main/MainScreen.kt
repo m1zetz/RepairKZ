@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
+import com.example.repairkz.Activity.MainActivityViewModel
 import com.example.repairkz.ui.features.components.BottomNavigation
 import com.example.repairkz.ui.features.home.HomeScreen
 import com.example.repairkz.ui.features.main.MainIntent
@@ -28,7 +29,7 @@ import com.example.repairkz.ui.features.settings.SettingsViewModel
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainWindow(mainViewModel: MainViewModel, navController: NavController, notificationViewModel: NotificationViewModel, settingsViewModel: SettingsViewModel){
+fun MainWindow(activityViewModel: MainActivityViewModel, mainViewModel: MainViewModel, navController: NavController, notificationViewModel: NotificationViewModel, settingsViewModel: SettingsViewModel){
     val selectedItemIndex = mainViewModel.screenIndexState.collectAsState()
 
     Scaffold(
@@ -61,7 +62,7 @@ fun MainWindow(mainViewModel: MainViewModel, navController: NavController, notif
             when(selectedItemIndex.value.selectedIndex){
                 0 -> HomeScreen(navController = navController)
                 1 -> NotificationsScreen(notificationViewModel)
-                2 -> SettingsScreen(settingsViewModel, navController)
+                2 -> SettingsScreen(settingsViewModel, activityViewModel,navController)
             }
 
         }
