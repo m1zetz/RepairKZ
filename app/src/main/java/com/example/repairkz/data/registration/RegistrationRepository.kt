@@ -1,9 +1,9 @@
-package com.example.repairkz.domain.repository
+package com.example.repairkz.data.registration
 
-import com.example.repairkz.data.remote.dto.UserRegistrationDTO
 import com.example.repairkz.data.remote.dto.LoginDTO
 import com.example.repairkz.data.remote.dto.LoginResponseDTO
 import com.example.repairkz.data.remote.dto.RegistrationResponseDTO
+import com.example.repairkz.data.remote.dto.UserRegistrationDTO
 import okhttp3.MultipartBody
 
 interface RegistrationRepository {

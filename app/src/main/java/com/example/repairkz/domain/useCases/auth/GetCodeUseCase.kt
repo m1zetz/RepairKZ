@@ -1,6 +1,6 @@
 package com.example.repairkz.domain.useCases.auth
 
-import com.example.repairkz.domain.repository.RegistrationRepository
+import com.example.repairkz.data.registration.RegistrationRepository
 import jakarta.inject.Inject
 
 class GetCodeUseCase @Inject constructor(

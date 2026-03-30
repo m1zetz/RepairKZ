@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.repairkz.common.enums.MasterSpetializationsEnum
 import com.example.repairkz.common.models.Master
 import com.example.repairkz.domain.useCases.files.PreparePhotoPartUseCase
 import com.example.repairkz.domain.useCases.files.SaveToInternalUseCase
@@ -35,7 +36,7 @@ class UserInfoViewModel @Inject constructor(
     private val saveToInternalUseCase: SaveToInternalUseCase,
     private val updateUserPhotoUseCase: UpdateUserPhotoUseCase,
     private val preparePhotoPartUseCase: PreparePhotoPartUseCase,
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
 ) : ViewModel() {
 
 
@@ -74,7 +75,6 @@ class UserInfoViewModel @Inject constructor(
             }
 
 
-
             UserIntent.CloseSheet -> {
                 _uiState.update { currentState ->
                     if (currentState is UserState.Success) {
@@ -110,31 +110,31 @@ class UserInfoViewModel @Inject constructor(
 
             UserIntent.CancelPhoto -> {
                 val currentState = _uiState.value
-                if (currentState is UserState.Success){
+                if (currentState is UserState.Success) {
                     _uiState.value = currentState.copy(
                         pendingUri = null
                     )
                 }
             }
+
             is UserIntent.ConfirmPhoto -> {
                 viewModelScope.launch {
                     val localUri = saveToInternalUseCase(intent.uri)
                     val currentState = _uiState.value
-                    if (currentState is UserState.Success){
+                    if (currentState is UserState.Success) {
                         _uiState.value = currentState.copy(
                             newAvatarData = localUri,
                             pendingUri = null
                         )
                         val user = getUserDataUseCase()
                         user?.let {
-                            val newUser = user.copy(
-                                userPhotoUrl = localUri.toString()
-                            )
-
                             val photo = preparePhotoPartUseCase(context, intent.uri)
                             photo?.let {
-                                withContext(NonCancellable) {
-                                    val result = updateUserPhotoUseCase(user.id.toLong(), photo)
+                                val result = withContext(NonCancellable) {
+                                   updateUserPhotoUseCase(user.id.toLong(), photo)
+                                }
+                                result.onSuccess {
+                                    defineUser(comingId)
                                 }
 
                             }
@@ -145,52 +145,78 @@ class UserInfoViewModel @Inject constructor(
             }
 
             is UserIntent.CurrentMasterIntent.ChangeDescription -> {
-                viewModelScope.launch {
-                    val state = _uiState.value
-                    if(state is UserState.Success){
-                        _uiState.value = state.copy(
-                            descriptionDraft = intent.description
-                        )
-//                        updateUserDataUseCase(master.copy(description = intent.description))
-//                        defineUser(comingId)
+                val state = _uiState.value
+                if (state is UserState.Success) {
+                    _uiState.value = state.copy(
+                        descriptionDraft = intent.description
+                    )
 
-                    }
                 }
-
-
             }
+
             is UserIntent.CurrentMasterIntent.ChangeExperience -> {
-
+                val state = _uiState.value
+                if (state is UserState.Success) {
+                    _uiState.value = state.copy(
+                        experienceDraft = intent.experience
+                    )
+                }
             }
+
             is UserIntent.CurrentMasterIntent.ChangeSpecialization -> {
+                val state = _uiState.value
+                if (state is UserState.Success) {
+                    _uiState.value = state.copy(
+                        specDraft = intent.spec
+                    )
+
+                }
 
             }
 
             UserIntent.CurrentMasterIntent.SaveDescription -> {
-                viewModelScope.launch {
-                    val state = _uiState.value
-                    if(state is UserState.Success){
-                        val user = state.userTypes
-                        if(user is UserTypes.IsCurrentMaster){
-                            updateUserDataUseCase(user.master.copy(description = state.descriptionDraft))
-                            defineUser(comingId)
-                        }
-                    }
+                val state = _uiState.value
+                if(state is UserState.Success){
+                    updateMasterData(desc = state.descriptionDraft)
                 }
-
-
             }
+
             UserIntent.CurrentMasterIntent.SaveExperience -> {
-
+                val state = _uiState.value
+                if(state is UserState.Success){
+                    updateMasterData(exp = state.experienceDraft)
+                }
             }
-            UserIntent.CurrentMasterIntent.SaveSpecialization -> {
 
+            UserIntent.CurrentMasterIntent.SaveSpecialization -> {
+                val state = _uiState.value
+                if(state is UserState.Success){
+                    updateMasterData(spec = state.specDraft)
+                }
             }
         }
 
 
     }
 
+    fun updateMasterData(exp: String? = null, spec: MasterSpetializationsEnum? = null, desc: String? = null) {
+        viewModelScope.launch {
+            val state = _uiState.value
+            if (state is UserState.Success) {
+                val user = state.userTypes
+                if (user is UserTypes.IsCurrentMaster) {
+                    updateUserDataUseCase(
+                        user.master.copy(
+                            description = desc?: user.master.description,
+                            experienceInYears = exp?.toIntOrNull()?: user.master.experienceInYears,
+                            masterSpecialization = spec?: user.master.masterSpecialization
+                        )
+                    )
+                    defineUser(comingId)
+                }
+            }
+        }
+    }
 
     init {
         defineUser(comingId)
@@ -201,9 +227,18 @@ class UserInfoViewModel @Inject constructor(
             _uiState.value = UserState.Loading
             getProfileTypeUseCase(id).fold(
                 onSuccess = { type ->
-                    val initialDesc = if(type is UserTypes.IsCurrentMaster) type.master.description else ""
                     _uiState.value =
-                        UserState.Success(type, descriptionDraft = initialDesc)
+                        if (type is UserTypes.IsCurrentMaster) {
+                            val data = type.master
+                            UserState.Success(
+                                type,
+                                descriptionDraft = data.description,
+                                specDraft = data.masterSpecialization,
+                                experienceDraft = data.experienceInYears.toString()
+                            )
+                        } else {
+                            UserState.Success(type)
+                        }
 
                 },
                 onFailure = {

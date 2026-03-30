@@ -2,7 +2,7 @@ package com.example.repairkz.domain.useCases.auth
 
 import com.example.repairkz.data.remote.dto.UserRegistrationDTO
 import com.example.repairkz.data.remote.dto.RegistrationResponseDTO
-import com.example.repairkz.domain.repository.RegistrationRepository
+import com.example.repairkz.data.registration.RegistrationRepository
 import okhttp3.MultipartBody
 import javax.inject.Inject
 

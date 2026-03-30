@@ -1,6 +1,6 @@
 package com.example.repairkz.domain.useCases.auth
 
-import com.example.repairkz.domain.repository.RegistrationRepository
+import com.example.repairkz.data.registration.RegistrationRepository
 import javax.inject.Inject
 
 class RefreshTokenUseCase @Inject constructor(

@@ -16,7 +16,7 @@ sealed class UserState {
         val pendingUri: Uri? = null,
         val descriptionDraft: String = "",
         val experienceDraft: String = "",
-        val spec: MasterSpetializationsEnum = MasterSpetializationsEnum.UNKNOWN
+        val specDraft: MasterSpetializationsEnum = MasterSpetializationsEnum.UNKNOWN
     ) : UserState()
 
     data class Error(val message: String) : UserState()

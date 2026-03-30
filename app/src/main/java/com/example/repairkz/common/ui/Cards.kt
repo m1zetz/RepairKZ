@@ -185,6 +185,8 @@ fun ShortInputCard(
     value: String,
     changeValue: (newValue: String) -> Unit,
     keyboardType: KeyboardType = KeyboardType.Text,
+    backIcon: ImageVector? = null,
+    action: (() -> Unit)? = null,
 
     ) {
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -219,7 +221,18 @@ fun ShortInputCard(
                     }
                 ),
                 shape = MaterialTheme.shapes.medium,
-                placeholder = { Text(stringResource(placeholderResId)) }
+                placeholder = { Text(stringResource(placeholderResId)) },
+                trailingIcon = backIcon?.let {
+                    {
+                        IconButton(onClick = {
+                            action?.invoke()
+                        }
+                        ) {
+                            Icon(it, null)
+                        }
+                    }
+
+                }
             )
 
         }
