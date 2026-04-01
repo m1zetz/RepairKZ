@@ -16,12 +16,12 @@ sealed class SettingsState {
 
 
 sealed class SettingIntent {
-    data class toUserScreen(val id: Int) : SettingIntent()
+    data class toUserScreen(val id: Long) : SettingIntent()
 
     data class SwitchStatus(val status: StatusOfUser) : SettingIntent()
 }
 
 
 sealed class SettingsEffects {
-    data class NavigateToUserInfo(val id: Int) : SettingsEffects()
+    data class NavigateToUserInfo(val id: Long) : SettingsEffects()
 }

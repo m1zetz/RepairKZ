@@ -17,6 +17,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -34,8 +35,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.graphics.alpha
 import coil.compose.AsyncImage
 import com.example.repairkz.R
 import com.example.repairkz.common.constants.SERVER_IP
@@ -181,13 +184,16 @@ fun ShortInfoCard(titleResID: Int, value: String) {
 @Composable
 fun ShortInputCard(
     @StringRes titleResID: Int,
-    @StringRes placeholderResId: Int,
+    @StringRes placeholderResId: Int? = null,
     value: String,
     changeValue: (newValue: String) -> Unit,
     keyboardType: KeyboardType = KeyboardType.Text,
     backIcon: ImageVector? = null,
     action: (() -> Unit)? = null,
-
+    suffix: (@Composable () -> Unit)? = null,
+    textAlign: TextAlign? = null,
+    singleLine: Boolean = true,
+    leadingIcon: ImageVector? = null
     ) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
@@ -205,7 +211,9 @@ fun ShortInputCard(
             )
             Spacer(modifier = Modifier.size(8.dp))
             OutlinedTextField(
+                singleLine = singleLine,
                 modifier = Modifier.fillMaxWidth(),
+                textStyle = LocalTextStyle.current.copy(textAlign = textAlign?: TextAlign.Start),
                 keyboardOptions = KeyboardOptions(
                     keyboardType = keyboardType,
                     imeAction = ImeAction.Done
@@ -221,7 +229,9 @@ fun ShortInputCard(
                     }
                 ),
                 shape = MaterialTheme.shapes.medium,
-                placeholder = { Text(stringResource(placeholderResId)) },
+                placeholder = placeholderResId?.let {
+                    { Text(stringResource(it), style = TextStyle(color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f))) }
+                },
                 trailingIcon = backIcon?.let {
                     {
                         IconButton(onClick = {
@@ -232,6 +242,12 @@ fun ShortInputCard(
                         }
                     }
 
+                },
+                suffix = suffix,
+                leadingIcon = leadingIcon?.let{
+                    {
+                        Icon(leadingIcon, null)
+                    }
                 }
             )
 

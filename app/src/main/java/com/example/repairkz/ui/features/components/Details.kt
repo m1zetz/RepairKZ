@@ -41,6 +41,8 @@ fun Details(orderData: Order){
         val paymentText = when(orderData.paymentMethod) {
             PaymentMethod.CASH -> stringResource(R.string.payment_cash)
             PaymentMethod.CARD -> stringResource(R.string.payment_card)
+            PaymentMethod.TRANSFER -> stringResource(R.string.transfer)
+            PaymentMethod.UNDEFINED -> stringResource(R.string.undefined)
         }
         ShortInfoCard(R.string.payment_system, paymentText)
     }

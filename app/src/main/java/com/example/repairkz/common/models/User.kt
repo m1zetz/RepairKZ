@@ -8,7 +8,7 @@ import com.example.repairkz.data.remote.dto.UserResponseDTO
 import com.example.repairkz.ui.features.UserInfo.CommonInfo
 
 open class User(
-    open val id: Int,
+    open val id: Long,
     open val userPhotoUrl: String?,
     open val firstName: String,
     open val lastName: String,
@@ -20,7 +20,7 @@ open class User(
     open val password: String? = null,
 ){
     fun copy(
-        userId: Int = this.id,
+        userId: Long = this.id,
         userPhotoUrl: String? = this.userPhotoUrl,
         firstName: String = this.firstName,
         lastName: String = this.lastName,
@@ -34,7 +34,7 @@ open class User(
     }
 
     fun getCommonInfo(
-        id: Int = this.id,
+        id: Long = this.id,
         userPhotoUrl: String? = this.userPhotoUrl,
         firstName: String = this.firstName,
         lastName: String = this.lastName,
@@ -50,7 +50,7 @@ open class User(
     }
 
     fun toMaster(
-        userId: Int = this.id,
+        userId: Long = this.id,
         userPhotoUrl: String? = this.userPhotoUrl,
         firstName: String = this.firstName,
         lastName: String = this.lastName,

@@ -62,7 +62,7 @@ class SignInViewModel @Inject constructor(
                             response.onSuccess {loginResponseDTO ->
                                 val dto = loginResponseDTO.user
                                 val user = User(
-                                    id = loginResponseDTO.id.toInt(),
+                                    id = loginResponseDTO.id,
                                     userPhotoUrl = dto.userPhotoUrl,
                                     firstName = dto.firstName,
                                     lastName = dto.lastName,

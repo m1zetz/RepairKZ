@@ -245,7 +245,7 @@ class SignUpViewModel @Inject constructor(
                             val userPart = user.toCreateUserDTO()
                             val response = createUserUseCase(userPart,photoPart )
                             response.onSuccess { dto ->
-                                val finalUser = user.copy(userId = dto.id.toInt())
+                                val finalUser = user.copy(userId = dto.id)
                                 dataStoreManager.saveToken(dto.token)
                                 saveUserToLocalUseCase(finalUser)
                                 _channel.send(NavigateToMainWindow)

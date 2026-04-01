@@ -7,7 +7,7 @@ import jakarta.inject.Inject
 class GetMasterByIdUseCase @Inject constructor(
     private val masterRepository: MasterRepository
 ) {
-    suspend operator fun invoke(id: Int) : Result<Master> {
+    suspend operator fun invoke(id: Long) : Result<Master> {
         return masterRepository.fetchMasterById(id)
     }
 }

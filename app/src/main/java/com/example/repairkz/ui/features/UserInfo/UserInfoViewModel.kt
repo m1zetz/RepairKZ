@@ -46,10 +46,10 @@ class UserInfoViewModel @Inject constructor(
     private val _channel = Channel<UserEffects>(Channel.BUFFERED)
     val channel = _channel.receiveAsFlow()
 
-    val comingId: Int? = try {
-        savedStateHandle.get<Int>("userId")
+    val comingId: Long? = try {
+        savedStateHandle.get<Long>("userId")
     } catch (e: Exception) {
-        savedStateHandle.get<String>("userId")?.toIntOrNull()
+        savedStateHandle.get<String>("userId")?.toLongOrNull()
     }
 
     fun handleIntent(intent: UserIntent) {
@@ -60,7 +60,10 @@ class UserInfoViewModel @Inject constructor(
             }
 
             is UserIntent.MasterProfileIntent.DoOrder -> {
-                Log.d("Сообщение", "Заказ мастера с айди ${intent.masterId}")
+                viewModelScope.launch {
+                    _channel.send(NavigateToOrderRegistration(intent.masterId))
+                }
+
             }
 
             is UserIntent.MasterProfileIntent.Report -> {
@@ -222,7 +225,7 @@ class UserInfoViewModel @Inject constructor(
         defineUser(comingId)
     }
 
-    fun defineUser(id: Int?) {
+    fun defineUser(id: Long?) {
         viewModelScope.launch {
             _uiState.value = UserState.Loading
             getProfileTypeUseCase(id).fold(

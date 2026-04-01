@@ -3,6 +3,7 @@ package com.example.repairkz.ui.features.UserInfo
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.LocalActivity
 import com.example.repairkz.R
@@ -98,6 +99,10 @@ fun UserInfo(userInfoViewModel: UserInfoViewModel, navController: NavController)
 
                 UserEffects.MapsToPreview -> {
                     navController.navigate(Routes.PHOTO_PREVIEW)
+                }
+
+                is UserEffects.NavigateToOrderRegistration -> {
+                    navController.navigate("${Routes.ORDER_REG}?id=${effect.masterId}")
                 }
             }
         }

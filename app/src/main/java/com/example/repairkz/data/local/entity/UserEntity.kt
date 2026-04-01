@@ -22,7 +22,7 @@ data class UserEntity(
 ){
     fun toUser(): User {
         return User(
-            id = this.id?.toInt() ?: 0,
+            id = this.id ?: 0,
             userPhotoUrl = this.userPhotoUrl,
             firstName = this.firstName,
             lastName = this.lastName,
@@ -35,7 +35,7 @@ data class UserEntity(
 
     fun toMaster(masterEntity: MasterEntity?): Master {
         return Master(
-            id = this.id?.toInt() ?: 0,
+            id = this.id ?: 0,
             userPhotoUrl = this.userPhotoUrl,
             firstName = this.firstName,
             lastName = this.lastName,

@@ -12,6 +12,8 @@ import com.example.repairkz.data.remote.api.RegistrationApi
 import com.example.repairkz.data.remote.api.TokenApi
 import com.example.repairkz.data.remote.api.UserApi
 import com.example.repairkz.data.registration.RegistrationRepository
+import com.example.repairkz.data.remote.api.MasterApi
+import com.example.repairkz.domain.useCases.userData.GetUserDataUseCase
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -28,8 +30,8 @@ object RepositoryModule{
         return NotificationRepositoryImpl()
     }
     @Provides
-    fun provideMasterRepository() : MasterRepository {
-        return MasterRepositoryImpl()
+    fun provideMasterRepository(masterApi: MasterApi, getUserDataUseCase: GetUserDataUseCase) : MasterRepository {
+        return MasterRepositoryImpl(masterApi, getUserDataUseCase)
     }
 
     @Provides

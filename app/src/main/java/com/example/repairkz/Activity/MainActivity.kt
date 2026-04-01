@@ -35,6 +35,7 @@ import com.example.repairkz.ui.features.main.MainViewModel
 import com.example.repairkz.ui.features.notifiacton.NotificationViewModel
 import com.example.repairkz.ui.features.search.SearchScreen
 import com.example.repairkz.ui.features.search.SearchViewModel
+import com.example.repairkz.ui.features.search.orderReg.OrderRegistration
 import com.example.repairkz.ui.features.settings.SettingsViewModel
 import com.example.repairkz.ui.theme.RepairkzTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -61,7 +62,7 @@ class MainActivity : ComponentActivity() {
             RepairkzTheme(darkTheme = state.isDarkTheme) {
                 val navController = rememberNavController()
                 Surface(color = MaterialTheme.colorScheme.background) {
-                    if(state.startDestination != null){
+                    if (state.startDestination != null) {
                         NavHost(
                             navController = navController,
                             startDestination = if (state.startDestination == StartDestination.MainWindow) Routes.MAIN_WINDOW else Routes.SIGN_IN
@@ -96,6 +97,17 @@ class MainActivity : ComponentActivity() {
                             ) {
                                 val searchViewModel: SearchViewModel = hiltViewModel()
                                 SearchScreen(navController, searchViewModel)
+                            }
+                            composable(
+                                route = "${Routes.ORDER_REG}?id={masterId}",
+                                arguments = listOf(
+                                    navArgument("masterId") {
+                                        type = NavType.Companion.LongType
+                                        defaultValue = 0
+                                    }
+                                )
+                            ){
+                                OrderRegistration()
                             }
                         }
                     }

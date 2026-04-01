@@ -8,6 +8,7 @@ import com.example.repairkz.domain.useCases.masterData.GetMastersUseCase
 import com.example.repairkz.domain.useCases.userData.GetProfileTypeUseCase
 import com.example.repairkz.ui.features.search.SearchEffects.*
 import com.example.repairkz.ui.features.search.SearchResult.*
+import com.example.repairkz.ui.features.settings.SettingsState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.channels.Channel
@@ -86,6 +87,12 @@ class SearchViewModel @Inject constructor(
                                 _uiState.update {
                                     it.copy(result = Success(mastersFromSearch))
                                 }
+                            }
+                        }.onFailure {
+                            _uiState.update { state ->
+                                state.copy(
+                                    result = Error(it.message?:"")
+                                )
                             }
                         }
 

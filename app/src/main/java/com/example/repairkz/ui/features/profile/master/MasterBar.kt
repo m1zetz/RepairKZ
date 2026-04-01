@@ -29,7 +29,7 @@ import com.example.repairkz.common.ui.ProfileMainActions
 import com.example.repairkz.ui.features.UserInfo.UserIntent
 
 @Composable
-fun MasterBar(onIntent: (UserIntent) -> Unit, masterId: Int){
+fun MasterBar(onIntent: (UserIntent) -> Unit, masterId: Long){
     Row(modifier = Modifier
         .fillMaxWidth()
         .padding(horizontal = 4.dp, vertical = 4.dp),

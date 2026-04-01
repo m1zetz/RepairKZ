@@ -11,7 +11,8 @@ data class SearchUiState(
     val filterData: FilterData = FilterData(),
     val isFiltersSheetOpen: Boolean = false,
     val isFilterActive: Boolean = false,
-    val searchFieldState: Boolean = true
+    val searchFieldState: Boolean = true,
+    val error: String = ""
 
 )
 
@@ -34,7 +35,7 @@ sealed class SearchIntents {
     data class ChangeText(val text: String) : SearchIntents()
     object GetData : SearchIntents()
     object NavigateToBack : SearchIntents()
-    data class NavigateToUserInfo(val id: Int) : SearchIntents()
+    data class NavigateToUserInfo(val id: Long) : SearchIntents()
 
     object OpenFilters : SearchIntents()
     object CloseFilters : SearchIntents()
@@ -56,5 +57,5 @@ sealed class FilterIntent{
 sealed interface SearchEffects {
     object NavigateBack : SearchEffects
 
-    data class NavigateToUserInfo(val id: Int) : SearchEffects
+    data class NavigateToUserInfo(val id: Long) : SearchEffects
 }

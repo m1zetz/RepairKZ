@@ -23,7 +23,7 @@ sealed class UserState {
 }
 
 data class CommonInfo(
-    val id: Int,
+    val id: Long,
     val photoUrl: String,
     val firstName: String,
     val lastName: String,
@@ -52,9 +52,9 @@ sealed class UserIntent {
     object CancelPhoto : UserIntent()
     data class GetPhotoFromMedia(val uri: Uri) : UserIntent()
     sealed class MasterProfileIntent : UserIntent() {
-        data class DoOrder(val masterId: Int) : MasterProfileIntent()
-        data class AddToFavorites(val masterId: Int) : MasterProfileIntent()
-        data class Report(val masterId: Int) : MasterProfileIntent()
+        data class DoOrder(val masterId: Long) : MasterProfileIntent()
+        data class AddToFavorites(val masterId: Long) : MasterProfileIntent()
+        data class Report(val masterId: Long) : MasterProfileIntent()
     }
 
     sealed class CurrentMasterIntent : UserIntent() {
@@ -74,4 +74,5 @@ sealed interface UserEffects {
     object MapsToPreview: UserEffects
 
     data class OpenPhotoPicker(val typeOfSelect: PhotoSourceEnum) : UserEffects
+    data class NavigateToOrderRegistration(val masterId: Long) : UserEffects
 }

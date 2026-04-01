@@ -17,9 +17,10 @@ object Routes {
     const val REG_GROUP = "reg_group"
 
     const val REG_PHOTO_GROUP = "reg_photo_group"
+    const val ORDER_REG = "order_reg"
     const val PROFILE_PHOTO_GROUP = "profile_photo_group"
 
-    fun userInfoRoute(id:Int?): String{
+    fun userInfoRoute(id:Long?): String{
         return if(id!=null){
             "${USERINFO}?userId=${id}"
         } else{

@@ -11,7 +11,7 @@ class GetProfileTypeUseCase @Inject constructor(
     val userRepository: UserRepository,
     val masterRepository: MasterRepository,
 ) {
-    suspend operator fun invoke(comingId: Int?): Result<UserTypes> {
+    suspend operator fun invoke(comingId: Long?): Result<UserTypes> {
         val user =  userRepository.fetchUserData()
 
         user?.let{

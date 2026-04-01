@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
-    private const val BASE_URL = "http://$SERVER_IP:8080/"
+    private const val BASE_URL = "http://192.168.0.4:8080/"
 
     @Provides
     fun providesRetrofit(okHttpClient: OkHttpClient): Retrofit {

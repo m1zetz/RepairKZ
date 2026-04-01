@@ -6,7 +6,7 @@ import com.example.repairkz.common.enums.MasterSpetializationsEnum
 import com.example.repairkz.common.enums.StatusOfUser
 
 data class Master(
-    override val id: Int,
+    override val id: Long,
     override val userPhotoUrl: String?,
     override val firstName: String,
     override val lastName: String,

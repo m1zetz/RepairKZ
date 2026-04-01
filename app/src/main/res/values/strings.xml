@@ -85,7 +85,23 @@
 
     <string name="spec">Специализация</string>
     <string name="exp">Опыт в годах</string>
+
+    <string name="placing">Оформление заказа</string>
     <string name="desc">Описание</string>
+    <string name="task">Что нужно сделать мастеру?</string>
+    <string name="price">Предложите цену:</string>
+    <string name="price_holder">Введите сумму</string>
+    <string name="address">Введите адрес:</string>
+    <string name="number">Введите номер телефона:</string>
+    <string name="payment_method">Выберите метод оплаты:</string>
+    <string name="order_master">Заказать мастера</string>
+
+    <string name="cash">Наличными</string>
+    <string name="card">Картой</string>
+    <string name="transfer">Переводом</string>
+    <string name="undefined">Не определено</string>
+
+
 
 
 </resources>
