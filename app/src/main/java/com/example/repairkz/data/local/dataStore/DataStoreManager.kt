@@ -20,6 +20,11 @@ class DataStoreManager(
         }
     }
 
+    suspend fun clearDataStore(){
+        context.dataStore.edit {
+            it.clear()
+        }
+    }
     suspend fun saveThemeType(isDark: Boolean){
         context.dataStore.edit { preferences ->
             preferences[PreferencesKeys.IS_DARK_THEME_KEY] = isDark

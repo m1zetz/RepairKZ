@@ -9,7 +9,7 @@ import com.example.repairkz.data.local.dao.MasterDao
 import com.example.repairkz.data.local.dao.UserDao
 import com.example.repairkz.data.local.entity.MasterEntity
 import com.example.repairkz.data.remote.api.UserApi
-import com.example.repairkz.data.remote.dto.ChangeStatusRequestDTO
+import com.example.repairkz.data.remote.dto.order.ChangeStatusRequestDTO
 import com.example.repairkz.data.remote.dto.FullUserRequestDTO
 import com.example.repairkz.data.remote.dto.MasterResponseDTO
 import com.example.repairkz.data.remote.dto.StatusRequestDTO

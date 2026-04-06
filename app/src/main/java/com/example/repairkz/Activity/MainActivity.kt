@@ -107,7 +107,7 @@ class MainActivity : ComponentActivity() {
                                     }
                                 )
                             ){
-                                OrderRegistration()
+                                OrderRegistration(navController = navController)
                             }
                         }
                     }

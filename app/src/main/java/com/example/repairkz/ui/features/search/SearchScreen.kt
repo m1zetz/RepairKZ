@@ -87,7 +87,9 @@ fun SearchScreen(navController: NavController, searchViewModel: SearchViewModel)
                 leadingIcon = {
                     IconButton(
                         onClick = {
-                            searchViewModel.handleIntent(SearchIntents.NavigateToBack)
+                            if (navController.previousBackStackEntry != null) {
+                                navController.popBackStack()
+                            }
                         }
                     ) {
                         Icon(Icons.Default.ArrowBack, null)

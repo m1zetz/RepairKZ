@@ -7,12 +7,15 @@ import com.example.repairkz.data.masterData.MasterRepository
 import com.example.repairkz.data.masterData.MasterRepositoryImpl
 import com.example.repairkz.data.notificationData.NotificationRepository
 import com.example.repairkz.data.notificationData.NotificationRepositoryImpl
+import com.example.repairkz.data.orderData.OrderRepository
+import com.example.repairkz.data.orderData.OrderRepositoryImpl
 import com.example.repairkz.data.registration.RegistrationRepositoryImpl
 import com.example.repairkz.data.remote.api.RegistrationApi
 import com.example.repairkz.data.remote.api.TokenApi
 import com.example.repairkz.data.remote.api.UserApi
 import com.example.repairkz.data.registration.RegistrationRepository
 import com.example.repairkz.data.remote.api.MasterApi
+import com.example.repairkz.data.remote.api.OrderApi
 import com.example.repairkz.domain.useCases.userData.GetUserDataUseCase
 import dagger.Binds
 import dagger.Module

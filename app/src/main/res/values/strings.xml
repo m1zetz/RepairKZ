@@ -11,6 +11,7 @@
 
     <string name="masterSpecialization">Тип мастера:</string>
     <string name="masterName">Имя мастера:</string>
+    <string name="clientName">Имя клиента:</string>
     <string name="time">Дата и время:</string>
     <string name="description">Задача мастера:</string>
     <string name="cost">Стоимость:</string>
@@ -100,6 +101,11 @@
     <string name="card">Картой</string>
     <string name="transfer">Переводом</string>
     <string name="undefined">Не определено</string>
+    <string name="accepted">Принят</string>
+    <string name="rejected">Отклонен</string>
+    <string name="pending">В ожидании подтверждения</string>
+    <string name="running">Выполняется</string>
+    <string name="completed">Завершен</string>
 
 
 

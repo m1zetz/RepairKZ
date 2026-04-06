@@ -63,7 +63,9 @@ fun SignIn(signInViewModel: SignInViewModel, navController: NavController) {
                     snackbarHostState.showSnackbar(effect.message)
                 }
 
-                SignInEffects.NavigateToMainWindow -> navController.navigate(MAIN_WINDOW)
+                SignInEffects.NavigateToMainWindow -> navController.navigate(MAIN_WINDOW){
+                    popUpTo(0) { inclusive = true }
+                }
             }
         }
     }

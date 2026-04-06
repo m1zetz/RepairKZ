@@ -4,7 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.repairkz.common.enums.StatusOfUser
 import com.example.repairkz.common.models.Master
-import com.example.repairkz.data.remote.dto.ChangeStatusRequestDTO
+import com.example.repairkz.data.local.dataBase.RepairDataBase
+import com.example.repairkz.data.local.dataStore.DataStoreManager
+import com.example.repairkz.data.remote.dto.order.ChangeStatusRequestDTO
 import com.example.repairkz.data.remote.dto.MasterDataResponseDTO
 import com.example.repairkz.data.remote.dto.MasterRequestDTO
 import com.example.repairkz.data.userData.UserRepository
@@ -14,6 +16,7 @@ import com.example.repairkz.ui.features.UserInfo.UserState
 import com.example.repairkz.ui.features.settings.SettingsEffects.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,12 +25,15 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     private val getUserDataUseCase: GetUserDataUseCase,
     private val updateUserStatusUseCase: UpdateUserStatusUseCase,
     private val userRepository: UserRepository,
+    private val dataStoreManager: DataStoreManager,
+    private val roomDB: RepairDataBase
 ) : ViewModel() {
     private var _uiState = MutableStateFlow<SettingsState>(SettingsState.Loading)
     val uiState = _uiState.asStateFlow()
@@ -65,6 +71,17 @@ class SettingsViewModel @Inject constructor(
                 switchUserStatus(intent.status)
             }
 
+            SettingIntent.Exit -> {
+                viewModelScope.launch {
+                    dataStoreManager.clearDataStore()
+                    withContext(Dispatchers.IO) {
+                        roomDB.clearAllTables()
+                    }
+                    _settingEffectsChannel.send(SettingsEffects.NavigateToLogin)
+
+                }
+
+            }
         }
     }
 

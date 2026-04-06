@@ -15,3 +15,8 @@ val RedDestructiveDark = Color(0xFFD99A91)
 
 val hyperBlue = Color(0xFF5D9CEC)
 val hyperBlueDark = Color(0xFF8CBDFF)
+
+val accept = Color(0xFF569650)
+val reject = Color(0xFF943E3E)
+
+val activeOrderColor = Color(0xFF3A6364)

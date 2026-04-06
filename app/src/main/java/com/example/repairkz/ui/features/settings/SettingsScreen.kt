@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.repairkz.Activity.ActivityIntent
 import com.example.repairkz.Activity.MainActivityViewModel
+import com.example.repairkz.Navigation.Routes
 import com.example.repairkz.Navigation.Routes.userInfoRoute
 import com.example.repairkz.common.enums.StatusOfUser
 import com.example.repairkz.common.ui.ProfileString
@@ -51,6 +52,12 @@ fun SettingsScreen(settingsViewModel: SettingsViewModel, activityViewModel: Main
             when (effect) {
                 is SettingsEffects.NavigateToUserInfo -> {
                     navController.navigate(userInfoRoute(effect.id))
+                }
+
+                SettingsEffects.NavigateToLogin -> {
+                    navController.navigate(Routes.SIGN_IN_SCREEN){
+                        popUpTo(0) { inclusive = true }
+                    }
                 }
             }
         }
@@ -139,7 +146,7 @@ fun SettingsScreen(settingsViewModel: SettingsViewModel, activityViewModel: Main
 
                     StandartString(
                         R.string.exit,
-                        intent = {},
+                        intent = {settingsViewModel.handleIntent(SettingIntent.Exit)},
                         color = MaterialTheme.colorScheme.error,
                         icon = Icons.Default.ExitToApp
                     )

@@ -1,6 +1,8 @@
 package com.example.repairkz.ui.features.search.orderReg
 
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -26,6 +28,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -37,6 +40,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.example.repairkz.Activity.ActivityIntent
 import com.example.repairkz.R
 import com.example.repairkz.common.enums.MasterSpetializationsEnum
@@ -46,9 +50,22 @@ import com.example.repairkz.common.ui.ShortInputCard
 import com.example.repairkz.common.ui.ShortWithComposableCard
 import com.example.repairkz.ui.features.UserInfo.UserIntent
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun OrderRegistration(orderRegistrationViewModel: OrderRegistrationViewModel = hiltViewModel()) {
+fun OrderRegistration(orderRegistrationViewModel: OrderRegistrationViewModel = hiltViewModel(), navController: NavController) {
     val state by orderRegistrationViewModel.state.collectAsState()
+
+    LaunchedEffect(Unit) {
+        orderRegistrationViewModel.channel.collect {effect ->
+            when(effect){
+                OrderRegistrationEffects.NavigateBack -> {
+                    navController.popBackStack()
+                }
+            }
+
+        }
+    }
+
     Surface(
         color = MaterialTheme.colorScheme.background
     ) {
@@ -121,7 +138,7 @@ fun OrderRegistration(orderRegistrationViewModel: OrderRegistrationViewModel = h
             Button(
                 modifier = Modifier.fillMaxWidth().padding(4.dp),
                 onClick = {
-
+                    orderRegistrationViewModel.handleIntent(OrderRegistrationIntent.CreateOrderRequest)
                 }
             ) {
                 Text(stringResource(R.string.order_master))

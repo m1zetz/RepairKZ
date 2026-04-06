@@ -1,6 +1,6 @@
 package com.example.repairkz.data.remote.api
 
-import com.example.repairkz.data.remote.dto.ChangeStatusRequestDTO
+import com.example.repairkz.data.remote.dto.order.ChangeStatusRequestDTO
 import com.example.repairkz.data.remote.dto.FullUserRequestDTO
 import com.example.repairkz.data.remote.dto.MasterDataResponseDTO
 import com.example.repairkz.data.remote.dto.MasterResponseDTO

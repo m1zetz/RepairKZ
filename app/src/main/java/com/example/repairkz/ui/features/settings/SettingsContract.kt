@@ -19,9 +19,14 @@ sealed class SettingIntent {
     data class toUserScreen(val id: Long) : SettingIntent()
 
     data class SwitchStatus(val status: StatusOfUser) : SettingIntent()
+
+    object Exit : SettingIntent()
 }
 
 
 sealed class SettingsEffects {
     data class NavigateToUserInfo(val id: Long) : SettingsEffects()
+
+    object NavigateToLogin : SettingsEffects()
+
 }
