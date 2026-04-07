@@ -7,6 +7,7 @@ import com.example.RepairKZ_Backend.entity.Master
 import com.example.RepairKZ_Backend.entity.User
 import com.example.RepairKZ_Backend.model.ChangeStatusRequestDTO
 import com.example.RepairKZ_Backend.model.EmailDTO
+import com.example.RepairKZ_Backend.model.MasterInfoDTO
 import com.example.RepairKZ_Backend.model.MasterRequestDTO
 import com.example.RepairKZ_Backend.model.MasterResponseDTO
 import com.example.RepairKZ_Backend.model.UserRegistrationDTO
@@ -35,6 +36,11 @@ class UserService(
     private val masterRepository: MasterRepository,
 ) {
 
+    fun getMasters(currentId: Long) : List<MasterInfoDTO> {
+        return masterRepository.findAllWithoutId(currentId).map { master ->
+                master.toInfoDto()
+        }
+    }
 
     fun getAllUsers(): List<UserResponseDTO> {
         return userRepository.findAll().map {

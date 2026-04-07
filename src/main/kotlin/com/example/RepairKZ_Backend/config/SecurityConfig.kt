@@ -31,6 +31,7 @@ class SecurityConfig(
             auth.requestMatchers(HttpMethod.POST, "/api/login").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/register").permitAll()
                 .requestMatchers(HttpMethod.GET, "/refresh-token").authenticated()
+                .requestMatchers(HttpMethod.POST, "/api/orders/**").permitAll()
 //                .requestMatchers("/api/**").authenticated()
                 .anyRequest().permitAll()
         }

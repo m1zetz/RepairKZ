@@ -6,6 +6,7 @@ import com.example.RepairKZ_Backend.common.enums.StatusOfUser
 import com.example.RepairKZ_Backend.model.ChangeStatusRequestDTO
 import com.example.RepairKZ_Backend.model.CodeCheckDTO
 import com.example.RepairKZ_Backend.model.EmailRequestDTO
+import com.example.RepairKZ_Backend.model.MasterInfoDTO
 import com.example.RepairKZ_Backend.model.MasterResponseDTO
 import com.example.RepairKZ_Backend.model.UpdatePhotoResponseDTO
 import com.example.RepairKZ_Backend.model.UserRegistrationDTO
@@ -45,6 +46,12 @@ class UserController(
     ): ResponseEntity<MasterResponseDTO> {
         val result = userService.updateUser(master)
         return ResponseEntity.ok(result)
+    }
+
+    @GetMapping("/get-masters/{currentId}")
+    fun getMasters(@PathVariable currentId: Long): ResponseEntity<List<MasterInfoDTO>> {
+        val response = userService.getMasters(currentId)
+        return ResponseEntity.ok(response)
     }
 
     @GetMapping("/get-master-by-id/{id}")

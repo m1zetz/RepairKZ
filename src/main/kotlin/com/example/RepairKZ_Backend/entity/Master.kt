@@ -1,6 +1,7 @@
 package com.example.RepairKZ_Backend.entity
 
 import com.example.RepairKZ_Backend.common.enums.MasterSpetializationsEnum
+import com.example.RepairKZ_Backend.model.MasterInfoDTO
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
@@ -29,4 +30,21 @@ data class Master(
 
     @Enumerated(EnumType.STRING)
     var masterSpecialization: MasterSpetializationsEnum? = null
-)
+){
+    fun toInfoDto() : MasterInfoDTO {
+        val user = this.user ?: throw Exception("User is null")
+        return MasterInfoDTO(
+            id = this.id!!,
+            userPhotoUrl = user.userPhotoUrl,
+            firstName = user.firstName!!,
+            lastName = user.lastName,
+            email = user.email,
+            phoneNumber = user.phoneNumber,
+            status = user.status,
+            city = user.city,
+            experienceInYears = experienceInYears ?: 0,
+            description = description ?: "",
+            masterSpecialization = masterSpecialization?:MasterSpetializationsEnum.UNKNOWN
+        )
+    }
+}

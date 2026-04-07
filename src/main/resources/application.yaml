@@ -32,3 +32,6 @@ spring:
     name: RepairKZ-Backend
 security:
   key: mySecretKeyForRepairKZApplicationJWT2024
+logging:
+  level:
+    org.springframework.web: DEBUG

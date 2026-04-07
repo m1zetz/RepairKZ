@@ -18,18 +18,18 @@ class FileService(
     private val cloudinary: Cloudinary
 ) {
 
-//    fun savePhotoAndGetUrl(rawFile : MultipartFile?) : String?{
-//        return try {
-//            rawFile?.let{
-//                val fileName = UUID.randomUUID().toString()
-//                val response = cloudinary.uploader().upload(rawFile.bytes, ObjectUtils.asMap("public_id", fileName))
-//                val url = response["secure_url"] as? String
-//                url
-//            }
-//        } catch (e: Exception){
-//            null
-//        }
-//    }
+    fun savePhotoAndGetUrlCloudinary(rawFile : MultipartFile?) : String?{
+        return try {
+            rawFile?.let{
+                val fileName = UUID.randomUUID().toString()
+                val response = cloudinary.uploader().upload(rawFile.bytes, ObjectUtils.asMap("public_id", fileName))
+                val url = response["secure_url"] as? String
+                url
+            }
+        } catch (e: Exception){
+            null
+        }
+    }
 
     fun savePhotoAndGetUrl(rawFile: MultipartFile?): String? {
         if (rawFile == null) {
@@ -39,7 +39,8 @@ class FileService(
             val content = rawFile.bytes
             val imageDirectory = File("$PHOTO_DIRECTORY$randomUUID.jpg")
             imageDirectory.writeBytes(content)
-            return "http://192.168.0.4:8080/$PHOTO_URL_PATH/$randomUUID.jpg"
+            val ip = "172.20.10.5   "
+            return "http://$ip:8080/$PHOTO_URL_PATH/$randomUUID.jpg"
         }
     }
 
