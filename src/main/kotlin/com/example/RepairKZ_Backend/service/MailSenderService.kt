@@ -6,12 +6,14 @@ import org.springframework.mail.MailSendException
 
 import org.springframework.mail.javamail.JavaMailSender
 import org.springframework.mail.javamail.MimeMessageHelper
+import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
 
 @Service
 class MailSenderService(
     private val emailSender: JavaMailSender
 ) {
+    @Async
     fun sendMail(emailMessage: EmailDTO){
         try {
             val msg = createSimpleMessage(emailMessage)

@@ -22,21 +22,6 @@ import org.springframework.web.bind.annotation.RestController
 class OrderController(
     private val orderService: OrderService
 ) {
-    @GetMapping("/get-master-order-history/{userId}")
-    fun getMasterOrderHistory(
-        @PathVariable userId: Long
-    ): ResponseEntity<List<MasterHistoryItemDTO>>{
-        val result = orderService.getMasterOrderHistory(userId)
-        return ResponseEntity.ok(result)
-    }
-
-    @GetMapping("/get-client-order-history/{userId}")
-    fun getClientOrderHistory(
-        @PathVariable userId: Long
-    ): ResponseEntity<List<ClientHistoryItemDTO>>{
-        val result = orderService.getClientOrderHistory(userId)
-        return ResponseEntity.ok(result)
-    }
 
     @PostMapping("/create-order")
     fun createOrder(@RequestBody orderRequestDTO: OrderRequestDTO): ResponseEntity<Unit> {
@@ -56,5 +41,20 @@ class OrderController(
         return ResponseEntity.ok(result)
     }
 
+    @GetMapping("/get-master-order-history/{userId}")
+    fun getMasterOrderHistory(
+        @PathVariable userId: Long
+    ): ResponseEntity<List<MasterHistoryItemDTO>>{
+        val result = orderService.getMasterOrderHistory(userId)
+        return ResponseEntity.ok(result)
+    }
+
+    @GetMapping("/get-client-order-history/{userId}")
+    fun getClientOrderHistory(
+        @PathVariable userId: Long
+    ): ResponseEntity<List<ClientHistoryItemDTO>>{
+        val result = orderService.getClientOrderHistory(userId)
+        return ResponseEntity.ok(result)
+    }
 
 }

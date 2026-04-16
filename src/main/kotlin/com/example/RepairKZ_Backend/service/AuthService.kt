@@ -63,13 +63,10 @@ class AuthService(
     }
 
     @Transactional
-    fun register(
-        user: UserRegistrationDTO,
-    ): RegistrationResponseDTO {
+    fun register(user: UserRegistrationDTO): RegistrationResponseDTO {
         if (userRepository.findByEmail(user.email) != null) {
             throw IllegalArgumentException("User with email ${user.email} already exists")
         }
-
         val hashPassword = passwordEncoder.encode(user.password)
         val newUser = User(
             firstName = user.firstName,
@@ -82,7 +79,6 @@ class AuthService(
             status = StatusOfUser.CLIENT,
             password = hashPassword!!
         )
-
         val savedUser = userRepository.save(
             newUser
         )
@@ -93,7 +89,6 @@ class AuthService(
         )
 
     }
-
     fun refreshToken(): RefreshResponseDTO {
         val user = SecurityContextHolder.getContext().authentication?.principal as User
         val newToken = tokenService.createToken(user)

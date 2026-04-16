@@ -53,7 +53,8 @@ class OrderService(
 
     @Transactional
     fun changeRequestStatus(changeDto: ChangeOrderRequestStatusDTO) {
-        val orderRequest = orderRequestRepository.findByIdOrNull(changeDto.orderRequestId) ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
+        val orderRequest = orderRequestRepository.findByIdOrNull(changeDto.orderRequestId)
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
         orderRequest.apply {
             orderRequestStatus = changeDto.orderStatus
         }
@@ -68,7 +69,8 @@ class OrderService(
     }
     @Transactional
     fun changeOrderStatus(dto: ChangeOrderStateDTO) {
-        val order = orderRepository.findByOrderRequest_Id(dto.orderID) ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
+        val order = orderRepository.findByOrderRequest_Id(dto.orderID)
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
         order.apply {
             orderStatus = dto.state
         }

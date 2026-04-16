@@ -15,9 +15,14 @@ spring:
     url: jdbc:postgresql://localhost:5432/repair_kz
     username: postgres
     password: "12345678"
+    hikari:
+      maximum-pool-size: 50
+      minimum-idle: 10
+      idle-timeout: 30000
+      connection-timeout: 20000
   servlet:
     multipart:
-      max-file-size: 10MB
+      max-file-size: 100MB
       max-request-size: 10MB
   jpa:
     hibernate:

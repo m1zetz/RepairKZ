@@ -39,8 +39,8 @@ class FileService(
             val content = rawFile.bytes
             val imageDirectory = File("$PHOTO_DIRECTORY$randomUUID.jpg")
             imageDirectory.writeBytes(content)
-            val ip = "172.20.10.5   "
-            return "http://$ip:8080/$PHOTO_URL_PATH/$randomUUID.jpg"
+            val ip = "172.20.10.5"
+            return "http://172.20.10.5:8080/$PHOTO_URL_PATH/$randomUUID.jpg"
         }
     }
 

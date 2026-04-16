@@ -42,7 +42,8 @@ class SecurityConfig(
         http.authenticationManager { auth ->
             val jwt = auth as BearerTokenAuthenticationToken
             val user = tokenService.parseToken(jwt.token) ?: throw InvalidBearerTokenException("Invalid token")
-            UsernamePasswordAuthenticationToken(user, "", listOf(SimpleGrantedAuthority("USER")))
+            UsernamePasswordAuthenticationToken(user,
+                "", listOf(SimpleGrantedAuthority("USER")))
         }
         http.sessionManagement {
             it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
