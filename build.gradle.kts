@@ -11,7 +11,7 @@ description = "Demo Server for repairKZ app"
 
 java {
 	toolchain {
-		languageVersion = JavaLanguageVersion.of(24)
+		languageVersion = JavaLanguageVersion.of(17)
 	}
 }
 
