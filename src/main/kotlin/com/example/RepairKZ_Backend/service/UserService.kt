@@ -129,7 +129,7 @@ class UserService(
     @Transactional
     fun updateUserPhoto(id: Long, file: MultipartFile) : String {
         val user = userRepository.findByIdOrNull(id) ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
-        val url = fileService.savePhotoAndGetUrl(file) ?: throw ResponseStatusException(HttpStatus.BAD_REQUEST)
+        val url = fileService.savePhotoAndGetUrlCloudinary(file) ?: throw ResponseStatusException(HttpStatus.BAD_REQUEST)
         user.userPhotoUrl = url
         userRepository.save(user)
         return url

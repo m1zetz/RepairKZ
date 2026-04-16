@@ -1,9 +1,16 @@
+server:
+  port: ${PORT:8080}
+  tomcat:
+    threads:
+      max: 200
+    max-connections: 10000
+
 spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: repairkz.auth@gmail.com
-    password: qxht gvlw iliu yafu
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
     properties:
       mail:
         smtp:
@@ -12,31 +19,34 @@ spring:
             enable: true
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/repair_kz
-    username: postgres
-    password: "12345678"
+    url: ${DATABASE_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     hikari:
-      maximum-pool-size: 50
+      maximum-pool-size: 30
       minimum-idle: 10
       idle-timeout: 30000
       connection-timeout: 20000
   servlet:
     multipart:
       max-file-size: 100MB
-      max-request-size: 10MB
+      max-request-size: 110MB
   jpa:
     hibernate:
       ddl-auto: update
       show_sql: true
       properties:
         hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
+          ddl-auto: update
+          show_sql: false
+          dialect: org.hibernate.dialect.PostgreSQLDialect
         temp:
           use_jdbc_metadata_defaults: false
   application:
     name: RepairKZ-Backend
 security:
-  key: mySecretKeyForRepairKZApplicationJWT2024
+  key: ${JWT_SECRET}
 logging:
   level:
-    org.springframework.web: DEBUG
+    org.springframework.web: INFO
+    root: INFO
