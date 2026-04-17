@@ -33,7 +33,6 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-      show_sql: true
       properties:
         hibernate:
           ddl-auto: update
