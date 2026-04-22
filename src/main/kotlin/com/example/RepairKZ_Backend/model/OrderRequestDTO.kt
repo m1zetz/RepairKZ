@@ -14,7 +14,7 @@ data class OrderRequestDTO(
     val description: String? = null,
     val clientPhoneNumber: String? = null,
     val clientAddress: String? = null,
-    val orderDate: String? = null,
+    val orderDate: LocalDateTime? = null,
     val paymentMethod: PaymentMethod = PaymentMethod.UNDEFINED,
     val offeredPrice: Int? = null,
 )

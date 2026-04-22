@@ -41,7 +41,7 @@ class OrderService(
             clientPhoneNumber = dto.clientPhoneNumber,
             clientAddress = dto.clientAddress,
             description = dto.description,
-            orderDate = dto.orderDate?.let { LocalDateTime.parse(it) },
+            orderDate = dto.orderDate,
             offeredPrice = dto.offeredPrice,
             createdAt = LocalDateTime.now(),
             paymentMethod = dto.paymentMethod

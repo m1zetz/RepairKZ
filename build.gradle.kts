@@ -11,7 +11,8 @@ description = "Demo Server for repairKZ app"
 
 java {
 	toolchain {
-		languageVersion = JavaLanguageVersion.of(17)
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
 	}
 }
 
@@ -22,6 +23,7 @@ repositories {
 dependencies {
 
     dependencies {
+        implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
         // Web и Data
         implementation("org.springframework.boot:spring-boot-starter-web")
         implementation("org.springframework.boot:spring-boot-starter-data-jpa")
