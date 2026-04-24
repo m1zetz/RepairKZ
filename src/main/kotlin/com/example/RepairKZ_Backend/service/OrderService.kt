@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service
 import org.springframework.util.Assert.state
 import org.springframework.web.server.ResponseStatusException
 import java.time.LocalDateTime
+import java.time.ZoneId
 
 @Service
 class OrderService(
@@ -43,7 +44,7 @@ class OrderService(
             description = dto.description,
             orderDate = dto.orderDate,
             offeredPrice = dto.offeredPrice,
-            createdAt = LocalDateTime.now(),
+            createdAt = LocalDateTime.now(ZoneId.of("Asia/Almaty")),
             paymentMethod = dto.paymentMethod
         )
         orderRequestRepository.save(
@@ -61,7 +62,7 @@ class OrderService(
         if (changeDto.orderStatus == OrderRequestStatus.ACCEPTED) {
             val order = Order(
                 orderRequest = orderRequest,
-                createdAt = LocalDateTime.now(),
+                createdAt = LocalDateTime.now(ZoneId.of("Asia/Almaty")),
             )
             orderRepository.save(order)
         }
