@@ -89,11 +89,11 @@ class OrderService(
                 description = request.description,
                 clientPhoneNumber = request.clientPhoneNumber,
                 clientAddress = request.clientAddress,
-                orderDate = request.orderDate.toString(),
+                orderDate = request.orderDate?.toString(),
                 offeredPrice = request.offeredPrice,
                 orderStatus = null,
                 orderRequestStatus = request.orderRequestStatus,
-                createdAt = request.createdAt.toString(),
+                createdAt = request.createdAt?.toString(),
                 paymentMethod = request.paymentMethod
             )
         }
@@ -107,11 +107,11 @@ class OrderService(
                     description = request.description,
                     clientPhoneNumber = request.clientPhoneNumber,
                     clientAddress = request.clientAddress,
-                    orderDate = request.orderDate.toString(),
+                    orderDate = request.orderDate?.toString(),
                     offeredPrice = request.offeredPrice,
                     orderStatus = order.orderStatus,
                     orderRequestStatus = null,
-                    createdAt = request.createdAt.toString(),
+                    createdAt = request.createdAt?.toString(),
                     paymentMethod = request.paymentMethod
                 )
             }
@@ -131,11 +131,11 @@ class OrderService(
                 description = request.description,
                 clientPhoneNumber = request.clientPhoneNumber,
                 clientAddress = request.clientAddress,
-                orderDate = request.orderDate.toString(),
+                orderDate = request.orderDate?.toString(),
                 offeredPrice = request.offeredPrice,
                 orderStatus = null,
                 orderRequestStatus = request.orderRequestStatus,
-                createdAt = request.createdAt.toString(),
+                createdAt = request.createdAt?.toString(),
                 paymentMethod = request.paymentMethod
             )
         }
@@ -150,11 +150,11 @@ class OrderService(
                 description = request.description,
                 clientPhoneNumber = request.clientPhoneNumber,
                 clientAddress = request.clientAddress,
-                orderDate = request.orderDate.toString(),
+                orderDate = request.orderDate?.toString(),
                 offeredPrice = request.offeredPrice,
                 orderStatus = order.orderStatus,
                 orderRequestStatus = null,
-                createdAt = request.createdAt.toString(),
+                createdAt = request.createdAt?.toString(),
                 paymentMethod = request.paymentMethod
             )
         }
