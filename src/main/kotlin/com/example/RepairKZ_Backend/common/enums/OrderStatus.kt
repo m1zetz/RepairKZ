@@ -2,7 +2,8 @@ package com.example.RepairKZ_Backend.common.enums
 
 enum class OrderStatus {
     RUNNING,
-    COMPLETED
+    COMPLETED,
+    REJECTED
 }
 
 enum class OrderRequestStatus{

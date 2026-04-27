@@ -59,13 +59,14 @@ class OrderService(
         orderRequest.apply {
             orderRequestStatus = changeDto.orderStatus
         }
-        if (changeDto.orderStatus == OrderRequestStatus.ACCEPTED) {
-            val order = Order(
-                orderRequest = orderRequest,
-                createdAt = LocalDateTime.now(ZoneId.of("Asia/Almaty")),
-            )
-            orderRepository.save(order)
-        }
+        val order = Order(
+            orderRequest = orderRequest,
+            orderStatus = if(changeDto.orderStatus == OrderRequestStatus.ACCEPTED)
+                OrderStatus.RUNNING
+            else OrderStatus.REJECTED,
+            createdAt = LocalDateTime.now(ZoneId.of("Asia/Almaty")),
+        )
+        orderRepository.save(order)
 
     }
     @Transactional
