@@ -54,19 +54,26 @@ class OrderService(
 
     @Transactional
     fun changeRequestStatus(changeDto: ChangeOrderRequestStatusDTO) {
-        val orderRequest = orderRequestRepository.findByIdOrNull(changeDto.orderRequestId)
-            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
-        orderRequest.apply {
-            orderRequestStatus = changeDto.orderStatus
+        try{
+            val orderRequest = orderRequestRepository.findByIdOrNull(changeDto.orderRequestId)
+                ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
+            orderRequest.apply {
+                orderRequestStatus = changeDto.orderStatus
+            }
+            val order = Order(
+                orderRequest = orderRequest,
+                orderStatus = if(changeDto.orderStatus == OrderRequestStatus.ACCEPTED)
+                    OrderStatus.RUNNING
+                else OrderStatus.REJECTED,
+                createdAt = LocalDateTime.now(ZoneId.of("Asia/Almaty")),
+            )
+            orderRepository.save(order)
+        } catch(e: Error){
+            println("ERROR: ${e.message}")
+            println("CAUSE: ${e.cause}")
+            throw e
         }
-        val order = Order(
-            orderRequest = orderRequest,
-            orderStatus = if(changeDto.orderStatus == OrderRequestStatus.ACCEPTED)
-                OrderStatus.RUNNING
-            else OrderStatus.REJECTED,
-            createdAt = LocalDateTime.now(ZoneId.of("Asia/Almaty")),
-        )
-        orderRepository.save(order)
+
 
     }
     @Transactional
