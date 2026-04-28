@@ -8,6 +8,6 @@ import java.util.Locale
 
 @RequiresApi(Build.VERSION_CODES.O)
 fun LocalDateTime.toRussianString(): String {
-    val formatter = DateTimeFormatter.ofPattern("d MMMM", Locale("ru"))
+    val formatter = DateTimeFormatter.ofPattern("d MMMM HH:mm", Locale("ru"))
     return this.format(formatter)
 }

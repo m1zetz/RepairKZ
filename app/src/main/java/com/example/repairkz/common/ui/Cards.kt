@@ -180,6 +180,20 @@ fun ShortInfoCard(titleResID: Int, value: String) {
         }
     }
 }
+@Composable
+fun ShortInfo(titleResID: Int, value: String) {
+    Column(modifier = Modifier.padding(8.dp)) {
+        Text(
+            text = stringResource(titleResID),
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.secondary
+        )
+        Text(
+            text = value,
+            style = MaterialTheme.typography.bodyLarge
+        )
+    }
+}
 
 @Composable
 fun ShortInputCard(
@@ -255,6 +269,73 @@ fun ShortInputCard(
     }
 }
 
+@Composable
+fun ShortInput(
+    @StringRes titleResID: Int,
+    @StringRes placeholderResId: Int? = null,
+    value: String,
+    changeValue: (newValue: String) -> Unit,
+    keyboardType: KeyboardType = KeyboardType.Text,
+    backIcon: ImageVector? = null,
+    action: (() -> Unit)? = null,
+    suffix: (@Composable () -> Unit)? = null,
+    textAlign: TextAlign? = null,
+    singleLine: Boolean = true,
+    leadingIcon: ImageVector? = null
+) {
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val focusManager = LocalFocusManager.current
+    Column() {
+        Text(
+            text = stringResource(titleResID),
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.secondary
+        )
+        Spacer(modifier = Modifier.size(4.dp))
+        OutlinedTextField(
+            singleLine = singleLine,
+            modifier = Modifier.fillMaxWidth(),
+            textStyle = LocalTextStyle.current.copy(textAlign = textAlign?: TextAlign.Start),
+            keyboardOptions = KeyboardOptions(
+                keyboardType = keyboardType,
+                imeAction = ImeAction.Done
+            ),
+            value = value,
+            onValueChange = { newValue ->
+                changeValue(newValue)
+            },
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    keyboardController?.hide()
+                    focusManager.clearFocus()
+                }
+            ),
+            shape = MaterialTheme.shapes.medium,
+            placeholder = placeholderResId?.let {
+                { Text(stringResource(it), style = TextStyle(color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f))) }
+            },
+            trailingIcon = backIcon?.let {
+                {
+                    IconButton(onClick = {
+                        action?.invoke()
+                    }
+                    ) {
+                        Icon(it, null)
+                    }
+                }
+
+            },
+            suffix = suffix,
+            leadingIcon = leadingIcon?.let{
+                {
+                    Icon(leadingIcon, null)
+                }
+            }
+        )
+
+    }
+}
+
 
 
 @Composable
@@ -308,6 +389,30 @@ fun ShortWithComposableCard(titleResID: Int, composable: @Composable () -> Unit)
             Spacer(modifier = Modifier.size(8.dp))
             composable()
         }
+    }
+}
+@Composable
+fun ShortWithComposable(titleResID: Int, composable: @Composable () -> Unit) {
+    Column(modifier = Modifier.padding(8.dp)) {
+        Text(
+            text = stringResource(titleResID),
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.secondary
+        )
+        Spacer(modifier = Modifier.size(8.dp))
+        composable()
+    }
+}
+@Composable
+fun ShortWithComposableWOpadding(titleResID: Int, composable: @Composable () -> Unit) {
+    Column() {
+        Text(
+            text = stringResource(titleResID),
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.secondary
+        )
+        Spacer(modifier = Modifier.size(8.dp))
+        composable()
     }
 }
 

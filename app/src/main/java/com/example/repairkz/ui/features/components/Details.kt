@@ -30,24 +30,30 @@ import java.time.LocalDateTime
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun Details(data: HistoryItem){
-    when(data){
+fun Details(data: HistoryItem) {
+    when (data) {
         is HistoryItem.ClientItem -> {
             val orderData = data.data
             Column(
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier
+                    .fillMaxSize()
                     .padding(8.dp)
                     .verticalScroll(rememberScrollState())
             ) {
-                ShortInfoCard(R.string.masterSpecialization, stringResource(orderData.masterSpec.resID))
+                ShortInfoCard(
+                    R.string.masterSpecialization,
+                    stringResource(orderData.masterSpec.resID)
+                )
                 ShortInfoCard(R.string.masterName, orderData.masterFirstName)
-                val dateTime = orderData.orderDate?.let { text -> LocalDateTime.parse(text) }
-                val dateString = dateTime?.toRussianString() ?: ""
-                val timeString = "${dateTime?.hour}:${dateTime?.minute}"
-                ShortInfoCard(R.string.time, "$dateString в $timeString")
-                ShortInfoCard(R.string.description, orderData.description?:"")
-                ShortInfoCard(R.string.cost, "${orderData.offeredPrice?:0} ₸")
-                val paymentText = when(orderData.paymentMethod) {
+                val dateTime = orderData.orderDate
+                    ?.takeIf { it.isNotBlank() }
+                    ?.let { text -> LocalDateTime.parse(text) }
+                val dateString =
+                    dateTime?.toRussianString() ?: stringResource(R.string.date_not_specified)
+                ShortInfoCard(R.string.time, dateString)
+                ShortInfoCard(R.string.description, orderData.description ?: "")
+                ShortInfoCard(R.string.cost, "${orderData.offeredPrice ?: 0} ₸")
+                val paymentText = when (orderData.paymentMethod) {
                     PaymentMethod.CASH -> stringResource(R.string.payment_cash)
                     PaymentMethod.CARD -> stringResource(R.string.payment_card)
                     PaymentMethod.TRANSFER -> stringResource(R.string.transfer)
@@ -57,26 +63,33 @@ fun Details(data: HistoryItem){
                     }
                 }
                 ShortInfoCard(R.string.payment_system, paymentText)
-                Log.d("Payment", "${orderData.paymentMethod}")
             }
         }
+
         is HistoryItem.MasterItem -> {
             val orderData = data.data
             Column(
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier
+                    .fillMaxSize()
                     .padding(8.dp)
                     .verticalScroll(rememberScrollState())
             ) {
-                ShortInfoCard(R.string.clientName, "${orderData.clientFirstName} ${orderData.clientLastName}")
-                val dateTime = orderData.orderDate?.let { text -> LocalDateTime.parse(text) }
+                ShortInfoCard(
+                    R.string.clientName,
+                    "${orderData.clientFirstName} ${orderData.clientLastName}"
+                )
+                val dateTime = orderData.orderDate
+                    ?.takeIf { it != "null" && it.isNotBlank() }
+                    ?.let { text -> LocalDateTime.parse(text) }
                 val dateString = dateTime?.toRussianString() ?: ""
-                val timeString = "${dateTime?.hour}:${dateTime?.minute}"
+                val timeString =
+                    if (dateTime != null) "${dateTime.hour}:${"% 02d".format(dateTime.minute)}" else ""
                 ShortInfoCard(R.string.time, "$dateString в $timeString")
-                ShortInfoCard(R.string.address, orderData.clientAddress ?: "")
-                ShortInfoCard(R.string.number, orderData.clientPhoneNumber ?: "")
+                ShortInfoCard(R.string.client_address, orderData.clientAddress ?: "")
+                ShortInfoCard(R.string.client_number, orderData.clientPhoneNumber ?: "")
                 ShortInfoCard(R.string.description, orderData.description ?: "")
                 ShortInfoCard(R.string.cost, "${orderData.offeredPrice ?: 0} ₸")
-                val paymentText = when(orderData.paymentMethod) {
+                val paymentText = when (orderData.paymentMethod) {
                     PaymentMethod.CASH -> stringResource(R.string.payment_cash)
                     PaymentMethod.CARD -> stringResource(R.string.payment_card)
                     PaymentMethod.TRANSFER -> stringResource(R.string.transfer)

@@ -48,6 +48,9 @@ configurations.all {
 }
 
 dependencies {
+    //DatePicker
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.2")
+    //Logging
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
     val room_version = "2.8.4"
     ksp("androidx.room:room-compiler:$room_version")
@@ -69,7 +72,7 @@ dependencies {
     implementation("androidx.camera:camera-camera2:$cameraxVersion")
     implementation("androidx.camera:camera-lifecycle:$cameraxVersion")
     implementation("androidx.camera:camera-view:$cameraxVersion")
-    // Material
+    //Material
     implementation("androidx.compose.material:material-icons-extended")
     //ViewModel
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")

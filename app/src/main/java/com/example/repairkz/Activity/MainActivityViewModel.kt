@@ -76,15 +76,20 @@ class MainActivityViewModel @Inject constructor(
                             startDestination = StartDestination.MainWindow
                         )
                     }
-                }.onFailure {
-                    _state.update {state ->
-                        state.copy(
-                            startDestination = StartDestination.Login
-                        )
+                }.onFailure {exception ->
+                    if (isNetworkError(exception)) {
+                        userRepository.getRoomData()
+                        _state.update { it.copy(startDestination = StartDestination.MainWindow) }
+                    } else {
+                        _state.update { it.copy(startDestination = StartDestination.Login) }
                     }
                 }
             }
         }
+    }
+    private fun isNetworkError(throwable: Throwable): Boolean {
+        val message = throwable.message ?: ""
+        return message.contains("Unable to resolve host") || message.contains("timeout") || throwable is java.io.IOException
     }
 
 

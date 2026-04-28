@@ -1,9 +1,14 @@
 package com.example.repairkz.di
 
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import com.example.repairkz.common.constants.SERVER_IP
 import com.example.repairkz.data.local.dataStore.DataStoreManager
 import com.example.repairkz.data.remote.api.RegistrationApi
+import com.google.gson.GsonBuilder
+import com.google.gson.JsonPrimitive
+import com.google.gson.JsonSerializer
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -18,19 +23,27 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
+import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
 
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
-    private const val BASE_URL = "http://192.168.0.4:8080/"
+    private const val BASE_URL = "https://repairkz.onrender.com/"
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @Provides
     fun providesRetrofit(okHttpClient: OkHttpClient): Retrofit {
+        val gson = GsonBuilder()
+            .registerTypeAdapter(LocalDateTime::class.java,
+                JsonSerializer<LocalDateTime> { src, _, _ ->
+                    JsonPrimitive(src.toString())
+                })
+            .create()
         return Retrofit
             .Builder()
             .baseUrl(BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create(gson))
             .addConverterFactory(ScalarsConverterFactory.create())
             .client(okHttpClient)
             .build()

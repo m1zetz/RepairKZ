@@ -36,7 +36,7 @@
     <string name="reset_filters">Сбросить фильтры</string>
     <string name="find_by_name">Поиск по имени</string>
 
-    <string name="do_order">Заказать</string>
+        <string name="do_order">Заказать</string>
     <string name="to_favorites">В избранное</string>
     <string name="report">Пожаловаться</string>
 
@@ -94,6 +94,8 @@
     <string name="price_holder">Введите сумму</string>
     <string name="address">Введите адрес:</string>
     <string name="number">Введите номер телефона:</string>
+    <string name="client_number">Номер телефона клиента:</string>
+    <string name="client_address">Адрес клиента:</string>
     <string name="payment_method">Выберите метод оплаты:</string>
     <string name="order_master">Заказать мастера</string>
 
@@ -103,9 +105,38 @@
     <string name="undefined">Не определено</string>
     <string name="accepted">Принят</string>
     <string name="rejected">Отклонен</string>
-    <string name="pending">В ожидании подтверждения</string>
+    <string name="pending">Ожидает ответ</string>
+    <string name="application_submitted">Заявка подана</string>
     <string name="running">Выполняется</string>
     <string name="completed">Завершен</string>
+    <string name="selected_date">Выбранная дата</string>
+    <string name="select_date">Выбрать дату и время</string>
+    <string name="no_selected_date">Дата не выбрана</string>
+    <string name="order_data">Данные о заказе</string>
+    <string name="contact_data">Контактная информация</string>
+    <string name="cancel">Закрыть</string>
+    <string name="select_time">Выбрать время</string>
+    <string name="OK">ОК</string>
+    <string name="date_not_specified">Дата не указана</string>
+    //notifies
+    <string name="order_running">Ваш заказ на мастера %1$s одобрен, мастер свяжется с вами.</string>
+    <string name="order_complete">Ваш заказ на мастера %1$s завершён.</string>
+    <string name="order_request">Вы заказали мастера %1$s, ожидайте ответа.</string>
+    <string name="order_request_unknown">Вы заказали мастера, ожидайте ответа.</string>
+    <string name="active_order_notify">У вас активный заказ по адресу %1$s, свяжитесь с клиентом.</string>
+    <string name="master_order_reject">Вы отклонили заказ клиента по адресу %1$s.</string>
+    <string name="order_reject">Ваш заказ на мастера %1$s был отклонен.</string>
+    <string name="master_order_complete">Ваш заказ по адресу %1$s завершен</string>
+    <string name="master_order_request">Вас заказал клиент по адресу %1$s </string>
+    <string name="details">Подробности</string>
+    <string name="complete_the_order">Завершить заказ</string>
+    <string name="active_order">Активный заказ</string>
+    <string name="expect_answer">Ожидает ответа</string>
+    <string name="not_defined">Не определено</string>
+    <string name="to_accept">Принять</string>
+    <string name="to_reject">Отклонить</string>
+
+
 
 
 

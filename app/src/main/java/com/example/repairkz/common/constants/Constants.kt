@@ -12,4 +12,4 @@ val EMAIL_ADDRESS_PATTERN = Pattern.compile(
             ")+"
 )
 
-const val SERVER_IP = "192.168.0.4"
+const val SERVER_IP = "https://repairkz.onrender.com/"

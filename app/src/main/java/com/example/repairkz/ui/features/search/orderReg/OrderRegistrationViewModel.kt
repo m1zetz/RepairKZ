@@ -1,11 +1,11 @@
 package com.example.repairkz.ui.features.search.orderReg
 
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.repairkz.common.utils.formattedTime
 import com.example.repairkz.data.remote.dto.order.OrderRequestDTO
 import com.example.repairkz.domain.useCases.order.CreateOrderRequestUseCase
 import com.example.repairkz.domain.useCases.userData.GetUserDataUseCase
@@ -16,7 +16,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.datetime.LocalTime
+import java.time.Instant
+
 import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZoneOffset
 import javax.inject.Inject
 
 @HiltViewModel
@@ -86,13 +91,81 @@ class OrderRegistrationViewModel @Inject constructor(
                         description = orderData.description,
                         clientPhoneNumber = orderData.clientNumber,
                         clientAddress = orderData.clientAddress,
-                        orderDate = LocalDateTime.now().toString(),
+                        orderDate = orderData.date,
                         offeredPrice = orderData.price.toIntOrNull() ?: 0,
                         paymentMethod = orderData.paymentMethod
 ,                    )
                     createOrderRequestUseCase(requestDto).onSuccess {
                         _channel.send(OrderRegistrationEffects.NavigateBack)
                     }
+                }
+
+            }
+
+            is OrderRegistrationIntent.ChangeDate -> {
+                val millis = intent.millis
+                val localDateTime = Instant.ofEpochMilli(millis)
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDateTime()
+                _state.update { state ->
+                    state.copy(
+                        dateMillis = millis
+                    )
+                }
+            }
+
+            OrderRegistrationIntent.CloseDayPicker -> {
+                _state.update {state -> 
+                    state.copy(
+                        isDayModalOpen = false
+                    )
+                }
+            }
+            OrderRegistrationIntent.OpenDayPicker -> {
+                _state.update {state ->
+                    state.copy(
+                        isDayModalOpen = true
+                    )
+                }
+            }
+
+            OrderRegistrationIntent.CloseTimePicker -> {
+                _state.update {state ->
+                    state.copy(
+                        isTimeModalOpen = false
+                    )
+                }
+            }
+            OrderRegistrationIntent.OpenTimePicker -> {
+                _state.update {state ->
+                    state.copy(
+                        isTimeModalOpen = true
+                    )
+                }
+            }
+
+            is OrderRegistrationIntent.ChangeTime -> {
+                _state.update {
+                    it.copy(
+                        hour = intent.hour,
+                        minute = intent.minute
+                    )
+                }
+            }
+
+            OrderRegistrationIntent.ChangeDateTime -> {
+                val state = _state.value
+                val hour = state.hour ?: return
+                val minute = state.minute ?: return
+                val dateMillis = state.dateMillis ?: return
+
+                val date = LocalDateTime.ofEpochSecond(dateMillis/1000,0,
+                    ZoneOffset.UTC).toLocalDate()
+                val dateTime = LocalDateTime.of(date, java.time.LocalTime.of(hour,minute))
+                _state.update {
+                    it.copy(
+                        date = dateTime
+                    )
                 }
 
             }

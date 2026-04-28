@@ -1,5 +1,7 @@
 package com.example.repairkz.ui.features.notifiacton
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import com.example.repairkz.common.enums.OrderRequestStatus
 import com.example.repairkz.common.enums.OrderStatus
 import com.example.repairkz.common.models.Order
@@ -8,13 +10,20 @@ import com.example.repairkz.data.remote.dto.order.MasterHistoryItemDTO
 import java.time.LocalDateTime
 
 sealed class HistoryItem {
-    abstract val createdAt: String?
+    abstract val createdAt: LocalDateTime?
 
-    data class MasterItem(val data: MasterHistoryItemDTO) : HistoryItem(){
+    data class MasterItem(val data: MasterHistoryItemDTO) : HistoryItem() {
+        @RequiresApi(Build.VERSION_CODES.O)
         override val createdAt = data.createdAt
+            ?.takeIf { it != "null" && it.isNotBlank() }
+            ?.let { LocalDateTime.parse(it) }
     }
-    data class ClientItem(val data: ClientHistoryItemDTO) : HistoryItem(){
+
+    data class ClientItem(val data: ClientHistoryItemDTO) : HistoryItem() {
+        @RequiresApi(Build.VERSION_CODES.O)
         override val createdAt = data.createdAt
+            ?.takeIf { it != "null" && it.isNotBlank() }
+            ?.let { LocalDateTime.parse(it) }
     }
 }
 

@@ -15,7 +15,7 @@ data class ClientHistoryItemDTO(
     val type: OrderType,
     val description: String? = null,
     val clientPhoneNumber: String? = null,
-    val clientAddress: String? = null,
+    val clientAddress: String,
     val paymentMethod: PaymentMethod? = null,
     val orderDate: String? = null,
     val offeredPrice: Int? = null,

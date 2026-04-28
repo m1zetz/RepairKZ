@@ -72,7 +72,6 @@ class SearchViewModel @Inject constructor(
                             }
                             if(_uiState.value.isFilterActive){
                                 val sorteredMasters = masters.filter { master ->
-
                                     val city = filter.city == null || master.city == filter.city
                                     val spec = filter.masterSpecialization == null || master.masterSpecialization == filter.masterSpecialization
                                     val descriptions = filter.detailDescriptions.isEmpty() || master.description?.contains(filter.detailDescriptions) ?: false
