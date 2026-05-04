@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service
 class MailSenderService(
     private val emailSender: JavaMailSender
 ) {
-    @Async
+
     fun sendMail(emailMessage: EmailDTO){
         try {
             val msg = createSimpleMessage(emailMessage)
