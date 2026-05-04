@@ -14,10 +14,12 @@ import com.example.RepairKZ_Backend.model.UserRegistrationDTO
 import com.example.RepairKZ_Backend.repository.MasterRepository
 import com.example.RepairKZ_Backend.repository.UserRepository
 import jakarta.transaction.Transactional
+import org.springframework.http.HttpStatus
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
+import org.springframework.web.server.ResponseStatusException
 
 @Service
 class AuthService(
@@ -32,10 +34,11 @@ class AuthService(
     fun login(
         loginRequest: LoginRequestDTO,
     ): LoginResponseDTO {
-        val user = userRepository.findByEmail(loginRequest.login) ?: throw IllegalArgumentException("User not found")
+        val user = userRepository.findByEmail(loginRequest.login) ?: throw ResponseStatusException(HttpStatus.BAD_REQUEST,"Invalid login or password")
         val masterData = master.findByUser(user)
+
         if (!passwordEncoder.matches(loginRequest.password, user.password)) {
-            throw IllegalArgumentException("Invalid password")
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST,"Invalid login or password")
         }
         val token = tokenService.createToken(user)
         val baseResponse = LoginResponseDTO(
