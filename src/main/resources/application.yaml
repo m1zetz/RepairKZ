@@ -34,15 +34,16 @@ spring:
       max-file-size: 100MB
       max-request-size: 110MB
   jpa:
+    properties:
+      hibernate:
+        ddl-auto: update
+        show_sql: false
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+      temp:
+        use_jdbc_metadata_defaults: false
     hibernate:
       ddl-auto: update
-      properties:
-        hibernate:
-          ddl-auto: update
-          show_sql: false
-          dialect: org.hibernate.dialect.PostgreSQLDialect
-        temp:
-          use_jdbc_metadata_defaults: false
+
   application:
     name: RepairKZ-Backend
 security:
