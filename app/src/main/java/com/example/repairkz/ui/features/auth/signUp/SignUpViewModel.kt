@@ -10,6 +10,7 @@ import com.example.repairkz.common.models.User
 import com.example.repairkz.common.utils.ValidationResult
 import com.example.repairkz.common.utils.Validator
 import com.example.repairkz.data.local.dataStore.DataStoreManager
+import com.example.repairkz.domain.errors.AuthorizationError
 import com.example.repairkz.domain.useCases.files.SaveToInternalUseCase
 import com.example.repairkz.domain.useCases.auth.CreateUserUseCase
 import com.example.repairkz.domain.useCases.auth.GetCodeUseCase
@@ -156,7 +157,10 @@ class SignUpViewModel @Inject constructor(
                             _channel.send(NavigateToConfirmation)
                             timer()
                         }.onFailure { error ->
-                            _channel.send(ShowSnackBar(error.message ?: "Ошибка сети"))
+                            if(error is AuthorizationError){
+                                _channel.send(ShowSnackBar(error))
+                            }
+
                         }
                         _uiState.value = _uiState.value.copy(
                             isLoading = false
@@ -177,7 +181,9 @@ class SignUpViewModel @Inject constructor(
                         response.onSuccess {
                             _channel.send(NavigateToFillingData)
                         }.onFailure { error ->
-                            _channel.send(ShowSnackBar(error.message ?: "Ошибка сети"))
+                            if(error is AuthorizationError){
+                                _channel.send(ShowSnackBar(error))
+                            }
                         }
                         _uiState.value = _uiState.value.copy(
                             isLoading = false

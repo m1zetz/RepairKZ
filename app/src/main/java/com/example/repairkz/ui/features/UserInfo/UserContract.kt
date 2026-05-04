@@ -14,6 +14,12 @@ sealed class UserState {
         val avatarSheetState: Boolean = false,
         val newAvatarData: Uri? = null,
         val pendingUri: Uri? = null,
+
+        val number: String = "",
+        val city: String = "",
+        val email: String = "",
+
+
         val descriptionDraft: String = "",
         val experienceDraft: String = "",
         val specDraft: MasterSpetializationsEnum = MasterSpetializationsEnum.UNKNOWN
@@ -47,7 +53,9 @@ sealed class UserIntent {
     object OpenSheet : UserIntent()
     object CloseSheet : UserIntent()
     data class ChangeAvatar(val typeOfSelect: PhotoSourceEnum) : UserIntent()
-
+    data class ChangeNumber(val number: String) : UserIntent()
+    data class ChangeCity(val city: String) : UserIntent()
+    data class ChangeEmail(val email: String) : UserIntent()
     data class ConfirmPhoto(val uri: Uri) : UserIntent()
     object CancelPhoto : UserIntent()
     data class GetPhotoFromMedia(val uri: Uri) : UserIntent()

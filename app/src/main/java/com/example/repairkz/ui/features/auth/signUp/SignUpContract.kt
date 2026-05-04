@@ -2,6 +2,7 @@ package com.example.repairkz.ui.features.auth.signUp
 
 import android.net.Uri
 import com.example.repairkz.common.enums.PhotoSourceEnum
+import com.example.repairkz.domain.errors.AuthorizationError
 import com.example.repairkz.ui.features.UserInfo.UserEffects
 import com.example.repairkz.ui.features.UserInfo.UserIntent
 
@@ -55,7 +56,7 @@ sealed class SignUpEffect{
 
     object NavigateToFillingData : SignUpEffect()
     object NavigateToMainWindow : SignUpEffect()
-    data class ShowSnackBar(val message: String) : SignUpEffect()
+    data class ShowSnackBar(val error: AuthorizationError) : SignUpEffect()
 
     data class OpenPhotoPicker(val typeOfSelect: PhotoSourceEnum) : SignUpEffect()
 

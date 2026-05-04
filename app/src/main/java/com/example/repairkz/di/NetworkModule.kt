@@ -59,8 +59,8 @@ object NetworkModule {
         return OkHttpClient()
             .newBuilder()
             .connectTimeout(30, TimeUnit.SECONDS)
-            .readTimeout(120, TimeUnit.SECONDS)
-            .writeTimeout(120, TimeUnit.SECONDS)
+            .readTimeout(10, TimeUnit.SECONDS)
+            .writeTimeout(10, TimeUnit.SECONDS)
             .addInterceptor(logging)
             .addInterceptor {chain ->
                 val token = runBlocking {

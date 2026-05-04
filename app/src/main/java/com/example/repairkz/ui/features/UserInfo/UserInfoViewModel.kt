@@ -15,6 +15,7 @@ import com.example.repairkz.domain.useCases.userData.GetUserDataUseCase
 import com.example.repairkz.domain.useCases.userData.UpdateUserDataUseCase
 import com.example.repairkz.domain.useCases.userData.UpdateUserPhotoUseCase
 import com.example.repairkz.ui.features.UserInfo.UserEffects.*
+import com.example.repairkz.ui.theme.darkAccept
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject
@@ -197,6 +198,33 @@ class UserInfoViewModel @Inject constructor(
                     updateMasterData(spec = state.specDraft)
                 }
             }
+
+            is UserIntent.ChangeNumber -> {
+                val state = _uiState.value
+                if(state is UserState.Success){
+                    _uiState.value =  state.copy(
+                        number = intent.number
+                    )
+                }
+
+            }
+
+            is UserIntent.ChangeCity -> {
+                val state = _uiState.value
+                if(state is UserState.Success){
+                    _uiState.value = state.copy(
+                        number = intent.city
+                    )
+                }
+            }
+            is UserIntent.ChangeEmail -> {
+                val state = _uiState.value
+                if(state is UserState.Success){
+                    _uiState.value =  state.copy(
+                        number = intent.email
+                    )
+                }
+            }
         }
 
 
@@ -230,18 +258,39 @@ class UserInfoViewModel @Inject constructor(
             _uiState.value = UserState.Loading
             getProfileTypeUseCase(id).fold(
                 onSuccess = { type ->
-                    _uiState.value =
-                        if (type is UserTypes.IsCurrentMaster) {
+                    _uiState.value = when(type){
+                        is UserTypes.IsCurrentUser -> {
+                            val data = type.user
+                            val updatedData = UserState.Success(
+                                userTypes = type,
+                                number = data.phoneNumber
+                            )
+                            updatedData
+                        }
+                        is UserTypes.IsCurrentMaster -> {
                             val data = type.master
-                            UserState.Success(
-                                type,
+                            val updatedData = UserState.Success(
+                                userTypes = type,
+                                number = data.phoneNumber,
                                 descriptionDraft = data.description,
                                 specDraft = data.masterSpecialization,
                                 experienceDraft = data.experienceInYears.toString()
                             )
-                        } else {
-                            UserState.Success(type)
+                            updatedData
                         }
+                        is UserTypes.IsOtherMaster -> {
+                            val data = type.master
+                            val updatedData = UserState.Success(
+                                userTypes = type,
+                                descriptionDraft = data.description,
+                                specDraft = data.masterSpecialization,
+                                experienceDraft = data.experienceInYears.toString()
+                            )
+                            updatedData
+                        }
+                    }
+
+
 
                 },
                 onFailure = {

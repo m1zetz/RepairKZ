@@ -46,7 +46,7 @@ fun Cap(
                 .fillMaxWidth()
                 .padding(horizontal = 8.dp, vertical = 2.dp)
                 .statusBarsPadding(),
-            shape = RoundedCornerShape(24.dp)
+            shape = RoundedCornerShape(12.dp)
         ) {
             Row(
                 modifier = Modifier

@@ -263,7 +263,7 @@ fun OrderRegistration(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ){
                     ShortInput(
-                        titleResID = R.string.address,
+                        titleResID = R.string.enter_address,
                         value = state.clientAddress,
                         changeValue = { newValue ->
                             orderRegistrationViewModel.handleIntent(
@@ -274,7 +274,7 @@ fun OrderRegistration(
                         }
                     )
                     ShortInput(
-                        titleResID = R.string.number,
+                        titleResID = R.string.enter_number,
                         value = state.clientNumber,
                         changeValue = { newValue ->
                             orderRegistrationViewModel.handleIntent(

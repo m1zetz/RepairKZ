@@ -66,8 +66,8 @@
     <string name="email_example">your_email@mail.ru</string>
     <string name="input_password">Введите пароль:</string>
     <string name="password_example">mypassword23213</string>
-    <string name="wrong_code">Неверный код подтверждения</string>
-    <string name="network_error">Ошибка сети</string>
+
+
 
     <string name="password_empty">Вы забыли ввести пароль</string>
     <string name="email_empty">Вы забыли ввести почту</string>
@@ -92,8 +92,8 @@
     <string name="task">Что нужно сделать мастеру?</string>
     <string name="price">Предложите цену:</string>
     <string name="price_holder">Введите сумму</string>
-    <string name="address">Введите адрес:</string>
-    <string name="number">Введите номер телефона:</string>
+    <string name="enter_address">Введите адрес:</string>
+    <string name="enter_number">Введите номер телефона:</string>
     <string name="client_number">Номер телефона клиента:</string>
     <string name="client_address">Адрес клиента:</string>
     <string name="payment_method">Выберите метод оплаты:</string>
@@ -118,6 +118,16 @@
     <string name="select_time">Выбрать время</string>
     <string name="OK">ОК</string>
     <string name="date_not_specified">Дата не указана</string>
+
+    //errors
+    <string name="you_not_authorized">Вы не авторизованы.</string>
+    <string name="status_change_error">Ошибка смены статуса.</string>
+    <string name="network_error">Ошибка сети</string>
+    <string name="no_internet">Отсутствует соединение с интернетом</string>
+    <string name="token_expired">Ваш токен истек</string>
+    <string name="wrong_code">Неверный код</string>
+    <string name="wrong_login_or_password">Неверный логин или пароль</string>
+
     //notifies
     <string name="order_running">Ваш заказ на мастера %1$s одобрен, мастер свяжется с вами.</string>
     <string name="order_complete">Ваш заказ на мастера %1$s завершён.</string>
@@ -135,6 +145,11 @@
     <string name="not_defined">Не определено</string>
     <string name="to_accept">Принять</string>
     <string name="to_reject">Отклонить</string>
+    <string name="master_data">Профессиональные данные</string>
+    <string name="user_data">Пользовательские данные</string>
+    <string name="number">Номер телефона:</string>
+    <string name="address">Адрес:</string>
+    <string name="email">Почта:</string>
 
 
 

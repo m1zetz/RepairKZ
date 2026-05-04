@@ -35,6 +35,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
@@ -47,6 +48,7 @@ import com.example.repairkz.Navigation.Routes.SIGN_UP_CODE
 import com.example.repairkz.Navigation.Routes.SIGN_UP_DATA
 import com.example.repairkz.R
 import com.example.repairkz.common.enums.PhotoSourceEnum
+import com.example.repairkz.domain.errors.toMessage
 import com.example.repairkz.ui.features.auth.signIn.SignInIntent
 import com.example.repairkz.ui.features.auth.signUp.SignUpEffect
 import com.example.repairkz.ui.features.auth.signUp.SignUpIntent
@@ -57,6 +59,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 @Composable
 fun SignUpCode(signUpViewModel: SignUpViewModel, navController: NavController) {
     val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
     LaunchedEffect(Unit) {
         signUpViewModel.channel.collect { effect ->
 
@@ -65,7 +68,7 @@ fun SignUpCode(signUpViewModel: SignUpViewModel, navController: NavController) {
                 is SignUpEffect.NavigateToFillingData -> {
                     navController.navigate(SIGN_UP_DATA)
                 }
-                is SignUpEffect.ShowSnackBar -> snackbarHostState.showSnackbar(effect.message)
+                is SignUpEffect.ShowSnackBar -> snackbarHostState.showSnackbar(effect.error.toMessage(context))
                 else -> {
                 }
 

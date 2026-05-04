@@ -1,5 +1,6 @@
 package com.example.repairkz.ui.features.auth.signIn
 
+import android.util.Log
 import com.example.repairkz.R
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -12,6 +13,7 @@ import com.example.repairkz.data.local.dataStore.DataStoreManager
 import com.example.repairkz.data.remote.api.TokenApi
 import com.example.repairkz.data.remote.dto.LoginDTO
 import com.example.repairkz.data.userData.UserRepository
+import com.example.repairkz.domain.errors.AuthorizationError
 import com.example.repairkz.domain.useCases.auth.LoginUseCase
 import com.example.repairkz.domain.useCases.userData.SaveUserToLocalUseCase
 import com.example.repairkz.domain.useCases.userData.UpdateUserDataUseCase
@@ -91,8 +93,11 @@ class SignInViewModel @Inject constructor(
                                 )
                                 dataStoreManager.saveToken(loginResponseDTO.token)
                                 _channel.send(SignInEffects.NavigateToMainWindow)
-                            }.onFailure {error ->
-                                _channel.send(SignInEffects.ShowSnackBar(error.message ?: "Ошибка сети"))
+                            }.onFailure { error ->
+                                if(error is AuthorizationError){
+                                    _channel.send(SignInEffects.ShowSnackBar(error))
+                                }
+
                             }
                         } catch (e: Exception){
                             _signInState.update { it.copy(error = "Ошибка сети") }

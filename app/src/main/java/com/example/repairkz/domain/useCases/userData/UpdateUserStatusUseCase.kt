@@ -9,7 +9,7 @@ import jakarta.inject.Inject
 class UpdateUserStatusUseCase @Inject constructor(
     val repository: UserRepository
 ) {
-    suspend operator fun invoke(id: Long, fullData: ChangeStatusRequestDTO){
+    suspend operator fun invoke(id: Long, fullData: ChangeStatusRequestDTO) : Result<Unit>{
         return repository.updateUserStatus(id,fullData)
     }
 }

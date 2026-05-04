@@ -11,6 +11,7 @@ import com.example.repairkz.data.remote.dto.LoginDTO
 import com.example.repairkz.data.remote.dto.LoginResponseDTO
 import com.example.repairkz.data.remote.dto.RegistrationResponseDTO
 import com.example.repairkz.data.registration.RegistrationRepository
+import com.example.repairkz.domain.errors.AuthorizationError
 import okhttp3.MultipartBody
 import javax.inject.Inject
 
@@ -56,7 +57,7 @@ class RegistrationRepositoryImpl @Inject constructor(
                 return Result.failure(Exception(errorMsg))
             }
             val userData = response.body() ?: return Result.failure(Exception("Empty response"))
-            if(photo!= null){
+            if (photo != null) {
                 val photoResponse = userApi.updateUserPhoto(userData.id, photo)
                 if (photoResponse.isSuccessful) {
                     val newPhotoUrl = photoResponse.body()?.photoUrl
@@ -76,14 +77,15 @@ class RegistrationRepositoryImpl @Inject constructor(
             val response = registrationApi.login(loginDTO)
             if (response.isSuccessful) Result.success(response.body()!!)
             else {
-                val errorMsg = when (response.code()) {
-                    400 -> "wrong data"
-                    else -> "network error"
-                }
-                Result.failure(Exception(errorMsg))
+                Result.failure(
+                    when (response.code()) {
+                        400 -> AuthorizationError.WrongLoginOrPassword
+                        else -> AuthorizationError.NetworkError
+                    }
+                )
             }
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.failure(AuthorizationError.NoInternet)
         }
     }
 
@@ -92,15 +94,15 @@ class RegistrationRepositoryImpl @Inject constructor(
             val response = tokenApi.refresh()
             if (response.isSuccessful) Result.success(response.body()!!.token)
             else {
-                Log.e("Refresh", "Code: ${response.code()} Body: ${response.errorBody()?.string()}")
-
-                val errorMsg = "error"
-                Result.failure(Exception(errorMsg))
+                Result.failure(
+                    when(response.code()){
+                        401 -> AuthorizationError.TokenExpired
+                        else -> AuthorizationError.NetworkError
+                    }
+                )
             }
         } catch (e: Exception) {
-            Log.e("Refresh", "Exception: ${e::class.simpleName} ${e.message}", e)
-
-            Result.failure(e)
+            Result.failure(AuthorizationError.NoInternet)
         }
 
     }

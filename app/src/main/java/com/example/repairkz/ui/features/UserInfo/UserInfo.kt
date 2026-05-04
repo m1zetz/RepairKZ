@@ -1,59 +1,50 @@
 package com.example.repairkz.ui.features.UserInfo
 
-import android.Manifest
-import android.content.Context
-import android.content.pm.PackageManager
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.LocalActivity
 import com.example.repairkz.R
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.PickVisualMediaRequest
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Camera
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Handyman
-import androidx.compose.material.icons.filled.PermMedia
+import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.repairkz.Navigation.Routes
-import com.example.repairkz.common.enums.CitiesEnum
 import com.example.repairkz.common.enums.MasterSpetializationsEnum
 import com.example.repairkz.common.enums.PhotoSourceEnum
 import com.example.repairkz.common.handlers.photoPickerHandler
 import com.example.repairkz.common.ui.EnumDropDown
 import com.example.repairkz.common.ui.PhotoSourceBottomSheet
-import com.example.repairkz.common.ui.ShortInputCard
-import com.example.repairkz.common.ui.ShortWithComposableCard
-import com.example.repairkz.common.ui.StandartString
-import com.example.repairkz.common.ui.UniversalTextField
+import com.example.repairkz.common.ui.ShortInput
+import com.example.repairkz.common.ui.ShortWithComposableWOpadding
 import com.example.repairkz.ui.features.CameraX.CameraIntent
 import com.example.repairkz.ui.features.CameraX.CameraViewModel
 import com.example.repairkz.ui.features.CameraX.PhotoPreview
-import com.example.repairkz.ui.features.auth.signUp.SignUpIntent
 import com.example.repairkz.ui.features.profile.common.Cap
 import com.example.repairkz.ui.features.profile.master.MasterBar
-import com.example.repairkz.ui.features.search.FilterIntent
-import com.example.repairkz.ui.features.search.SearchIntents
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -135,13 +126,17 @@ fun UserInfo(userInfoViewModel: UserInfoViewModel, navController: NavController)
         }
 
         is UserState.Success -> {
+            val scrollState = rememberScrollState()
             val user = state.userTypes
             Surface(
                 modifier = Modifier.fillMaxSize(),
             ) {
                 Column(
-                    modifier = Modifier.fillMaxSize(),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(scrollState),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     if (state.pendingUri != null) {
                         PhotoPreview(
@@ -160,75 +155,139 @@ fun UserInfo(userInfoViewModel: UserInfoViewModel, navController: NavController)
                         when (user) {
                             is UserTypes.IsCurrentUser, is UserTypes.IsCurrentMaster -> {
                                 Column(
-                                    modifier = Modifier.fillMaxSize()
-                                        .padding(8.dp),
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                    verticalArrangement = Arrangement.Top
+                                    Modifier.padding(horizontal = 8.dp)
                                 ) {
-
-                                    //общий
-
-
-                                    if (user is UserTypes.IsCurrentMaster) {
-
-                                        ShortInputCard(
-                                            R.string.desc,
-                                            R.string.enter_words,
-                                            state.descriptionDraft,
-                                            { newValue ->
+                                    Text(
+                                        stringResource(R.string.user_data),
+                                        style = MaterialTheme.typography.titleMedium.copy(
+                                            letterSpacing = 1.5.sp
+                                        ),
+                                        color = MaterialTheme.colorScheme.primary,
+                                    )
+                                    HorizontalDivider()
+                                }
+                                //общий
+                                Card(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 8.dp),
+                                    shape = RoundedCornerShape(12.dp)
+                                ) {
+                                    Column(
+                                        modifier = Modifier.padding(8.dp),
+                                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                                    ) {
+                                        ShortInput(
+                                            titleResID = R.string.enter_number,
+                                            value = state.number,
+                                            changeValue = { newValue ->
                                                 userInfoViewModel.handleIntent(
-                                                    UserIntent.CurrentMasterIntent.ChangeDescription(
+                                                    UserIntent.ChangeNumber(
                                                         newValue
                                                     )
                                                 )
                                             },
-                                            backIcon = if (state.descriptionDraft != user.master.description) Icons.Default.Check else null,
-                                            action = {
-                                                userInfoViewModel.handleIntent(UserIntent.CurrentMasterIntent.SaveDescription)
-                                            }
+                                            keyboardType = KeyboardType.Phone
                                         )
-
-                                        ShortWithComposableCard(
-                                            R.string.spec,
-                                            {
-                                                EnumDropDown(
-                                                    R.string.choice_city,
-                                                    state.specDraft,
-                                                    MasterSpetializationsEnum.entries,
-                                                    onSelect = { spec ->
-                                                        userInfoViewModel.handleIntent(
-                                                            UserIntent.CurrentMasterIntent.ChangeSpecialization(
-                                                                spec
-                                                            )
-                                                        )
-
-                                                    },
-                                                    backIcon = if (state.specDraft != user.master.masterSpecialization) Icons.Default.Check else null,
-                                                    action = {
-                                                        userInfoViewModel.handleIntent(UserIntent.CurrentMasterIntent.SaveSpecialization)
-                                                    }
-                                                )
-                                            }
-                                        )
-
-                                        ShortInputCard(
-                                            R.string.exp,
-                                            R.string.enter_words,
-                                            state.experienceDraft.toString(),
-                                            { newValue ->
+                                        ShortInput(
+                                            titleResID = R.string.email,
+                                            value = state.email,
+                                            changeValue = { newValue ->
                                                 userInfoViewModel.handleIntent(
-                                                    UserIntent.CurrentMasterIntent.ChangeExperience(
+                                                    UserIntent.ChangeEmail(
                                                         newValue
                                                     )
                                                 )
                                             },
-                                            backIcon = if (state.experienceDraft != user.master.experienceInYears.toString()) Icons.Default.Check else null,
-                                            action = {
-                                                userInfoViewModel.handleIntent(UserIntent.CurrentMasterIntent.SaveExperience)
-                                            }
+                                            keyboardType = KeyboardType.Phone
                                         )
-
                                     }
+                                }
+                                if (user is UserTypes.IsCurrentMaster) {
+                                    Column(
+                                        Modifier.padding(horizontal = 8.dp)
+                                    ) {
+                                        Text(
+                                            stringResource(R.string.master_data),
+                                            style = MaterialTheme.typography.titleMedium.copy(
+                                                letterSpacing = 1.5.sp
+                                            ),
+                                            color = MaterialTheme.colorScheme.primary,
+                                        )
+                                        HorizontalDivider()
+                                    }
+                                    Card(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(horizontal = 8.dp),
+                                        shape = RoundedCornerShape(12.dp)
+                                    ) {
+                                        Column(
+                                            modifier = Modifier.padding(8.dp),
+                                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                                        ) {
+                                            ShortInput(
+                                                R.string.desc,
+                                                R.string.enter_words,
+                                                state.descriptionDraft,
+                                                { newValue ->
+                                                    userInfoViewModel.handleIntent(
+                                                        UserIntent.CurrentMasterIntent.ChangeDescription(
+                                                            newValue
+                                                        )
+                                                    )
+                                                },
+                                                backIcon = if (state.descriptionDraft != user.master.description) Icons.Default.Check else null,
+                                                action = {
+                                                    userInfoViewModel.handleIntent(UserIntent.CurrentMasterIntent.SaveDescription)
+                                                }
+                                            )
+
+                                            ShortWithComposableWOpadding(
+                                                R.string.spec,
+                                                {
+                                                    EnumDropDown(
+                                                        R.string.choice_city,
+                                                        state.specDraft,
+                                                        MasterSpetializationsEnum.entries,
+                                                        onSelect = { spec ->
+                                                            userInfoViewModel.handleIntent(
+                                                                UserIntent.CurrentMasterIntent.ChangeSpecialization(
+                                                                    spec
+                                                                )
+                                                            )
+
+                                                        },
+                                                        backIcon = if (state.specDraft != user.master.masterSpecialization) Icons.Default.Check else null,
+                                                        action = {
+                                                            userInfoViewModel.handleIntent(
+                                                                UserIntent.CurrentMasterIntent.SaveSpecialization
+                                                            )
+                                                        }
+                                                    )
+                                                }
+                                            )
+
+                                            ShortInput(
+                                                R.string.exp,
+                                                R.string.enter_words,
+                                                state.experienceDraft.toString(),
+                                                { newValue ->
+                                                    userInfoViewModel.handleIntent(
+                                                        UserIntent.CurrentMasterIntent.ChangeExperience(
+                                                            newValue
+                                                        )
+                                                    )
+                                                },
+                                                backIcon = if (state.experienceDraft != user.master.experienceInYears.toString()) Icons.Default.Check else null,
+                                                action = {
+                                                    userInfoViewModel.handleIntent(UserIntent.CurrentMasterIntent.SaveExperience)
+                                                }
+                                            )
+                                        }
+                                    }
+
+
                                 }
 
                             }

@@ -1,5 +1,7 @@
 package com.example.repairkz.ui.features.auth.signIn
 
+import com.example.repairkz.domain.errors.AuthorizationError
+
 data class SignInState(
     val email: String = "",
     val password: String = "",
@@ -19,7 +21,7 @@ sealed class SignInIntent{
 }
 
 sealed class SignInEffects{
-    data class ShowSnackBar(val message: String) : SignInEffects()
+    data class ShowSnackBar(val error: AuthorizationError) : SignInEffects()
     object NavigateToMainWindow : SignInEffects()
     object NavigateToRegistration : SignInEffects()
 }

@@ -68,7 +68,7 @@ class MainActivityViewModel @Inject constructor(
             }
             else{
                 val result = refreshToken()
-                result.onSuccess {token ->
+                result.onSuccess { token ->
                     dataStoreManager.saveToken(token)
                     userRepository.getRoomData()
                     _state.update {state ->
@@ -76,7 +76,7 @@ class MainActivityViewModel @Inject constructor(
                             startDestination = StartDestination.MainWindow
                         )
                     }
-                }.onFailure {exception ->
+                }.onFailure { exception ->
                     if (isNetworkError(exception)) {
                         userRepository.getRoomData()
                         _state.update { it.copy(startDestination = StartDestination.MainWindow) }
@@ -88,8 +88,7 @@ class MainActivityViewModel @Inject constructor(
         }
     }
     private fun isNetworkError(throwable: Throwable): Boolean {
-        val message = throwable.message ?: ""
-        return message.contains("Unable to resolve host") || message.contains("timeout") || throwable is java.io.IOException
+        return throwable is java.io.IOException
     }
 
 

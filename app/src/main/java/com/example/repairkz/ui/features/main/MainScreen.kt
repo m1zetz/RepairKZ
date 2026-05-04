@@ -8,11 +8,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import com.example.repairkz.Activity.MainActivityViewModel
@@ -31,8 +34,11 @@ import com.example.repairkz.ui.features.settings.SettingsViewModel
 @Composable
 fun MainWindow(activityViewModel: MainActivityViewModel, mainViewModel: MainViewModel, navController: NavController, notificationViewModel: NotificationViewModel, settingsViewModel: SettingsViewModel){
     val selectedItemIndex = mainViewModel.screenIndexState.collectAsState()
-
+    val snackbarHostState = remember { SnackbarHostState() }
     Scaffold(
+        snackbarHost = {
+            SnackbarHost(snackbarHostState)
+        },
         topBar = {
             TopAppBar(
                 title = { Text("RepairKZ") },
@@ -62,7 +68,7 @@ fun MainWindow(activityViewModel: MainActivityViewModel, mainViewModel: MainView
             when(selectedItemIndex.value.selectedIndex){
                 0 -> HomeScreen(navController = navController)
                 1 -> NotificationsScreen(notificationViewModel)
-                2 -> SettingsScreen(settingsViewModel, activityViewModel,navController)
+                2 -> SettingsScreen(settingsViewModel, activityViewModel,navController, snackbarHostState)
             }
 
         }

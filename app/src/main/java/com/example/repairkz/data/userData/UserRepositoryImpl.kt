@@ -14,6 +14,7 @@ import com.example.repairkz.data.remote.dto.FullUserRequestDTO
 import com.example.repairkz.data.remote.dto.MasterResponseDTO
 import com.example.repairkz.data.remote.dto.StatusRequestDTO
 import com.example.repairkz.data.remote.dto.UpdatePhotoResponseDTO
+import com.example.repairkz.data.remote.dto.UserResponseDTO
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -146,19 +147,26 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun updateUserStatus(id: Long, dto: ChangeStatusRequestDTO) {
-        val currentUser = _userData.value ?: return
-        val response = userApi.updateStatus(id, dto)
-        if(response.isSuccessful){
-            val data = response.body()
-            data?.let{masterDto ->
+    override suspend fun updateUserStatus(id: Long, dto: ChangeStatusRequestDTO) : Result<Unit> {
+        return try {
+            val currentUser =
+                _userData.value ?: return Result.failure(Exception("current user is null"))
+            val response = userApi.updateStatus(id, dto)
+            return if (response.isSuccessful) {
+
+                val data = response.body()
+
+                if (data == null){
+                    return Result.failure(Exception("Response body is null"))
+                }
                 val updatedUser = if (dto.statusOfUser == StatusOfUser.MASTER) {
                     currentUser.toMaster(
                         statusOfUser = StatusOfUser.MASTER
                     ).copy(
-                        experienceInYears = masterDto.experienceInYears ?: 0,
-                        description = masterDto.description ?: "",
-                        masterSpecialization = masterDto.masterSpecialization ?: MasterSpetializationsEnum.UNKNOWN
+                        experienceInYears = data.experienceInYears ?: 0,
+                        description = data.description ?: "",
+                        masterSpecialization = data.masterSpecialization
+                            ?: MasterSpetializationsEnum.UNKNOWN
                     )
                 } else {
                     currentUser.copy(statusOfUser = StatusOfUser.CLIENT)
@@ -171,23 +179,21 @@ class UserRepositoryImpl @Inject constructor(
                 if (updatedUser is Master) {
                     masterDao.saveMaster(
                         MasterEntity(
-                            userId = updatedUser.id.toLong(),
+                            userId = updatedUser.id,
                             description = updatedUser.description,
                             experienceInYears = updatedUser.experienceInYears,
                             masterSpecialization = updatedUser.masterSpecialization
                         )
                     )
                 }
-            }
+                Result.success(Unit)
 
+            } else {
+                Result.failure(Exception("Network error"))
+            }
+        } catch (e: Exception){
+            Result.failure(Exception(e.message))
         }
 
-
-
-
-
-
-
     }
-
 }
