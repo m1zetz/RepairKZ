@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service
 
 @Service
 class MailSenderService(
-    private val emailSender: JavaMailSender
 ) {
 
     @Value("\${mailersend.api-key}")
@@ -43,14 +42,14 @@ class MailSenderService(
         }
 
     }
-    private fun createSimpleMessage(emailMessage: EmailDTO): MimeMessage {
-        val message: MimeMessage = emailSender.createMimeMessage()
-        val helper = MimeMessageHelper(message)
-        helper.setTo(emailMessage.to)
-        helper.setSubject(emailMessage.subject)
-        helper.setText(emailMessage.code.toString())
-        return message
-    }
+//    private fun createSimpleMessage(emailMessage: EmailDTO): MimeMessage {
+//        val message: MimeMessage = emailSender.createMimeMessage()
+//        val helper = MimeMessageHelper(message)
+//        helper.setTo(emailMessage.to)
+//        helper.setSubject(emailMessage.subject)
+//        helper.setText(emailMessage.code.toString())
+//        return message
+//    }
     fun generateCodeEmail(code: String): String {
         val digits = code.map {
             """<div style="width:44px;height:52px;border:1.5px solid #7F77DD;border-radius:8px;text-align:center;line-height:52px;font-size:22px;font-weight:500;color:#534AB7;font-family:monospace;display:inline-block;">$it</div>"""
