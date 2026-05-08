@@ -19,21 +19,11 @@ class MailSenderService(
     private val emailSender: JavaMailSender
 ) {
 
-    @Value("\${resend.api-key}")
-    lateinit var key: String
 
     fun sendMail(emailMessage: EmailDTO){
-        val resend = Resend(key)
-        val params = CreateEmailOptions.builder()
-            .from("Acme <onboarding@resend.dev>")
-            .to(listOf(emailMessage.to))
-            .subject(emailMessage.subject)
-            .html(generateCodeEmail(emailMessage.code.toString()))
-            .build()
+
 
         try {
-//            val data = resend.emails().send(params)
-//            println(data.id)
             val msg = createSimpleMessage(emailMessage)
             emailSender.send(msg)
         } catch (e: Exception) {
