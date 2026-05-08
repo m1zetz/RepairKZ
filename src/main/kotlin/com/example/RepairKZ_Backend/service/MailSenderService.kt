@@ -26,16 +26,16 @@ class MailSenderService(
         val resend = Resend(key)
         val params = CreateEmailOptions.builder()
             .from("Acme <onboarding@resend.dev>")
-            .to(emailMessage.to)
+            .to(listOf(emailMessage.to))
             .subject(emailMessage.subject)
             .html(generateCodeEmail(emailMessage.code.toString()))
             .build()
 
         try {
-            val data = resend.emails().send(params)
-            println(data.id)
-//            val msg = createSimpleMessage(emailMessage)
-//            emailSender.send(msg)
+//            val data = resend.emails().send(params)
+//            println(data.id)
+            val msg = createSimpleMessage(emailMessage)
+            emailSender.send(msg)
         } catch (e: Exception) {
             print("Failed to send Email: ${e.message}")
             throw MailSendException("Failed to send email", e)
