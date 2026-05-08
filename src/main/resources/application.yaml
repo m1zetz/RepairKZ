@@ -53,4 +53,3 @@ logging:
     org.springframework.web: INFO
     root: INFO
 resend:
-  api-key=${RESEND_API_KEY}:
