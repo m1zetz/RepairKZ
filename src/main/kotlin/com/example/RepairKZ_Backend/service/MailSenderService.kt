@@ -1,8 +1,9 @@
 package com.example.RepairKZ_Backend.service
 
 import com.example.RepairKZ_Backend.model.EmailDTO
-import com.resend.Resend
-import com.resend.services.emails.model.CreateEmailOptions
+import com.mailersend.sdk.MailerSend
+import com.mailersend.sdk.emails.Email
+
 import com.sun.tools.javac.util.Log
 import jakarta.mail.internet.MimeMessage
 import org.apache.naming.factory.SendMailFactory
@@ -19,13 +20,23 @@ class MailSenderService(
     private val emailSender: JavaMailSender
 ) {
 
+    @Value("\${mailersend.api-key}")
+    private lateinit var token: String
 
     fun sendMail(emailMessage: EmailDTO){
 
-
+        val email = Email()
+        email.setFrom("RepairKZ", "test-r9084zvnj0jgw63d.mlsender.net")
+        email.addRecipient(emailMessage.to, emailMessage.to)
+        email.setSubject(emailMessage.subject)
+        email.setHtml(generateCodeEmail(emailMessage.code.toString()))
+        val ms = MailerSend()
+        ms.token = token
         try {
-            val msg = createSimpleMessage(emailMessage)
-            emailSender.send(msg)
+            val response = ms.emails().send(email)
+            println(response.messageId)
+//            val msg = createSimpleMessage(emailMessage)
+//            emailSender.send(msg)
         } catch (e: Exception) {
             print("Failed to send Email: ${e.message}")
             throw MailSendException("Failed to send email", e)

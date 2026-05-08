@@ -21,8 +21,8 @@ repositories {
 }
 
 dependencies {
+    implementation("com.mailersend:java-sdk:1.5.0")
     // Resend
-    implementation("com.resend:resend-java:3.1.0")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
     // Web и Data
     implementation("org.springframework.boot:spring-boot-starter-web")

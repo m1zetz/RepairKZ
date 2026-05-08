@@ -8,17 +8,7 @@ spring:
   jackson:
     serialization:
       write-dates-as-timestamps: false
-  mail:
-    host: smtp.gmail.com
-    port: 465
-    username: ${MAIL_USERNAME}
-    password: ${MAIL_PASSWORD}
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
+
   datasource:
     driver-class-name: org.postgresql.Driver
     url: ${DATABASE_URL}
@@ -52,4 +42,5 @@ logging:
   level:
     org.springframework.web: INFO
     root: INFO
-resend:
+mailersend:
+  api-key: ${RESEND_API_KEY_API_KEY}
