@@ -155,8 +155,8 @@ class UserInfoViewModel @Inject constructor(
                     _uiState.value = state.copy(
                         descriptionDraft = intent.description
                     )
-
                 }
+
             }
 
             is UserIntent.CurrentMasterIntent.ChangeExperience -> {
@@ -166,6 +166,7 @@ class UserInfoViewModel @Inject constructor(
                         experienceDraft = intent.experience
                     )
                 }
+
             }
 
             is UserIntent.CurrentMasterIntent.ChangeSpecialization -> {
@@ -176,6 +177,7 @@ class UserInfoViewModel @Inject constructor(
                     )
 
                 }
+
 
             }
 
@@ -188,6 +190,7 @@ class UserInfoViewModel @Inject constructor(
                     )
                 }
 
+
             }
 
             is UserIntent.ChangeCity -> {
@@ -197,6 +200,7 @@ class UserInfoViewModel @Inject constructor(
                         city = intent.city
                     )
                 }
+
             }
 
             is UserIntent.ChangeEmail -> {
@@ -217,7 +221,6 @@ class UserInfoViewModel @Inject constructor(
                         if (userResult.isSuccess) {
                             defineUser(comingId)
                         } else {
-                            Log.d("UPDATE", "FAIL")
                             _uiState.value = state.copy(isSaving = false)
                         }
 
@@ -229,13 +232,16 @@ class UserInfoViewModel @Inject constructor(
 
 
     }
-    private suspend fun updateProfile(state: UserState.Success) : Result<Unit>{
+
+
+
+    private suspend fun updateProfile(state: UserState.Success): Result<Unit> {
 
         val type = state.userTypes
-        if(type !is UserTypes.IsCurrentUser) return Result.failure(Exception("The state is not success"))
+        if (type !is UserTypes.IsCurrentUser) return Result.failure(Exception("The state is not success"))
         val user = type.user
 
-        val finalUser = if(type.isMaster && user is Master){
+        val finalUser = if (type.isMaster && user is Master) {
             user.copy(
                 phoneNumber = state.number,
                 email = state.email,
@@ -244,7 +250,7 @@ class UserInfoViewModel @Inject constructor(
                 experienceInYears = state.experienceDraft?.toIntOrNull() ?: user.experienceInYears,
                 masterSpecialization = state.specDraft ?: user.masterSpecialization
             )
-        } else{
+        } else {
             user.copy(
                 phoneNumber = state.number,
                 email = state.email,
@@ -254,8 +260,35 @@ class UserInfoViewModel @Inject constructor(
         return updateUserDataUseCase(finalUser)
     }
 
+    private fun checkChanges(state: UserState) : Boolean {
+        if (state !is UserState.Success) return false
+        val type = state.userTypes
+        if (type !is UserTypes.IsCurrentUser) return false
+        val user = type.user
+        val userDataChanges = state.number.trim() != user.phoneNumber.trim() || state.city != user.city
+        val masterDataChanges = if (user is Master) {
+            state.specDraft != user.masterSpecialization ||
+                    (state.experienceDraft.toIntOrNull() ?: 0) != user.experienceInYears ||
+                    state.descriptionDraft != user.description
+        } else {
+            false
+        }
+        return userDataChanges || masterDataChanges
+    }
+
     init {
         defineUser(comingId)
+        viewModelScope.launch {
+            uiState.collect {state ->
+                if(state is UserState.Success){
+                    val shouldShow = checkChanges(state)
+                    if(state.showSave != shouldShow){
+                        _uiState.value = state.copy(showSave = shouldShow)
+                    }
+                }
+
+            }
+        }
     }
 
     fun defineUser(id: Long?) {

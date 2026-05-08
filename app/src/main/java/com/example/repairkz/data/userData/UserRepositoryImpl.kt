@@ -95,6 +95,7 @@ class UserRepositoryImpl @Inject constructor(
                         description = data.description ?: user.description,
                         masterSpecialization = data.masterSpecialization ?: user.masterSpecialization
                     )
+
                 } else {
                     user.copy(
                         firstName = userData.firstName,
@@ -104,9 +105,11 @@ class UserRepositoryImpl @Inject constructor(
                         city = userData.city
                     )
                 }
+
                 _userData.value = finalUser
                 userDao.saveUser(finalUser.toEntity())
                 if(finalUser is Master){
+                    Log.d("USERINFO", data.masterSpecialization.toString())
                     masterDao.saveMaster(
                         MasterEntity(
                             userId = finalUser.id,

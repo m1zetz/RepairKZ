@@ -2,6 +2,7 @@ package com.example.repairkz.ui.features.UserInfo
 
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.LocalActivity
+import androidx.compose.animation.AnimatedVisibility
 import com.example.repairkz.R
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -164,12 +165,10 @@ fun UserInfo(userInfoViewModel: UserInfoViewModel, navController: NavController)
                                         modifier = Modifier.fillMaxWidth(),
                                         horizontalArrangement = Arrangement.End
                                     ){
-                                        Button(
-                                            onClick = {
-                                                userInfoViewModel.handleIntent(UserIntent.SaveChanges)
+                                        AnimatedVisibility(visible = state.showSave) {
+                                            Button(onClick = { userInfoViewModel.handleIntent(UserIntent.SaveChanges) }) {
+                                                Text(stringResource(R.string.save_changes))
                                             }
-                                        ) {
-                                            Text(stringResource(R.string.save_changes))
                                         }
                                         if(state.isSaving){
                                          CircularProgressIndicator()

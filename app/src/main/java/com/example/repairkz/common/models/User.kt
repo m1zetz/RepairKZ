@@ -1,6 +1,7 @@
 package com.example.repairkz.common.models
 
 import com.example.repairkz.common.enums.CitiesEnum
+import com.example.repairkz.common.enums.MasterSpetializationsEnum
 import com.example.repairkz.common.enums.StatusOfUser
 import com.example.repairkz.data.local.entity.UserEntity
 import com.example.repairkz.data.remote.dto.UserRegistrationDTO
@@ -69,6 +70,35 @@ open class User(
             phoneNumber,
             StatusOfUser.MASTER,
             city
+        )
+        return master
+    }
+    fun toMasterWithData(
+        userId: Long = this.id,
+        userPhotoUrl: String? = this.userPhotoUrl,
+        firstName: String = this.firstName,
+        lastName: String = this.lastName,
+        email: String = this.email,
+        phoneNumber: String = this.phoneNumber,
+        statusOfUser: StatusOfUser = this.status,
+        city: CitiesEnum? = this.city,
+        desc: String,
+        spec: MasterSpetializationsEnum,
+        exp: Int
+    ) : Master {
+
+        val master = Master(
+            userId,
+            userPhotoUrl,
+            firstName,
+            lastName,
+            email,
+            phoneNumber,
+            StatusOfUser.MASTER,
+            city,
+            exp,
+            desc,
+            spec
         )
         return master
     }

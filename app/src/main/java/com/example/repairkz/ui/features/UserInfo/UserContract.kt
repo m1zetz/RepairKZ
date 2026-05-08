@@ -25,7 +25,8 @@ sealed class UserState {
         val experienceDraft: String = "",
         val specDraft: MasterSpetializationsEnum = MasterSpetializationsEnum.UNKNOWN,
 
-        val isSaving: Boolean = false
+        val isSaving: Boolean = false,
+        val showSave: Boolean = false
     ) : UserState()
 
     data class Error(val message: String) : UserState()
@@ -68,11 +69,11 @@ fun UserTypes.toSuccessState(): UserState.Success {
                 successState
 
             } else {
-                val master = this.user.toMaster()
+                val master = data as? Master
                 successState.copy(
-                    descriptionDraft = master.description,
-                    specDraft = master.masterSpecialization,
-                    experienceDraft = master.experienceInYears.toString()
+                    descriptionDraft = master?.description ?: "",
+                    specDraft = master?.masterSpecialization ?: MasterSpetializationsEnum.UNKNOWN,
+                    experienceDraft = master?.experienceInYears.toString()
                 )
 
             }
