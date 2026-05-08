@@ -36,7 +36,7 @@ data class User(
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    var city: CitiesEnum = CitiesEnum.UNKNOWN,
+    var city: CitiesEnum? = CitiesEnum.UNKNOWN,
 
     @Column(nullable = false, unique = true)
     var email: String = "",
