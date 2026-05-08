@@ -28,7 +28,7 @@ class MailSenderService(
             .from("Acme <onboarding@resend.dev>")
             .to(emailMessage.to)
             .subject(emailMessage.subject)
-            .html(generateCodeEmail())
+            .html(generateCodeEmail(emailMessage.code.toString()))
             .build()
 
         try {
@@ -47,7 +47,7 @@ class MailSenderService(
         val helper = MimeMessageHelper(message)
         helper.setTo(emailMessage.to)
         helper.setSubject(emailMessage.subject)
-        helper.setText(emailMessage.text)
+        helper.setText(emailMessage.code.toString())
         return message
     }
     fun generateCodeEmail(code: String): String {
