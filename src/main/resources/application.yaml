@@ -43,4 +43,4 @@ logging:
     org.springframework.web: INFO
     root: INFO
 mailersend:
-  api-key: ${RESEND_API_KEY_API_KEY}
+  api-key: ${RESEND_API_KEY}
