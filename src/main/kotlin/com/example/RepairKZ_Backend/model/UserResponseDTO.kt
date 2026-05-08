@@ -10,6 +10,6 @@ data class UserResponseDTO(
     val lastName: String,
     val phone: String,
     val status: StatusOfUser,
-    val city: CitiesEnum,
+    val city: CitiesEnum?,
     val email: String,
 )
