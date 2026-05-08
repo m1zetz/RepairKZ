@@ -25,7 +25,7 @@ class MailSenderService(
     fun sendMail(emailMessage: EmailDTO){
 
         val email = Email()
-        email.setFrom("RepairKZ", "test-r9084zvnj0jgw63d.mlsender.net")
+        email.setFrom("RepairKZ", "noreply@test-r9084zvnj0jgw63d.mlsender.net")
         email.addRecipient(emailMessage.to, emailMessage.to)
         email.setSubject(emailMessage.subject)
         email.setHtml(generateCodeEmail(emailMessage.code.toString()))
