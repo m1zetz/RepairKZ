@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
-    private const val BASE_URL = "https://repairkz.onrender.com/"
+    private const val BASE_URL = "https://repairkz-copy-production.up.railway.app/"
 
     @RequiresApi(Build.VERSION_CODES.O)
     @Provides

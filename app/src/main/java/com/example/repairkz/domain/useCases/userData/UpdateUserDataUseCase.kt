@@ -8,7 +8,7 @@ import jakarta.inject.Inject
 class UpdateUserDataUseCase@Inject constructor(
     val repository: UserRepository
 ) {
-    suspend operator fun invoke(user: User){
+    suspend operator fun invoke(user: User) : Result<Unit>{
         return repository.updateUserData(user)
     }
 }

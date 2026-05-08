@@ -118,6 +118,8 @@
     <string name="select_time">Выбрать время</string>
     <string name="OK">ОК</string>
     <string name="date_not_specified">Дата не указана</string>
+    <string name="save_changes">Сохранить измененеия</string>
+
 
     //errors
     <string name="you_not_authorized">Вы не авторизованы.</string>

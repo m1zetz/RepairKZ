@@ -16,7 +16,7 @@ open class User(
 
     open val phoneNumber: String,
     open val status: StatusOfUser,
-    open val city: CitiesEnum,
+    open val city: CitiesEnum? = CitiesEnum.UNKNOWN,
     open val password: String? = null,
 ){
     fun copy(
@@ -27,7 +27,7 @@ open class User(
         email: String = this.email,
         phoneNumber: String = this.phoneNumber,
         statusOfUser: StatusOfUser = this.status,
-        city: CitiesEnum = this.city
+        city: CitiesEnum? = this.city
     ) : User{
         val updatedUser = User(userId,userPhotoUrl,firstName,lastName,email,phoneNumber,statusOfUser,city)
         return updatedUser
@@ -57,7 +57,7 @@ open class User(
         email: String = this.email,
         phoneNumber: String = this.phoneNumber,
         statusOfUser: StatusOfUser = this.status,
-        city: CitiesEnum = this.city
+        city: CitiesEnum? = this.city
     ) : Master {
 
         val master = Master(
@@ -77,7 +77,7 @@ open class User(
         return this
     }
     fun toResponseDTO() = UserResponseDTO(
-        id = this.id.toLong(),
+        id = this.id,
         userPhotoUrl = this.userPhotoUrl,
         firstName = this.firstName,
         lastName = this.lastName,

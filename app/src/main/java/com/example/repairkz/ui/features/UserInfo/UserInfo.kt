@@ -5,6 +5,7 @@ import androidx.activity.compose.LocalActivity
 import com.example.repairkz.R
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -13,6 +14,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -33,6 +35,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.repairkz.Navigation.Routes
+import com.example.repairkz.common.enums.CitiesEnum
 import com.example.repairkz.common.enums.MasterSpetializationsEnum
 import com.example.repairkz.common.enums.PhotoSourceEnum
 import com.example.repairkz.common.handlers.photoPickerHandler
@@ -153,10 +156,28 @@ fun UserInfo(userInfoViewModel: UserInfoViewModel, navController: NavController)
                             commonInfo = user.commonInfo,
                             changeAvatarIntent = { userInfoViewModel.handleIntent(UserIntent.OpenSheet) })
                         when (user) {
-                            is UserTypes.IsCurrentUser, is UserTypes.IsCurrentMaster -> {
+                            is UserTypes.IsCurrentUser -> {
                                 Column(
                                     Modifier.padding(horizontal = 8.dp)
                                 ) {
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.End
+                                    ){
+                                        Button(
+                                            onClick = {
+                                                userInfoViewModel.handleIntent(UserIntent.SaveChanges)
+                                            }
+                                        ) {
+                                            Text(stringResource(R.string.save_changes))
+                                        }
+                                        if(state.isSaving){
+                                         CircularProgressIndicator()
+                                        }
+
+                                    }
+
+
                                     Text(
                                         stringResource(R.string.user_data),
                                         style = MaterialTheme.typography.titleMedium.copy(
@@ -192,18 +213,37 @@ fun UserInfo(userInfoViewModel: UserInfoViewModel, navController: NavController)
                                         ShortInput(
                                             titleResID = R.string.email,
                                             value = state.email,
-                                            changeValue = { newValue ->
+                                            changeValue = { email ->
                                                 userInfoViewModel.handleIntent(
                                                     UserIntent.ChangeEmail(
-                                                        newValue
+                                                        email
                                                     )
                                                 )
                                             },
-                                            keyboardType = KeyboardType.Phone
+                                            keyboardType = KeyboardType.Email,
+                                            readOnly = true
+                                        )
+                                        ShortWithComposableWOpadding(
+                                            R.string.city,
+                                            {
+                                                EnumDropDown(
+                                                    R.string.choice_city,
+                                                    state.city,
+                                                    CitiesEnum.entries,
+                                                    onSelect = { city ->
+                                                        userInfoViewModel.handleIntent(
+                                                            UserIntent.ChangeCity(
+                                                                city
+                                                            )
+                                                        )
+
+                                                    }
+                                                )
+                                            }
                                         )
                                     }
                                 }
-                                if (user is UserTypes.IsCurrentMaster) {
+                                if (user.isMaster) {
                                     Column(
                                         Modifier.padding(horizontal = 8.dp)
                                     ) {
@@ -236,10 +276,6 @@ fun UserInfo(userInfoViewModel: UserInfoViewModel, navController: NavController)
                                                             newValue
                                                         )
                                                     )
-                                                },
-                                                backIcon = if (state.descriptionDraft != user.master.description) Icons.Default.Check else null,
-                                                action = {
-                                                    userInfoViewModel.handleIntent(UserIntent.CurrentMasterIntent.SaveDescription)
                                                 }
                                             )
 
@@ -257,12 +293,6 @@ fun UserInfo(userInfoViewModel: UserInfoViewModel, navController: NavController)
                                                                 )
                                                             )
 
-                                                        },
-                                                        backIcon = if (state.specDraft != user.master.masterSpecialization) Icons.Default.Check else null,
-                                                        action = {
-                                                            userInfoViewModel.handleIntent(
-                                                                UserIntent.CurrentMasterIntent.SaveSpecialization
-                                                            )
                                                         }
                                                     )
                                                 }
@@ -278,10 +308,6 @@ fun UserInfo(userInfoViewModel: UserInfoViewModel, navController: NavController)
                                                             newValue
                                                         )
                                                     )
-                                                },
-                                                backIcon = if (state.experienceDraft != user.master.experienceInYears.toString()) Icons.Default.Check else null,
-                                                action = {
-                                                    userInfoViewModel.handleIntent(UserIntent.CurrentMasterIntent.SaveExperience)
                                                 }
                                             )
                                         }

@@ -17,10 +17,10 @@ class GetProfileTypeUseCase @Inject constructor(
         user?.let{
             if (user.id == comingId || comingId == null) {
                 if(user is Master){
-                    return Result.success(UserTypes.IsCurrentMaster(user, user.getCommonInfo(isMe = true)))
+                    return Result.success(UserTypes.IsCurrentUser(user, user.getCommonInfo(isMe = true), true))
                 }
                 else{
-                    return Result.success(UserTypes.IsCurrentUser(user, user.getCommonInfo(isMe = true)))
+                    return Result.success(UserTypes.IsCurrentUser(user, user.getCommonInfo(isMe = true), false) )
                 }
             } else {
                 val masterResult = masterRepository.fetchMasterById(comingId)

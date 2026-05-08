@@ -18,7 +18,7 @@ data class UserEntity(
     val email: String,
     val phoneNumber: String,
     val status: StatusOfUser,
-    val city: CitiesEnum,
+    val city: CitiesEnum?,
 ){
     fun toUser(): User {
         return User(

@@ -9,7 +9,7 @@ import com.example.repairkz.data.local.entity.UserEntity
 
 @Database(
     entities = [UserEntity::class, MasterEntity::class],
-    version = 2
+    version = 3
 )
 abstract class RepairDataBase : RoomDatabase(){
     abstract val userDao: UserDao

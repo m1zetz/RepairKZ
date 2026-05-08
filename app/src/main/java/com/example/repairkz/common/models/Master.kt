@@ -13,7 +13,7 @@ data class Master(
     override val email: String,
     override val phoneNumber: String,
     override val status: StatusOfUser,
-    override val city: CitiesEnum,
+    override val city: CitiesEnum?,
     val experienceInYears: Int = 0,
     val description: String = "",
     val masterSpecialization: MasterSpetializationsEnum = MasterSpetializationsEnum.UNKNOWN

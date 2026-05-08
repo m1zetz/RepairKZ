@@ -281,7 +281,8 @@ fun ShortInput(
     suffix: (@Composable () -> Unit)? = null,
     textAlign: TextAlign? = null,
     singleLine: Boolean = true,
-    leadingIcon: ImageVector? = null
+    leadingIcon: ImageVector? = null,
+    readOnly: Boolean? = null
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
@@ -330,7 +331,8 @@ fun ShortInput(
                 {
                     Icon(leadingIcon, null)
                 }
-            }
+            },
+            readOnly = readOnly?: false
         )
 
     }

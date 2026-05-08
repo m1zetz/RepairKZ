@@ -5,6 +5,8 @@ import androidx.annotation.StringRes
 import com.example.repairkz.common.ui.DisplayableEnum
 
 enum class CitiesEnum(@StringRes override val resID: Int) : DisplayableEnum {
+
+    UNKNOWN(R.string.undefined),
     KARAGANDY(R.string.Karagandy),
     ALMATY(R.string.Almaty),
     ASTANA(R.string.Astana),

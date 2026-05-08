@@ -69,7 +69,7 @@ class UserRepositoryImpl @Inject constructor(
 
     }
 
-    override suspend fun updateUserData(user: User) {
+    override suspend fun updateUserData(user: User) : Result<Unit> {
 
         val request = FullUserRequestDTO(
             user.toResponseDTO(),
@@ -79,7 +79,7 @@ class UserRepositoryImpl @Inject constructor(
         )
         val response = userApi.updateUser(request)
 
-        if (response.isSuccessful) {
+        return if (response.isSuccessful) {
             val data = response.body()
             if (data!=null) {
                 val userData = data.user
@@ -109,16 +109,20 @@ class UserRepositoryImpl @Inject constructor(
                 if(finalUser is Master){
                     masterDao.saveMaster(
                         MasterEntity(
-                            userId = finalUser.id.toLong(),
+                            userId = finalUser.id,
                             description =  finalUser.description,
                             experienceInYears = finalUser.experienceInYears,
                             masterSpecialization =  finalUser.masterSpecialization
                         )
                     )
                 }
+
+
             }
 
-
+            Result.success(Unit)
+        } else {
+            Result.failure(Exception("Fail to update user"))
         }
     }
 

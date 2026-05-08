@@ -11,5 +11,5 @@ data class UserRegistrationDTO(
     val password: String?,
     val phone: String,
     val status: StatusOfUser,
-    val city: CitiesEnum
+    val city: CitiesEnum?
 )

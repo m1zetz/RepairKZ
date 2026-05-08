@@ -16,7 +16,7 @@ interface UserRepository {
     suspend fun saveUserToLocal(user:User)
     suspend fun updateUserStatus(id: Long, dto: ChangeStatusRequestDTO) : Result<Unit>
 
-    suspend fun updateUserData(user: User)
+    suspend fun updateUserData(user: User) : Result<Unit>
     suspend fun updateUserPhoto(id: Long ,file: MultipartBody.Part) : Result<UpdatePhotoResponseDTO>
 
     suspend fun getRoomData()
