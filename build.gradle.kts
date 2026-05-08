@@ -21,28 +21,27 @@ repositories {
 }
 
 dependencies {
+    // Resend
+    implementation("com.resend:resend-java:3.1.0")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
+    // Web и Data
+    implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 
-    dependencies {
-        implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
-        // Web и Data
-        implementation("org.springframework.boot:spring-boot-starter-web")
-        implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation("org.springframework.boot:spring-boot-starter-security")
+    implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
+    implementation("org.springframework.boot:spring-boot-starter-mail")
 
-        implementation("org.springframework.boot:spring-boot-starter-security")
-        implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
-        implementation("org.springframework.boot:spring-boot-starter-mail")
-
-        implementation("org.jetbrains.kotlin:kotlin-reflect")
-        implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
-        implementation("com.cloudinary:cloudinary-http5:2.0.0")
-        runtimeOnly("org.postgresql:postgresql")
+    implementation("org.jetbrains.kotlin:kotlin-reflect")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
+    implementation("com.cloudinary:cloudinary-http5:2.0.0")
+    runtimeOnly("org.postgresql:postgresql")
 
 
-        testImplementation("org.springframework.boot:spring-boot-starter-test")
-        testImplementation("io.mockk:mockk:1.13.10")
-        testImplementation("com.ninja-squad:springmockk:4.0.2")
-        testImplementation("org.springframework.security:spring-security-test")
-    }
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("io.mockk:mockk:1.13.10")
+    testImplementation("com.ninja-squad:springmockk:4.0.2")
+    testImplementation("org.springframework.security:spring-security-test")
 }
 
 kotlin {

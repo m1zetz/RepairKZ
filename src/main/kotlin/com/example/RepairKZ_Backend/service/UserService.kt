@@ -64,7 +64,7 @@ class UserService(
             EmailDTO(
                 email,
                 "Hello, please verify your email for RepairKZ",
-                text = "Code $code",
+               code
             )
         )
     }
