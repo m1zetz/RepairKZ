@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -22,6 +24,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,6 +36,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -44,6 +49,7 @@ import com.example.repairkz.R
 import com.example.repairkz.common.constants.SERVER_IP
 import com.example.repairkz.common.models.User
 import com.example.repairkz.ui.features.UserInfo.UserIntent
+import kotlinx.coroutines.launch
 
 @Composable
 fun ProfileString(
@@ -71,22 +77,27 @@ fun ProfileString(
                 .fillMaxWidth()
                 .padding(12.dp)
         ) {
-            AsyncImage(
-                model = when {
-                    user.userPhotoUrl.isNullOrEmpty() -> R.drawable.ic_launcher_background
-                    user.userPhotoUrl.toString()
-                        .startsWith("/photos/") -> "http://$SERVER_IP:8080${user.userPhotoUrl}"
-
-                    else -> user.userPhotoUrl
-                },
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .size(56.dp)
-                    .clip(CircleShape)
-                    .align(Alignment.CenterVertically)
-
+            UserPhoto(
+                photoUri = user.userPhotoUrl,
+                isMe = false,
+                size = 56.dp
             )
+//            AsyncImage(
+//                model = when {
+//                    user.userPhotoUrl.isNullOrEmpty() -> R.drawable.ic_launcher_background
+//                    user.userPhotoUrl.toString()
+//                        .startsWith("/photos/") -> "http://$SERVER_IP:8080${user.userPhotoUrl}"
+//
+//                    else -> user.userPhotoUrl
+//                },
+//                contentDescription = null,
+//                contentScale = ContentScale.Crop,
+//                modifier = Modifier
+//                    .size(56.dp)
+//                    .clip(CircleShape)
+//                    .align(Alignment.CenterVertically)
+//
+//            )
 
             Spacer(modifier = Modifier.size(12.dp))
             Column(
@@ -282,8 +293,11 @@ fun ShortInput(
     textAlign: TextAlign? = null,
     singleLine: Boolean = true,
     leadingIcon: ImageVector? = null,
-    readOnly: Boolean? = null
+    readOnly: Boolean? = null,
+    imeAction: ImeAction = ImeAction.Done,
 ) {
+    val bringIntoViewRequester = remember { BringIntoViewRequester() }
+    val coroutineScope = rememberCoroutineScope()
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
     Column() {
@@ -295,15 +309,17 @@ fun ShortInput(
         Spacer(modifier = Modifier.size(4.dp))
         OutlinedTextField(
             singleLine = singleLine,
-            modifier = Modifier.fillMaxWidth(),
             textStyle = LocalTextStyle.current.copy(textAlign = textAlign?: TextAlign.Start),
             keyboardOptions = KeyboardOptions(
                 keyboardType = keyboardType,
-                imeAction = ImeAction.Done
+                imeAction = imeAction
             ),
             value = value,
             onValueChange = { newValue ->
                 changeValue(newValue)
+                coroutineScope.launch {
+                    bringIntoViewRequester.bringIntoView()
+                }
             },
             keyboardActions = KeyboardActions(
                 onDone = {
@@ -332,7 +348,8 @@ fun ShortInput(
                     Icon(leadingIcon, null)
                 }
             },
-            readOnly = readOnly?: false
+            readOnly = readOnly?: false,
+            modifier =  Modifier.fillMaxWidth().bringIntoViewRequester(bringIntoViewRequester),
         )
 
     }

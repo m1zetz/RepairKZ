@@ -26,6 +26,7 @@ sealed class UserState {
         val specDraft: MasterSpetializationsEnum = MasterSpetializationsEnum.UNKNOWN,
 
         val isSaving: Boolean = false,
+        val isPhotoSaving: Boolean = false,
         val showSave: Boolean = false
     ) : UserState()
 

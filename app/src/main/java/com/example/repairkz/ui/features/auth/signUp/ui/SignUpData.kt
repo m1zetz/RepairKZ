@@ -136,7 +136,8 @@ fun SignUpData(signUpViewModel: SignUpViewModel, navController: NavController) {
                         state.userInfo.photoUri?.toString(),
                         changeAvatarIntent = {
                             signUpViewModel.handleIntent(SignUpIntent.OpenSheet)
-                        }
+                        },
+                        isLoading = state.isPhotoLoading
                     )
                     Spacer(modifier = Modifier.size(8.dp))
                     UniversalTextField(

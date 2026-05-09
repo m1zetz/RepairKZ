@@ -34,7 +34,8 @@ import com.example.repairkz.ui.features.UserInfo.UserIntent
 @Composable
 fun Cap(
     commonInfo: CommonInfo,
-    changeAvatarIntent: () -> Unit
+    changeAvatarIntent: () -> Unit,
+    isLoading: Boolean = false
 ) {
     Column(
         modifier = Modifier
@@ -45,7 +46,7 @@ fun Cap(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 8.dp, vertical = 2.dp)
-                .statusBarsPadding(),
+            ,
             shape = RoundedCornerShape(12.dp)
         ) {
             Row(
@@ -61,10 +62,12 @@ fun Cap(
                     UserPhoto(
                         commonInfo.photoUrl,
                         commonInfo.isMe,
-                        {changeAvatarIntent()}
+                        {changeAvatarIntent()},
+                        isLoading = isLoading
                     )
 
                 }
+
 
 
             }

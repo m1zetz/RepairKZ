@@ -14,6 +14,7 @@ data class SignUpState(
     val emailError: Int? = null,
     val codeError: Int? = null,
     val isLoading: Boolean = false,
+    val isPhotoLoading: Boolean = false,
     val error: String? = null,
     val isCodeSent: Boolean = false,
     val timerSeconds: Int = 0,

@@ -126,23 +126,27 @@ class UserInfoViewModel @Inject constructor(
                 viewModelScope.launch {
                     val localUri = saveToInternalUseCase(intent.uri)
                     val currentState = _uiState.value
-                    if (currentState is UserState.Success) {
-                        _uiState.value = currentState.copy(
-                            newAvatarData = localUri,
-                            pendingUri = null
-                        )
-                        val user = getUserDataUseCase()
-                        user?.let {
-                            val photo = preparePhotoPartUseCase(context, intent.uri)
-                            photo?.let {
-                                val result = withContext(NonCancellable) {
-                                    updateUserPhotoUseCase(user.id.toLong(), photo)
-                                }
-                                result.onSuccess {
-                                    defineUser(comingId)
-                                }
-
+                    if (currentState !is UserState.Success) return@launch
+                    _uiState.value = currentState.copy(
+                        newAvatarData = localUri,
+                        pendingUri = null,
+                        isPhotoSaving = true
+                    )
+                    val user = getUserDataUseCase()
+                    user?.let {
+                        val photo = preparePhotoPartUseCase(context, intent.uri)
+                        photo?.let {
+                            val result = withContext(NonCancellable) {
+                                updateUserPhotoUseCase(user.id, photo)
                             }
+                            result.onSuccess {
+                                defineUser(comingId)
+                            }
+                            val newState = _uiState.value
+                            if (newState !is UserState.Success) return@launch
+                            _uiState.value = newState.copy(
+                                isPhotoSaving = false
+                            )
                         }
                     }
 

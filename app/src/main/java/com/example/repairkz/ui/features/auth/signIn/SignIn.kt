@@ -63,7 +63,7 @@ fun SignIn(signInViewModel: SignInViewModel, navController: NavController) {
         signInViewModel.channel.collect {effect ->
             when(effect){
                 SignInEffects.NavigateToRegistration -> {
-                    navController.navigate(Routes.SIGN_UP_EMAIL)
+                    navController.navigate(Routes.REG_GROUP)
                 }
 
                 is SignInEffects.ShowSnackBar -> {

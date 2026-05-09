@@ -47,7 +47,7 @@ class SignUpViewModel @Inject constructor(
     private val createUserUseCase: CreateUserUseCase,
     private val dataStoreManager: DataStoreManager,
     private val preparePhotoPartUseCase: PreparePhotoPartUseCase,
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
 ) : ViewModel() {
 
 
@@ -157,7 +157,7 @@ class SignUpViewModel @Inject constructor(
                             _channel.send(NavigateToConfirmation)
                             timer()
                         }.onFailure { error ->
-                            if(error is AuthorizationError){
+                            if (error is AuthorizationError) {
                                 _channel.send(ShowSnackBar(error))
                             }
 
@@ -181,7 +181,7 @@ class SignUpViewModel @Inject constructor(
                         response.onSuccess {
                             _channel.send(NavigateToFillingData)
                         }.onFailure { error ->
-                            if(error is AuthorizationError){
+                            if (error is AuthorizationError) {
                                 _channel.send(ShowSnackBar(error))
                             }
                         }
@@ -246,10 +246,11 @@ class SignUpViewModel @Inject constructor(
                         }
                         try {
                             val uri = _uiState.value.userInfo.photoUri
-                            val photoPart = if(uri!=null) preparePhotoPartUseCase(context,uri) else null
+                            val photoPart =
+                                if (uri != null) preparePhotoPartUseCase(context, uri) else null
 
                             val userPart = user.toCreateUserDTO()
-                            val response = createUserUseCase(userPart,photoPart )
+                            val response = createUserUseCase(userPart, photoPart)
                             response.onSuccess { dto ->
                                 val finalUser = user.copy(userId = dto.id)
                                 dataStoreManager.saveToken(dto.token)
@@ -259,7 +260,7 @@ class SignUpViewModel @Inject constructor(
                                 _uiState.update { it.copy(error = error.message) }
                             }
 
-                        } catch(e: Exception){
+                        } catch (e: Exception) {
                             _uiState.update { it.copy(error = "Ошибка сети") }
                         } finally {
                             _uiState.update { state ->
@@ -309,12 +310,16 @@ class SignUpViewModel @Inject constructor(
             is SignUpIntent.ConfirmPhoto -> {
 
                 viewModelScope.launch {
+                    _uiState.value = _uiState.value.copy(
+                        isPhotoLoading = true,
+                        userInfo = _uiState.value.userInfo.copy(pendingPhotoUri = null)
+                    )
                     val localUri = saveToInternalUseCase(intent.uri)
                     _uiState.value = _uiState.value.copy(
                         userInfo = _uiState.value.userInfo.copy(
                             photoUri = localUri,
-                            pendingPhotoUri = null
-                        )
+                        ),
+                        isPhotoLoading = false
                     )
                 }
             }

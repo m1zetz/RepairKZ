@@ -3,38 +3,63 @@ package com.example.repairkz.ui.features.UserInfo
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.LocalActivity
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.background
 import com.example.repairkz.R
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.isImeVisible
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+
+
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+
 import com.example.repairkz.Navigation.Routes
 import com.example.repairkz.common.enums.CitiesEnum
 import com.example.repairkz.common.enums.MasterSpetializationsEnum
@@ -49,9 +74,10 @@ import com.example.repairkz.ui.features.CameraX.CameraViewModel
 import com.example.repairkz.ui.features.CameraX.PhotoPreview
 import com.example.repairkz.ui.features.profile.common.Cap
 import com.example.repairkz.ui.features.profile.master.MasterBar
+import kotlinx.coroutines.launch
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun UserInfo(userInfoViewModel: UserInfoViewModel, navController: NavController) {
     val context = LocalContext.current
@@ -132,16 +158,31 @@ fun UserInfo(userInfoViewModel: UserInfoViewModel, navController: NavController)
         is UserState.Success -> {
             val scrollState = rememberScrollState()
             val user = state.userTypes
-            Surface(
-                modifier = Modifier.fillMaxSize(),
-            ) {
-                Column(
+
+            if (state.showSave) {
+                Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .verticalScroll(scrollState),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
+                        .height(120.dp)
+                        .background(
+                            brush = Brush.verticalGradient(
+                                colors = listOf(
+                                    Color.Transparent,
+                                    Color.Black
+                                )
+                            )
+                        )
+                )
+            }
+
+            Surface(
+                modifier = Modifier
+                    .fillMaxSize(),
+            ) {
+                Scaffold(
+                    modifier = Modifier
+                        .imePadding(),
+                ) { paddingValues ->
                     if (state.pendingUri != null) {
                         PhotoPreview(
                             context,
@@ -153,101 +194,29 @@ fun UserInfo(userInfoViewModel: UserInfoViewModel, navController: NavController)
                             }
                         }
                     } else {
-                        Cap(
-                            commonInfo = user.commonInfo,
-                            changeAvatarIntent = { userInfoViewModel.handleIntent(UserIntent.OpenSheet) })
-                        when (user) {
-                            is UserTypes.IsCurrentUser -> {
-                                Column(
-                                    Modifier.padding(horizontal = 8.dp)
-                                ) {
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.End
-                                    ){
-                                        AnimatedVisibility(visible = state.showSave) {
-                                            Button(onClick = { userInfoViewModel.handleIntent(UserIntent.SaveChanges) }) {
-                                                Text(stringResource(R.string.save_changes))
-                                            }
-                                        }
-                                        if(state.isSaving){
-                                         CircularProgressIndicator()
-                                        }
 
-                                    }
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .verticalScroll(scrollState)
+                                .padding(paddingValues),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
 
-
-                                    Text(
-                                        stringResource(R.string.user_data),
-                                        style = MaterialTheme.typography.titleMedium.copy(
-                                            letterSpacing = 1.5.sp
-                                        ),
-                                        color = MaterialTheme.colorScheme.primary,
-                                    )
-                                    HorizontalDivider()
-                                }
-                                //общий
-                                Card(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(horizontal = 8.dp),
-                                    shape = RoundedCornerShape(12.dp)
-                                ) {
-                                    Column(
-                                        modifier = Modifier.padding(8.dp),
-                                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                                    ) {
-                                        ShortInput(
-                                            titleResID = R.string.enter_number,
-                                            value = state.number,
-                                            changeValue = { newValue ->
-                                                userInfoViewModel.handleIntent(
-                                                    UserIntent.ChangeNumber(
-                                                        newValue
-                                                    )
-                                                )
-                                            },
-                                            keyboardType = KeyboardType.Phone
-                                        )
-                                        ShortInput(
-                                            titleResID = R.string.email,
-                                            value = state.email,
-                                            changeValue = { email ->
-                                                userInfoViewModel.handleIntent(
-                                                    UserIntent.ChangeEmail(
-                                                        email
-                                                    )
-                                                )
-                                            },
-                                            keyboardType = KeyboardType.Email,
-                                            readOnly = true
-                                        )
-                                        ShortWithComposableWOpadding(
-                                            R.string.city,
-                                            {
-                                                EnumDropDown(
-                                                    R.string.choice_city,
-                                                    state.city,
-                                                    CitiesEnum.entries,
-                                                    onSelect = { city ->
-                                                        userInfoViewModel.handleIntent(
-                                                            UserIntent.ChangeCity(
-                                                                city
-                                                            )
-                                                        )
-
-                                                    }
-                                                )
-                                            }
-                                        )
-                                    }
-                                }
-                                if (user.isMaster) {
+                            Cap(
+                                commonInfo = user.commonInfo,
+                                changeAvatarIntent = { userInfoViewModel.handleIntent(UserIntent.OpenSheet) },
+                                isLoading = state.isPhotoSaving
+                            )
+                            when (user) {
+                                is UserTypes.IsCurrentUser -> {
                                     Column(
                                         Modifier.padding(horizontal = 8.dp)
                                     ) {
+
                                         Text(
-                                            stringResource(R.string.master_data),
+                                            stringResource(R.string.user_data),
                                             style = MaterialTheme.typography.titleMedium.copy(
                                                 letterSpacing = 1.5.sp
                                             ),
@@ -255,6 +224,7 @@ fun UserInfo(userInfoViewModel: UserInfoViewModel, navController: NavController)
                                         )
                                         HorizontalDivider()
                                     }
+                                    //общий
                                     Card(
                                         modifier = Modifier
                                             .fillMaxWidth()
@@ -265,30 +235,45 @@ fun UserInfo(userInfoViewModel: UserInfoViewModel, navController: NavController)
                                             modifier = Modifier.padding(8.dp),
                                             verticalArrangement = Arrangement.spacedBy(8.dp)
                                         ) {
+                                            //номер телефона
                                             ShortInput(
-                                                R.string.desc,
-                                                R.string.enter_words,
-                                                state.descriptionDraft,
-                                                { newValue ->
+                                                titleResID = R.string.enter_number,
+                                                value = state.number,
+                                                changeValue = { newValue ->
                                                     userInfoViewModel.handleIntent(
-                                                        UserIntent.CurrentMasterIntent.ChangeDescription(
+                                                        UserIntent.ChangeNumber(
                                                             newValue
                                                         )
                                                     )
-                                                }
+                                                },
+                                                keyboardType = KeyboardType.Phone
                                             )
-
+                                            // эмейл
+                                            ShortInput(
+                                                titleResID = R.string.email,
+                                                value = state.email,
+                                                changeValue = { email ->
+                                                    userInfoViewModel.handleIntent(
+                                                        UserIntent.ChangeEmail(
+                                                            email
+                                                        )
+                                                    )
+                                                },
+                                                keyboardType = KeyboardType.Email,
+                                                readOnly = true
+                                            )
+                                            // город
                                             ShortWithComposableWOpadding(
-                                                R.string.spec,
+                                                R.string.city,
                                                 {
                                                     EnumDropDown(
                                                         R.string.choice_city,
-                                                        state.specDraft,
-                                                        MasterSpetializationsEnum.entries,
-                                                        onSelect = { spec ->
+                                                        state.city,
+                                                        CitiesEnum.entries,
+                                                        onSelect = { city ->
                                                             userInfoViewModel.handleIntent(
-                                                                UserIntent.CurrentMasterIntent.ChangeSpecialization(
-                                                                    spec
+                                                                UserIntent.ChangeCity(
+                                                                    city
                                                                 )
                                                             )
 
@@ -296,47 +281,151 @@ fun UserInfo(userInfoViewModel: UserInfoViewModel, navController: NavController)
                                                     )
                                                 }
                                             )
-
-                                            ShortInput(
-                                                R.string.exp,
-                                                R.string.enter_words,
-                                                state.experienceDraft.toString(),
-                                                { newValue ->
-                                                    userInfoViewModel.handleIntent(
-                                                        UserIntent.CurrentMasterIntent.ChangeExperience(
-                                                            newValue
-                                                        )
-                                                    )
-                                                }
-                                            )
                                         }
                                     }
 
+                                    // мастерские данные
+                                    if (user.isMaster) {
+                                        Column(
+                                            Modifier.padding(horizontal = 8.dp)
+                                        ) {
+                                            Text(
+                                                stringResource(R.string.master_data),
+                                                style = MaterialTheme.typography.titleMedium.copy(
+                                                    letterSpacing = 1.5.sp
+                                                ),
+                                                color = MaterialTheme.colorScheme.primary,
+                                            )
+                                            HorizontalDivider()
+                                        }
+                                        Card(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(horizontal = 8.dp),
+                                            shape = RoundedCornerShape(12.dp)
+                                        ) {
+                                            Column(
+                                                modifier = Modifier.padding(8.dp),
+                                                verticalArrangement = Arrangement.spacedBy(8.dp)
+                                            ) {
+
+                                                //описание
+                                                ShortInput(
+                                                    R.string.desc,
+                                                    R.string.enter_words,
+                                                    state.descriptionDraft,
+                                                    { newValue ->
+                                                        userInfoViewModel.handleIntent(
+                                                            UserIntent.CurrentMasterIntent.ChangeDescription(
+                                                                newValue
+                                                            )
+                                                        )
+                                                    },
+                                                    singleLine = false,
+                                                    imeAction = ImeAction.Default
+
+                                                )
+                                                // спек
+                                                ShortWithComposableWOpadding(
+                                                    R.string.spec,
+                                                    {
+                                                        EnumDropDown(
+                                                            R.string.choice_city,
+                                                            state.specDraft,
+                                                            MasterSpetializationsEnum.entries,
+                                                            onSelect = { spec ->
+                                                                userInfoViewModel.handleIntent(
+                                                                    UserIntent.CurrentMasterIntent.ChangeSpecialization(
+                                                                        spec
+                                                                    )
+                                                                )
+
+                                                            }
+                                                        )
+                                                    }
+                                                )
+
+                                                // стаж опыт
+                                                ShortInput(
+                                                    R.string.exp,
+                                                    R.string.exp,
+                                                    state.experienceDraft,
+                                                    { newValue ->
+                                                        userInfoViewModel.handleIntent(
+                                                            UserIntent.CurrentMasterIntent.ChangeExperience(
+                                                                newValue
+                                                            )
+                                                        )
+                                                    },
+                                                    keyboardType = KeyboardType.Number
+                                                )
+
+
+                                            }
+
+                                        }
+                                        AnimatedVisibility(
+                                            visible = state.showSave,
+                                            enter = fadeIn(),
+                                            exit = fadeOut()
+                                        ){
+                                            Button(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .padding(horizontal = 8.dp),
+                                                onClick = {
+                                                    userInfoViewModel.handleIntent(
+                                                        UserIntent.SaveChanges
+                                                    )
+                                                }) {
+                                                Row(
+                                                    modifier = Modifier.fillMaxWidth(),
+                                                    horizontalArrangement = Arrangement.spacedBy(
+                                                        8.dp,
+                                                        Alignment.CenterHorizontally
+                                                    ),
+                                                    verticalAlignment = Alignment.CenterVertically
+                                                ) {
+                                                    Text(stringResource(R.string.save_changes))
+                                                    if (state.isSaving) {
+                                                        CircularProgressIndicator(
+                                                            color = MaterialTheme.colorScheme.onPrimary,
+                                                            modifier = Modifier.size(18.dp)
+                                                        )
+                                                    }
+                                                }
+                                            }
+                                        }
+
+
+
+                                    }
 
                                 }
 
-                            }
-
-                            is UserTypes.IsOtherMaster -> {
-                                Column(
-                                    modifier = Modifier.fillMaxSize(),
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                    verticalArrangement = Arrangement.Top
-                                ) {
-                                    MasterBar(
-                                        { intent ->
-                                            userInfoViewModel.handleIntent(intent)
-                                        },
-                                        masterId = user.commonInfo.id,
-                                    )
+                                is UserTypes.IsOtherMaster -> {
+                                    Column(
+                                        modifier = Modifier.fillMaxSize(),
+                                        horizontalAlignment = Alignment.CenterHorizontally,
+                                        verticalArrangement = Arrangement.Top
+                                    ) {
+                                        MasterBar(
+                                            { intent ->
+                                                userInfoViewModel.handleIntent(intent)
+                                            },
+                                            masterId = user.commonInfo.id,
+                                        )
+                                    }
                                 }
+
                             }
 
                         }
+
                     }
-
-
                 }
+
+
             }
             if (state.avatarSheetState) {
                 PhotoSourceBottomSheet(
@@ -361,4 +450,5 @@ fun UserInfo(userInfoViewModel: UserInfoViewModel, navController: NavController)
             }
         }
     }
+
 }
