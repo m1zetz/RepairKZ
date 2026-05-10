@@ -1,5 +1,6 @@
 package com.example.RepairKZ_Backend.entity
 
+import com.example.RepairKZ_Backend.common.enums.CitiesEnum
 import com.example.RepairKZ_Backend.common.enums.MasterSpetializationsEnum
 import com.example.RepairKZ_Backend.model.MasterInfoDTO
 import jakarta.persistence.Column
@@ -41,7 +42,7 @@ data class Master(
             email = user.email,
             phoneNumber = user.phoneNumber,
             status = user.status,
-            city = user.city,
+            city = user.city?: CitiesEnum.UNKNOWN,
             experienceInYears = experienceInYears ?: 0,
             description = description ?: "",
             masterSpecialization = masterSpecialization?:MasterSpetializationsEnum.UNKNOWN
