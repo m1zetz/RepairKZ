@@ -11,6 +11,7 @@ import com.example.RepairKZ_Backend.model.MasterResponseDTO
 import com.example.RepairKZ_Backend.model.UpdatePhotoResponseDTO
 import com.example.RepairKZ_Backend.model.UserRegistrationDTO
 import com.example.RepairKZ_Backend.model.UserResponseDTO
+import com.example.RepairKZ_Backend.service.MasterService
 import com.example.RepairKZ_Backend.service.UserService
 import org.springframework.http.ResponseEntity
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -56,8 +57,8 @@ class UserController(
 
     @GetMapping("/get-master-by-id/{id}")
     fun getMasterById(@PathVariable id: Long): ResponseEntity<MasterResponseDTO> {
-        val response = userService.getMasterById(id)
-        return ResponseEntity.ok(response)
+        val master = userService.getMasterById(id)
+        return ResponseEntity.ok(master)
     }
 
     @GetMapping("/{id}")

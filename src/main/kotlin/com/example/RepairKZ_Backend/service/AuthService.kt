@@ -27,7 +27,8 @@ class AuthService(
     private val master: MasterRepository,
     private val fileService: FileService,
     private val passwordEncoder: PasswordEncoder,
-    private val tokenService: TokenService
+    private val tokenService: TokenService,
+    private val masterService: MasterService
 ) {
 
     @Transactional
@@ -35,7 +36,6 @@ class AuthService(
         loginRequest: LoginRequestDTO,
     ): LoginResponseDTO {
         val user = userRepository.findByEmail(loginRequest.login) ?: throw ResponseStatusException(HttpStatus.BAD_REQUEST,"Invalid login or password")
-        val masterData = master.findByUser(user)
 
         if (!passwordEncoder.matches(loginRequest.password, user.password)) {
             throw ResponseStatusException(HttpStatus.BAD_REQUEST,"Invalid login or password")
@@ -50,13 +50,15 @@ class AuthService(
             StatusOfUser.CLIENT -> {
                 baseResponse
             }
-
             StatusOfUser.MASTER -> {
+                val masterData = master.findByUser(user) ?: throw ResponseStatusException(HttpStatus.NOT_FOUND,"Master not found")
+                val services = masterService.getServicesByMasterId(masterData.id!!)
                 baseResponse.copy(
                     master = MasterShortInfoDTO(
-                        masterData?.experienceInYears,
-                        masterData?.description,
-                        masterData?.masterSpecialization
+                        masterData.experienceInYears,
+                        masterData.description,
+                        masterData.masterSpecialization,
+                        services
                     )
                 )
             }

@@ -37,14 +37,8 @@ data class Master(
         return MasterInfoDTO(
             id = this.id!!,
             userPhotoUrl = user.userPhotoUrl,
-            firstName = user.firstName!!,
+            firstName = user.firstName,
             lastName = user.lastName,
-            email = user.email,
-            phoneNumber = user.phoneNumber,
-            status = user.status,
-            city = user.city?: CitiesEnum.UNKNOWN,
-            experienceInYears = experienceInYears ?: 0,
-            description = description ?: "",
             masterSpecialization = masterSpecialization?:MasterSpetializationsEnum.UNKNOWN
         )
     }

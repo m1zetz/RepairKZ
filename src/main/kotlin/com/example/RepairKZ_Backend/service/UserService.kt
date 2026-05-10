@@ -29,6 +29,7 @@ import kotlin.random.Random
 @Service
 class UserService(
     private val userRepository: UserRepository,
+    private val masterService: MasterService,
     private val emailVerificationRepository: EmailVerificationRepository,
     private val fileService: FileService,
     private val mailSenderService: MailSenderService,
@@ -72,14 +73,16 @@ class UserService(
 
     @Transactional
     fun getMasterById(id: Long): MasterResponseDTO? {
-        return masterRepository.findByUserId(id)?.let { master ->
-            MasterResponseDTO(
-                master.user?.toResponseDTO() ?: throw IllegalStateException("Master without user entity"),
-                master.experienceInYears,
-                master.description,
-                master.masterSpecialization,
-            )
-        }
+        val master = masterRepository.findByUserId(id)?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
+        val services = masterService.getServicesByMasterId(master.id!!)
+        return MasterResponseDTO(
+            masterId = master.id,
+            user = master.user?.toResponseDTO() ?: throw IllegalStateException("Master without user entity"),
+            experienceInYears =  master.experienceInYears,
+            description = master.description,
+            masterSpecialization = master.masterSpecialization,
+            services = services,
+        )
     }
 
     @Transactional
@@ -143,10 +146,10 @@ class UserService(
         )
         user.status = dto.statusOfUser
         if (dto.statusOfUser == StatusOfUser.CLIENT) {
-            return MasterResponseDTO(user.toResponseDTO())
+            return MasterResponseDTO(user = user.toResponseDTO())
         }
         val masterDataDto = MasterResponseDTO(
-            user.toResponseDTO(),
+            user = user.toResponseDTO(),
             experienceInYears =  dto.masterData?.experienceInYears,
             description = dto.masterData?.description,
             masterSpecialization = dto.masterData?.masterSpecialization

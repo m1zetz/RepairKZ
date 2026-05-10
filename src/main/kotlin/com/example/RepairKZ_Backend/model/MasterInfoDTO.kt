@@ -9,11 +9,5 @@ data class MasterInfoDTO(
     val userPhotoUrl: String?,
     val firstName: String,
     val lastName: String,
-    val email: String,
-    val phoneNumber: String,
-    val status: StatusOfUser,
-    val city: CitiesEnum,
-    val experienceInYears: Int = 0,
-    val description: String = "",
     val masterSpecialization: MasterSpetializationsEnum = MasterSpetializationsEnum.UNKNOWN,
 )
