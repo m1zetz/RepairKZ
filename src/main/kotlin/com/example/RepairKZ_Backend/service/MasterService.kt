@@ -23,11 +23,12 @@ class MasterService(
 
     fun createService(dto: MasterServiceDTO) : MasterServiceDTO {
         val master = masterRepository.findByIdOrNull(dto.masterId) ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
+        var count = masterServiceRepository.countByMasterId(dto.masterId)
         val service = MasterServiceEntity(
             master = master,
             service = dto.service,
             price = dto.price,
-            position = dto.position,
+            position = count++
         )
         val entity = masterServiceRepository.save(service)
         return dto.copy(

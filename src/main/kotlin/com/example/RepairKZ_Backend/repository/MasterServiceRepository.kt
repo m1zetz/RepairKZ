@@ -6,4 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository
 
 interface MasterServiceRepository : JpaRepository<MasterServiceEntity, Long> {
     fun findByMasterId(masterId: Long): List<MasterServiceEntity>
+    fun countByMasterId(masterId: Long): Int
 }
