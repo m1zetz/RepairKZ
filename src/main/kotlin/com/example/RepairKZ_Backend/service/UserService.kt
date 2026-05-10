@@ -73,7 +73,7 @@ class UserService(
 
     @Transactional
     fun getMasterById(id: Long): MasterResponseDTO? {
-        val master = masterRepository.findByUserId(id)?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
+        val master = masterRepository.findByIdOrNull(id) ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
         val services = masterService.getServicesByMasterId(master.id!!)
         return MasterResponseDTO(
             masterId = master.id,
