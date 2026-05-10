@@ -23,7 +23,7 @@ class MasterRepositoryImpl @Inject constructor(
     override suspend fun getMasters(): Result<List<Master>> {
         val userData =
             getUserDataUseCase() ?: return Result.failure(Exception("Current user is null"))
-        val response = masterApi.getMasters(userData.id.toLong())
+        val response = masterApi.getMasters(userData.id)
         val list = response.body()?: return Result.failure(Exception("Network error"))
         _masters.value = list.map { dto ->
             Master(
@@ -31,12 +31,6 @@ class MasterRepositoryImpl @Inject constructor(
                 userPhotoUrl = dto.userPhotoUrl,
                 firstName = dto.firstName,
                 lastName = dto.lastName,
-                email = dto.email,
-                phoneNumber = dto.phoneNumber,
-                status = dto.status,
-                city = dto.city,
-                experienceInYears = dto.experienceInYears,
-                description = dto.description,
                 masterSpecialization = dto.masterSpecialization
             )
         }
@@ -44,15 +38,34 @@ class MasterRepositoryImpl @Inject constructor(
     }
 
     override suspend fun fetchMasterById(id: Long): Result<Master> {
-        if (_masters.value == null) {
-            getMasters()
+        return try{
+            val response = masterApi.getMasterById(id)
+            if(response.isSuccessful){
+                val body = response.body() ?: return Result.failure(Exception("Empty body"))
+                val userData = body.user
+                val masterId = body.masterId ?: return Result.failure(Exception("Master id is null"))
+                val master = Master(
+                    id = masterId,
+                    userPhotoUrl = userData.userPhotoUrl,
+                    firstName = userData.firstName,
+                    lastName = userData.lastName,
+                    email = userData.email,
+                    phoneNumber = userData.phone,
+                    status = StatusOfUser.MASTER,
+                    city = userData.city,
+                    experienceInYears = body.experienceInYears?:0,
+                    description = body.description?:"",
+                    masterSpecialization = body.masterSpecialization?: MasterSpetializationsEnum.UNKNOWN,
+                    services = body.services
+                )
+                Result.success(master)
+            } else {
+                Result.failure(Exception(response.message()))
+            }
+
+        } catch (e: Exception){
+            Result.failure(Exception(e.message))
         }
 
-        val master = _masters.value?.find { it.id == id }
-        return if (master != null) {
-            Result.success(master)
-        } else {
-            Result.failure(Exception("Мастер с id $id не найден"))
-        }
     }
 }

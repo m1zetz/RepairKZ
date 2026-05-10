@@ -5,6 +5,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import com.example.repairkz.common.enums.MasterSpetializationsEnum
+import com.example.repairkz.data.remote.dto.MasterServiceDTO
 
 @Entity(
     "master",
@@ -23,4 +24,5 @@ data class MasterEntity(
     val experienceInYears: Int? = null,
     val description: String? = null,
     val masterSpecialization: MasterSpetializationsEnum? = null,
+    val services: List<MasterServiceDTO> = emptyList()
 )

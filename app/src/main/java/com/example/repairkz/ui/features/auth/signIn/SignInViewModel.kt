@@ -29,7 +29,6 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class SignInViewModel @Inject constructor(
     private val loginUseCase: LoginUseCase,
-    private val updateUserDataUseCase : UpdateUserDataUseCase,
     private val dataStoreManager: DataStoreManager,
     private val saveUserToLocalUseCase: SaveUserToLocalUseCase
 )  : ViewModel() {
@@ -85,7 +84,8 @@ class SignInViewModel @Inject constructor(
                                                 description = loginResponseDTO.master?.description
                                                     ?: "",
                                                 experienceInYears = loginResponseDTO.master?.experienceInYears
-                                                    ?: 0
+                                                    ?: 0,
+                                                services = loginResponseDTO.master?.services?:emptyList()
                                             )
                                         }
                                     }

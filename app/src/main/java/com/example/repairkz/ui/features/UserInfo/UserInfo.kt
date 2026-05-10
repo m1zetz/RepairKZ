@@ -1,5 +1,6 @@
 package com.example.repairkz.ui.features.UserInfo
 
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.LocalActivity
 import androidx.compose.animation.AnimatedVisibility
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -359,6 +361,8 @@ fun UserInfo(userInfoViewModel: UserInfoViewModel, navController: NavController)
                                                     },
                                                     keyboardType = KeyboardType.Number
                                                 )
+                                                val text = state.services[0].service
+                                                Log.d("SERVICE", text)
 
 
                                             }
@@ -415,7 +419,17 @@ fun UserInfo(userInfoViewModel: UserInfoViewModel, navController: NavController)
                                             },
                                             masterId = user.commonInfo.id,
                                         )
+                                        state.services.sortedBy {
+                                            it.position
+                                        }.forEach {item ->
+                                            Row(modifier = Modifier.fillMaxWidth().padding(10.dp)){
+                                                Text(item.service)
+                                                Spacer(modifier = Modifier.size(10.dp))
+                                                Text(item.price.toString())
+                                            }
+                                        }
                                     }
+
                                 }
 
                             }

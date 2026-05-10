@@ -6,6 +6,7 @@ import com.example.repairkz.common.enums.MasterSpetializationsEnum
 import com.example.repairkz.common.enums.PhotoSourceEnum
 import com.example.repairkz.common.models.Master
 import com.example.repairkz.common.models.User
+import com.example.repairkz.data.remote.dto.MasterServiceDTO
 import com.example.repairkz.ui.features.auth.signUp.SignUpIntent
 
 sealed class UserState {
@@ -24,6 +25,7 @@ sealed class UserState {
         val descriptionDraft: String = "",
         val experienceDraft: String = "",
         val specDraft: MasterSpetializationsEnum = MasterSpetializationsEnum.UNKNOWN,
+        val services: List<MasterServiceDTO> = emptyList(),
 
         val isSaving: Boolean = false,
         val isPhotoSaving: Boolean = false,
@@ -74,7 +76,8 @@ fun UserTypes.toSuccessState(): UserState.Success {
                 successState.copy(
                     descriptionDraft = master?.description ?: "",
                     specDraft = master?.masterSpecialization ?: MasterSpetializationsEnum.UNKNOWN,
-                    experienceDraft = master?.experienceInYears.toString()
+                    experienceDraft = master?.experienceInYears.toString(),
+                    services = master?.services?: emptyList()
                 )
 
             }
@@ -86,7 +89,8 @@ fun UserTypes.toSuccessState(): UserState.Success {
                 userTypes = this,
                 descriptionDraft = data.description,
                 specDraft = data.masterSpecialization,
-                experienceDraft = data.experienceInYears.toString()
+                experienceDraft = data.experienceInYears.toString(),
+                services = data.services
             )
         }
     }

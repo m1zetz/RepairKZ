@@ -45,7 +45,8 @@ data class UserEntity(
             city = this.city,
             experienceInYears = masterEntity?.experienceInYears?:0,
             description = masterEntity?.description?: "",
-            masterSpecialization = masterEntity?.masterSpecialization?: MasterSpetializationsEnum.UNKNOWN
+            masterSpecialization = masterEntity?.masterSpecialization?: MasterSpetializationsEnum.UNKNOWN,
+            services = masterEntity?.services?: emptyList()
         )
     }
 }

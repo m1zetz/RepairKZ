@@ -5,5 +5,6 @@ import com.example.repairkz.common.enums.MasterSpetializationsEnum
 data class MasterDataResponseDTO(
     val experienceInYears: Int = 0,
     val description: String = "",
-    val masterSpecialization: MasterSpetializationsEnum = MasterSpetializationsEnum.UNKNOWN
+    val masterSpecialization: MasterSpetializationsEnum = MasterSpetializationsEnum.UNKNOWN,
+    val services: List<MasterServiceDTO>? = null
 )

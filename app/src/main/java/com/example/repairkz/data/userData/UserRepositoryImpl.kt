@@ -11,8 +11,6 @@ import com.example.repairkz.data.local.entity.MasterEntity
 import com.example.repairkz.data.remote.api.UserApi
 import com.example.repairkz.data.remote.dto.order.ChangeStatusRequestDTO
 import com.example.repairkz.data.remote.dto.FullUserRequestDTO
-import com.example.repairkz.data.remote.dto.MasterResponseDTO
-import com.example.repairkz.data.remote.dto.StatusRequestDTO
 import com.example.repairkz.data.remote.dto.UpdatePhotoResponseDTO
 import com.example.repairkz.data.remote.dto.UserResponseDTO
 import javax.inject.Inject
@@ -43,10 +41,11 @@ class UserRepositoryImpl @Inject constructor(
         userDao.saveUser(user.toEntity())
         if (user is Master){
             val entity = MasterEntity(
-                userId = user.id.toLong(),
+                userId = user.id,
                 experienceInYears = user.experienceInYears,
                 masterSpecialization = user.masterSpecialization,
-                description = user.description
+                description = user.description,
+                services = user.services
             )
             masterDao.saveMaster(entity)
         }

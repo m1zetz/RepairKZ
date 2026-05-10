@@ -9,4 +9,5 @@ interface MasterRepository {
     val masters: StateFlow<List<Master>?>
     suspend fun getMasters() : Result<List<Master>>
     suspend fun fetchMasterById(id: Long) : Result<Master>
+
 }
