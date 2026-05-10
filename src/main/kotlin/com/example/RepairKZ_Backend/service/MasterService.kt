@@ -32,7 +32,8 @@ class MasterService(
         )
         val entity = masterServiceRepository.save(service)
         return dto.copy(
-            id = entity.id
+            id = entity.id,
+            position = service.position
         )
     }
 
