@@ -5,7 +5,7 @@ data class MasterServiceDTO(
     val masterId: Long,
     val service: String,
     val price: Int,
-    val position: Int
+    val position: Int = 0
 ){
 
 }
