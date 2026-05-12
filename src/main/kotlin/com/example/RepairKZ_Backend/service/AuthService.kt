@@ -55,6 +55,7 @@ class AuthService(
                 val services = masterService.getServicesByMasterId(masterData.id!!)
                 baseResponse.copy(
                     master = MasterShortInfoDTO(
+                        masterData.id,
                         masterData.experienceInYears,
                         masterData.description,
                         masterData.masterSpecialization,

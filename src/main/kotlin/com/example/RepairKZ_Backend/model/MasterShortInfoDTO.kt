@@ -3,6 +3,7 @@ package com.example.RepairKZ_Backend.model
 import com.example.RepairKZ_Backend.common.enums.MasterSpetializationsEnum
 
 data class MasterShortInfoDTO(
+    val masterId: Long,
     val experienceInYears: Int?,
     val description: String?,
     val masterSpecialization: MasterSpetializationsEnum?,
