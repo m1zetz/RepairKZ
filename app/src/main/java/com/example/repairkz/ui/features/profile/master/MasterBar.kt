@@ -29,7 +29,12 @@ import com.example.repairkz.common.ui.ProfileMainActions
 import com.example.repairkz.ui.features.UserInfo.UserIntent
 
 @Composable
-fun MasterBar(onIntent: (UserIntent) -> Unit, masterId: Long){
+fun MasterBar(
+    doOrder:()-> Unit,
+    addToFavorites:()-> Unit,
+    doReport:()-> Unit,
+
+){
     Row(modifier = Modifier
         .fillMaxWidth()
         .padding(horizontal = 4.dp, vertical = 4.dp),
@@ -37,22 +42,19 @@ fun MasterBar(onIntent: (UserIntent) -> Unit, masterId: Long){
         ProfileMainActions(
             R.string.do_order,
             Icons.Default.Build,
-            UserIntent.MasterProfileIntent.DoOrder(masterId),
-            onAction = onIntent,
+            onAction = { doOrder() },
             modifier = Modifier.weight(1f)
         )
         ProfileMainActions(
             R.string.to_favorites,
             Icons.Default.FavoriteBorder,
-            UserIntent.MasterProfileIntent.AddToFavorites(masterId),
-            onAction = onIntent,
+            onAction = { addToFavorites() },
             modifier = Modifier.weight(1f)
         )
         ProfileMainActions(
             R.string.report,
             Icons.Default.Report,
-            UserIntent.MasterProfileIntent.Report(masterId),
-            onAction = onIntent,
+            onAction = { doReport() },
             modifier = Modifier.weight(1f)
         )
 

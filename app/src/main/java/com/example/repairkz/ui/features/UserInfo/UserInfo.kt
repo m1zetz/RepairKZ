@@ -1,10 +1,10 @@
 package com.example.repairkz.ui.features.UserInfo
 
+
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.LocalActivity
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
@@ -13,55 +13,53 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.isImeVisible
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.layout.width
 
 
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 
+import com.example.repairkz.ui.features.components.Service
 import com.example.repairkz.Navigation.Routes
 import com.example.repairkz.common.enums.CitiesEnum
 import com.example.repairkz.common.enums.MasterSpetializationsEnum
@@ -75,15 +73,13 @@ import com.example.repairkz.ui.features.CameraX.CameraIntent
 import com.example.repairkz.ui.features.CameraX.CameraViewModel
 import com.example.repairkz.ui.features.CameraX.PhotoPreview
 import com.example.repairkz.ui.features.profile.common.Cap
-import com.example.repairkz.ui.features.profile.master.MasterBar
-import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun UserInfo(userInfoViewModel: UserInfoViewModel, navController: NavController) {
     val context = LocalContext.current
-    val uiState = userInfoViewModel.uiState.collectAsState()
+    val uiState = userInfoViewModel.uiState.collectAsStateWithLifecycle()
     val activity = LocalActivity.current as ComponentActivity
     val cameraViewModel: CameraViewModel = hiltViewModel(viewModelStoreOwner = activity)
     val action = photoPickerHandler(
@@ -207,7 +203,7 @@ fun UserInfo(userInfoViewModel: UserInfoViewModel, navController: NavController)
                         ) {
 
                             Cap(
-                                commonInfo = user.commonInfo,
+                                businessCardData = user.commonInfo,
                                 changeAvatarIntent = { userInfoViewModel.handleIntent(UserIntent.OpenSheet) },
                                 isLoading = state.isPhotoSaving
                             )
@@ -215,6 +211,7 @@ fun UserInfo(userInfoViewModel: UserInfoViewModel, navController: NavController)
                                 is UserTypes.IsCurrentUser -> {
                                     Column(
                                         Modifier.padding(horizontal = 8.dp)
+                                            .fillMaxWidth()
                                     ) {
 
                                         Text(
@@ -224,7 +221,7 @@ fun UserInfo(userInfoViewModel: UserInfoViewModel, navController: NavController)
                                             ),
                                             color = MaterialTheme.colorScheme.primary,
                                         )
-                                        HorizontalDivider()
+
                                     }
                                     //общий
                                     Card(
@@ -240,7 +237,7 @@ fun UserInfo(userInfoViewModel: UserInfoViewModel, navController: NavController)
                                             //номер телефона
                                             ShortInput(
                                                 titleResID = R.string.enter_number,
-                                                value = state.number,
+                                                value = state.numberDraft,
                                                 changeValue = { newValue ->
                                                     userInfoViewModel.handleIntent(
                                                         UserIntent.ChangeNumber(
@@ -253,7 +250,7 @@ fun UserInfo(userInfoViewModel: UserInfoViewModel, navController: NavController)
                                             // эмейл
                                             ShortInput(
                                                 titleResID = R.string.email,
-                                                value = state.email,
+                                                value = state.emailDraft,
                                                 changeValue = { email ->
                                                     userInfoViewModel.handleIntent(
                                                         UserIntent.ChangeEmail(
@@ -270,7 +267,7 @@ fun UserInfo(userInfoViewModel: UserInfoViewModel, navController: NavController)
                                                 {
                                                     EnumDropDown(
                                                         R.string.choice_city,
-                                                        state.city,
+                                                        state.cityDraft,
                                                         CitiesEnum.entries,
                                                         onSelect = { city ->
                                                             userInfoViewModel.handleIntent(
@@ -290,6 +287,7 @@ fun UserInfo(userInfoViewModel: UserInfoViewModel, navController: NavController)
                                     if (user.isMaster) {
                                         Column(
                                             Modifier.padding(horizontal = 8.dp)
+                                                .fillMaxWidth()
                                         ) {
                                             Text(
                                                 stringResource(R.string.master_data),
@@ -298,7 +296,7 @@ fun UserInfo(userInfoViewModel: UserInfoViewModel, navController: NavController)
                                                 ),
                                                 color = MaterialTheme.colorScheme.primary,
                                             )
-                                            HorizontalDivider()
+
                                         }
                                         Card(
                                             modifier = Modifier
@@ -361,10 +359,100 @@ fun UserInfo(userInfoViewModel: UserInfoViewModel, navController: NavController)
                                                     },
                                                     keyboardType = KeyboardType.Number
                                                 )
-                                                val text = state.services[0].service
-                                                Log.d("SERVICE", text)
+                                            }
+
+                                        }
+                                        Column(
+                                            Modifier.padding(horizontal = 8.dp)
+                                                .fillMaxWidth()
+                                        ) {
+                                            Row(
+                                                modifier = Modifier.fillMaxWidth(),
+                                                horizontalArrangement = Arrangement.SpaceBetween
+                                            ){
+                                                Text(
+                                                    stringResource(R.string.services),
+                                                    style = MaterialTheme.typography.titleMedium.copy(
+                                                        letterSpacing = 1.5.sp
+                                                    ),
+                                                    color = MaterialTheme.colorScheme.primary,
+                                                )
+                                                Button(
+                                                    onClick = {
+                                                        userInfoViewModel.handleIntent(UserIntent.CurrentMasterIntent.OpenCreate)
+                                                    }
+                                                ) {
+                                                    Text("Создать")
+                                                }
+                                            }
+
+                                        }
+                                        Card(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(horizontal = 8.dp),
+                                            shape = RoundedCornerShape(12.dp)
+                                        ){
+                                            Column(
+                                                modifier = Modifier.fillMaxWidth()
+                                            ) {
+                                                Row(
+                                                    modifier = Modifier
+                                                        .fillMaxWidth()
+                                                        .height(IntrinsicSize.Min)
+                                                        .padding(10.dp),
+
+                                                    ) {
+                                                    Text(stringResource(R.string.service_name), modifier = Modifier
+                                                        .weight(1f)
+                                                        .padding(end = 8.dp)
+                                                        .align(Alignment.Top),
+                                                        textAlign = TextAlign.Center,
+                                                        fontWeight = FontWeight.Medium)
+                                                    VerticalDivider(
+                                                        Modifier
+                                                            .fillMaxHeight()
+                                                            .width(1.dp),
+                                                        color = MaterialTheme.colorScheme.outlineVariant
+                                                    )
+                                                    Text(
+                                                        stringResource(R.string.price_in_tenge), modifier = Modifier
+                                                            .weight(1f)
+                                                            .padding(start = 8.dp)
+                                                            .align(Alignment.Top),
+                                                        textAlign = TextAlign.Center,
+                                                        color = MaterialTheme.colorScheme.primary
+                                                    )
 
 
+                                                }
+                                                HorizontalDivider(
+                                                    modifier = Modifier
+                                                        .fillMaxWidth()
+                                                        .padding(horizontal = 8.dp)
+                                                )
+                                                Text("count: ${state.services.size}")
+                                                state.services.sortedBy {
+                                                    it.position
+                                                }.forEach {item ->
+                                                    Log.d("UI", "rendering service: ${item.service}")
+
+                                                    Service(
+                                                        item,
+                                                        onDelete = {
+                                                            if(item.id!=null){
+                                                                userInfoViewModel.handleIntent(
+                                                                    UserIntent.CurrentMasterIntent.DeleteService(item.id)
+                                                                )
+                                                            } else {
+                                                            }
+                                                        },
+                                                        onEdit = {
+
+                                                        }
+                                                    )
+                                                }
+                                                Spacer(Modifier.size(8.dp))
                                             }
 
                                         }
@@ -400,6 +488,7 @@ fun UserInfo(userInfoViewModel: UserInfoViewModel, navController: NavController)
                                                 }
                                             }
                                         }
+                                        Spacer(Modifier.size(80.dp))
 
 
 
@@ -408,27 +497,7 @@ fun UserInfo(userInfoViewModel: UserInfoViewModel, navController: NavController)
                                 }
 
                                 is UserTypes.IsOtherMaster -> {
-                                    Column(
-                                        modifier = Modifier.fillMaxSize(),
-                                        horizontalAlignment = Alignment.CenterHorizontally,
-                                        verticalArrangement = Arrangement.Top
-                                    ) {
-                                        MasterBar(
-                                            { intent ->
-                                                userInfoViewModel.handleIntent(intent)
-                                            },
-                                            masterId = user.commonInfo.id,
-                                        )
-                                        state.services.sortedBy {
-                                            it.position
-                                        }.forEach {item ->
-                                            Row(modifier = Modifier.fillMaxWidth().padding(10.dp)){
-                                                Text(item.service)
-                                                Spacer(modifier = Modifier.size(10.dp))
-                                                Text(item.price.toString())
-                                            }
-                                        }
-                                    }
+
 
                                 }
 
@@ -461,6 +530,43 @@ fun UserInfo(userInfoViewModel: UserInfoViewModel, navController: NavController)
                         )
                     }
                 )
+            }
+            if (state.showCreate) {
+                ModalBottomSheet(
+                    onDismissRequest = {
+                        userInfoViewModel.handleIntent(UserIntent.CurrentMasterIntent.CloseCreate)
+                    },
+                ) {
+                    Column(
+                        Modifier.fillMaxWidth()
+                    ){
+                        TextField(
+                            value = state.serviceDraft,
+                            onValueChange = {newValue ->
+                                userInfoViewModel.handleIntent(UserIntent.CurrentMasterIntent.ChangeServiceDraft(newValue))
+                            }
+                        )
+                        TextField(
+                            value = state.priceDraft,
+                            onValueChange = {newValue ->
+                                userInfoViewModel.handleIntent(UserIntent.CurrentMasterIntent.ChangePriceDraft(newValue))
+                            }
+                        )
+                        Button(
+                            onClick = {
+
+                                userInfoViewModel.handleIntent(UserIntent.CurrentMasterIntent.CreateService)
+                            }
+                        ) {
+                            Text("Создать")
+                        }
+                        Button(onClick = {
+                            Log.d("STATE", "services: ${userInfoViewModel.uiState.value.let { (it as? UserState.Success)?.services?.size }}")
+                        }) {
+                            Text("check")
+                        }
+                    }
+                }
             }
         }
     }

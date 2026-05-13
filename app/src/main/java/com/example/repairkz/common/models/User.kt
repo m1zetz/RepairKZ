@@ -6,9 +6,9 @@ import com.example.repairkz.common.enums.StatusOfUser
 import com.example.repairkz.data.local.entity.UserEntity
 import com.example.repairkz.data.remote.dto.UserRegistrationDTO
 import com.example.repairkz.data.remote.dto.UserResponseDTO
-import com.example.repairkz.ui.features.UserInfo.CommonInfo
+import com.example.repairkz.ui.features.UserInfo.BusinessCardData
 
-open class User(
+open  class User(
     open val id: Long,
     open val userPhotoUrl: String?,
     open val firstName: String,
@@ -40,8 +40,8 @@ open class User(
         firstName: String = this.firstName,
         lastName: String = this.lastName,
         isMe: Boolean
-    ) : CommonInfo{
-        return CommonInfo(
+    ) : BusinessCardData{
+        return BusinessCardData(
             id,
             userPhotoUrl?: "",
             firstName,
@@ -52,6 +52,7 @@ open class User(
 
     fun toMaster(
         userId: Long = this.id,
+        masterId: Long,
         userPhotoUrl: String? = this.userPhotoUrl,
         firstName: String = this.firstName,
         lastName: String = this.lastName,
@@ -63,6 +64,7 @@ open class User(
 
         val master = Master(
             userId,
+            masterId,
             userPhotoUrl,
             firstName,
             lastName,
@@ -75,6 +77,7 @@ open class User(
     }
     fun toMasterWithData(
         userId: Long = this.id,
+        masterId: Long,
         userPhotoUrl: String? = this.userPhotoUrl,
         firstName: String = this.firstName,
         lastName: String = this.lastName,
@@ -89,6 +92,7 @@ open class User(
 
         val master = Master(
             userId,
+            masterId,
             userPhotoUrl,
             firstName,
             lastName,
@@ -141,5 +145,22 @@ open class User(
 
     open val displayDescriptionRes: Int
         get() = this.status.resID
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is User) return false
+        return id == other.id &&
+                userPhotoUrl == other.userPhotoUrl &&
+                firstName == other.firstName &&
+                lastName == other.lastName &&
+                email == other.email &&
+                phoneNumber == other.phoneNumber &&
+                status == other.status &&
+                city == other.city
+    }
+
+    override fun hashCode(): Int {
+        return id.hashCode()
+    }
 
 }

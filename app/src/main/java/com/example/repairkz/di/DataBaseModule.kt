@@ -3,6 +3,7 @@ package com.example.repairkz.di
 import android.content.Context
 import androidx.room.Room
 import com.example.repairkz.data.local.dao.MasterDao
+import com.example.repairkz.data.local.dao.ServiceDao
 import com.example.repairkz.data.local.dao.UserDao
 import com.example.repairkz.data.local.dataBase.RepairDataBase
 import dagger.Module
@@ -30,5 +31,9 @@ object DataBaseModule {
     @Provides
     fun provideMasterDao(dataBase: RepairDataBase) : MasterDao {
         return dataBase.masterDao
+    }
+    @Provides
+    fun provideServiceDao(dataBase: RepairDataBase) : ServiceDao {
+        return dataBase.serviceDao
     }
 }

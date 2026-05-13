@@ -8,7 +8,6 @@ import com.example.repairkz.domain.useCases.masterData.GetMastersUseCase
 import com.example.repairkz.domain.useCases.userData.GetProfileTypeUseCase
 import com.example.repairkz.ui.features.search.SearchEffects.*
 import com.example.repairkz.ui.features.search.SearchResult.*
-import com.example.repairkz.ui.features.settings.SettingsState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.channels.Channel
@@ -26,15 +25,15 @@ class SearchViewModel @Inject constructor(
     private val getProfileTypeUseCase: GetProfileTypeUseCase
 ) : ViewModel() {
 
-    private val initialPatternResId: Int? = savedStateHandle.get<Int>("pattern")
-    private val _uiState = MutableStateFlow(SearchUiState(initialPatternResId = initialPatternResId))
+    private val comingId: Int? = savedStateHandle.get<Int>("pattern")
+    private val _uiState = MutableStateFlow(SearchUiState(initialPatternResId = comingId))
     val uiState = _uiState.asStateFlow()
 
     private val _searchEffectsChannel = Channel<SearchEffects>(Channel.BUFFERED)
     val searchEffectsChannel = _searchEffectsChannel.receiveAsFlow()
 
     init {
-        initialPatternResId?.let{ id ->
+        comingId?.let{ id ->
             val masterSpecialization = MasterSpetializationsEnum.getSpecByResId(id)
             if(masterSpecialization != MasterSpetializationsEnum.UNKNOWN){
                 handleIntent(SearchIntents.FilterAction(FilterIntent.UpdateMasterSpecialization(masterSpecialization)))
@@ -105,7 +104,7 @@ class SearchViewModel @Inject constructor(
 
             is SearchIntents.NavigateToUserInfo -> {
                 viewModelScope.launch {
-                    _searchEffectsChannel.send(NavigateToUserInfo(intent.id))
+                    _searchEffectsChannel.send(NavigateToMasterInfo(intent.id))
                 }
             }
 

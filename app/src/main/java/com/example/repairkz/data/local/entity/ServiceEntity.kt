@@ -8,21 +8,28 @@ import com.example.repairkz.common.enums.MasterSpetializationsEnum
 import com.example.repairkz.data.remote.dto.MasterServiceDTO
 
 @Entity(
-    "master",
+    "service",
     foreignKeys = [ForeignKey(
-        entity = UserEntity::class,
+        entity = MasterEntity::class,
         parentColumns = arrayOf("id"),
-        childColumns = arrayOf("user_id"),
+        childColumns = arrayOf("master_id"),
         onDelete = ForeignKey.CASCADE
     )]
 )
-data class MasterEntity(
-    @PrimaryKey()
+data class ServiceEntity(
+    @PrimaryKey
+    val id: Long? = null,
     @ColumnInfo(name = "master_id")
-    val masterId: Long = 0,
-    @ColumnInfo(name = "user_id")
-    val userId: Long,
-    val experienceInYears: Int? = null,
-    val description: String? = null,
-    val masterSpecialization: MasterSpetializationsEnum? = null
-)
+    val masterId: Long,
+    val service: String,
+    val price: Int,
+    val position: Int? = null,
+){
+    fun toDto() = MasterServiceDTO(
+        id = id,
+        masterId = masterId,
+        service = service,
+        price = price,
+        position = position
+    )
+}

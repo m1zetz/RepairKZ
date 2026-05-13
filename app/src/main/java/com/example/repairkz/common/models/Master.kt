@@ -8,6 +8,7 @@ import com.example.repairkz.data.remote.dto.MasterServiceDTO
 
 data class Master(
     override val id: Long,
+    val masterId: Long,
     override val userPhotoUrl: String?,
     override val firstName: String,
     override val lastName: String,
@@ -46,7 +47,8 @@ data class Master(
             city = this.city,
             experienceInYears = this.experienceInYears,
             description = this.description,
-            masterSpecialization = this.masterSpecialization
+            masterSpecialization = this.masterSpecialization,
+            masterId = this.masterId
         )
     }
     override val displayDescriptionRes : Int

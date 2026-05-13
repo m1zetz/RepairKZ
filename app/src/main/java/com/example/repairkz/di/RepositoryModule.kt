@@ -3,6 +3,8 @@ package com.example.repairkz.di
 import android.content.Context
 import com.example.repairkz.data.fileData.FileRepository
 import com.example.repairkz.data.fileData.FileRepositoryImpl
+import com.example.repairkz.data.local.dao.MasterDao
+import com.example.repairkz.data.local.dao.ServiceDao
 import com.example.repairkz.data.masterData.MasterRepository
 import com.example.repairkz.data.masterData.MasterRepositoryImpl
 import com.example.repairkz.data.notificationData.NotificationRepository
@@ -16,6 +18,7 @@ import com.example.repairkz.data.remote.api.UserApi
 import com.example.repairkz.data.registration.RegistrationRepository
 import com.example.repairkz.data.remote.api.MasterApi
 import com.example.repairkz.data.remote.api.OrderApi
+import com.example.repairkz.data.remote.api.ServicesApi
 import com.example.repairkz.domain.useCases.userData.GetUserDataUseCase
 import dagger.Binds
 import dagger.Module
@@ -33,8 +36,8 @@ object RepositoryModule{
         return NotificationRepositoryImpl()
     }
     @Provides
-    fun provideMasterRepository(masterApi: MasterApi, getUserDataUseCase: GetUserDataUseCase) : MasterRepository {
-        return MasterRepositoryImpl(masterApi, getUserDataUseCase)
+    fun provideMasterRepository(masterApi: MasterApi, servicesApi: ServicesApi, getUserDataUseCase: GetUserDataUseCase, serviceDao: ServiceDao, masterDao: MasterDao) : MasterRepository {
+        return MasterRepositoryImpl(masterApi, servicesApi , getUserDataUseCase, serviceDao, masterDao)
     }
 
     @Provides

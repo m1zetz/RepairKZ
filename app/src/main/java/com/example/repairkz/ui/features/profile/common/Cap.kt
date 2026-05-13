@@ -5,37 +5,25 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.CameraAlt
 import androidx.compose.material3.Card
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
-import com.example.repairkz.R
 import com.example.repairkz.common.ui.UserPhoto
-import com.example.repairkz.ui.features.UserInfo.CommonInfo
-import com.example.repairkz.ui.features.UserInfo.UserIntent
+import com.example.repairkz.ui.features.UserInfo.BusinessCardData
 
 @Composable
 fun Cap(
-    commonInfo: CommonInfo,
-    changeAvatarIntent: () -> Unit,
-    isLoading: Boolean = false
+    businessCardData: BusinessCardData,
+    changeAvatarIntent: (() -> Unit)? = null,
+    isLoading: Boolean? = null
 ) {
     Column(
         modifier = Modifier
@@ -60,10 +48,10 @@ fun Cap(
                     contentAlignment = Alignment.BottomEnd
                 ){
                     UserPhoto(
-                        commonInfo.photoUrl,
-                        commonInfo.isMe,
-                        {changeAvatarIntent()},
-                        isLoading = isLoading
+                        businessCardData.photoUrl,
+                        businessCardData.isMe,
+                        {changeAvatarIntent?.invoke()},
+                        isLoading = isLoading?:false
                     )
 
                 }
@@ -77,9 +65,9 @@ fun Cap(
                     .padding(top = 4.dp, bottom = 8.dp, start = 8.dp, end = 8.dp),
                 horizontalArrangement = Arrangement.Center
             ) {
-                Text(commonInfo.firstName, fontSize = 28.sp)
+                Text(businessCardData.firstName, fontSize = 28.sp)
                 Spacer(modifier = Modifier.size(4.dp))
-                Text(commonInfo.lastName, fontSize = 28.sp)
+                Text(businessCardData.lastName, fontSize = 28.sp)
             }
         }
 

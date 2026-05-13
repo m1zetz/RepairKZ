@@ -66,7 +66,6 @@ class NotificationViewModel @Inject constructor(
                                     Success(combined)
                             }
                         } catch (e: Exception) {
-                            Log.e("NOTIF", e.message ?: "unknown error", e)
                             _state.value = Error(message = "Ошибка запроса")
 
                         }

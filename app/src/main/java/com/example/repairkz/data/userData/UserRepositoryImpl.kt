@@ -6,27 +6,38 @@ import com.example.repairkz.common.enums.StatusOfUser
 import com.example.repairkz.common.models.Master
 import com.example.repairkz.common.models.User
 import com.example.repairkz.data.local.dao.MasterDao
+import com.example.repairkz.data.local.dao.ServiceDao
 import com.example.repairkz.data.local.dao.UserDao
 import com.example.repairkz.data.local.entity.MasterEntity
+import com.example.repairkz.data.local.entity.ServiceEntity
 import com.example.repairkz.data.remote.api.UserApi
 import com.example.repairkz.data.remote.dto.order.ChangeStatusRequestDTO
 import com.example.repairkz.data.remote.dto.FullUserRequestDTO
 import com.example.repairkz.data.remote.dto.UpdatePhotoResponseDTO
 import com.example.repairkz.data.remote.dto.UserResponseDTO
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import okhttp3.MultipartBody
 
 @Singleton
 class UserRepositoryImpl @Inject constructor(
     private val userDao: UserDao,
+    private val serviceDao: ServiceDao,
     private val masterDao: MasterDao,
     private val userApi: UserApi,
 ) : UserRepository {
-    private val _userData = MutableStateFlow<User?>(null)
+    private val _userData: Flow<User?> = userDao.getUser().map { data ->
+        val userEntity = data?.user?:return@map null
+        when(userEntity){
+            StatusOfUser.MASTER -> userEntity.toMaster(data.master)
+            else -> userEntity.toUser()
+        }
+    }
     override val userData = _userData.asStateFlow()
 
     override suspend fun fetchUserData(): User? {
@@ -36,23 +47,35 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     override suspend fun saveUserToLocal(user: User) {
-
-        _userData.value = user
-        userDao.saveUser(user.toEntity())
-        if (user is Master){
-            val entity = MasterEntity(
-                userId = user.id,
-                experienceInYears = user.experienceInYears,
-                masterSpecialization = user.masterSpecialization,
-                description = user.description,
-                services = user.services
-            )
-            masterDao.saveMaster(entity)
+        try {
+            _userData.value = user
+            Log.d("SAVE", "userId: ${user.id}")
+            userDao.saveUser(user.toEntity())
+            val saved = userDao.getUser()
+            Log.d("SAVE", "user in db: ${saved?.user?.id}")
+            Log.d("SAVE", "user saved, now saving master with userId: ${user.id}")
+            if (user is Master) {
+                val entity = MasterEntity(
+                    userId = user.id,
+                    masterId = user.masterId,
+                    experienceInYears = user.experienceInYears,
+                    masterSpecialization = user.masterSpecialization,
+                    description = user.description,
+                )
+                Log.d("SAVE", "is master: ${user is Master}")
+                val masterId = masterDao.saveMaster(entity)
+                Log.d("SAVE", "masterId saved: $masterId")
+                user.services.forEach { service ->
+                    serviceDao.upsertMasterService(service.copy(masterId = masterId).toEntity())
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("SAVE", "error: ${e.message}", e)
         }
     }
 
 
-    override suspend fun getRoomData() {
+    override suspend fun getRoomData() : Flow<User?> {
 
         val data = userDao.getUser()
         val userEntity = data?.user
@@ -62,13 +85,14 @@ class UserRepositoryImpl @Inject constructor(
                     val masterEntity = data.master
                     userEntity.toMaster(masterEntity)
                 }
+
                 else -> userEntity.toUser()
             }
         }
 
     }
 
-    override suspend fun updateUserData(user: User) : Result<Unit> {
+    override suspend fun updateUserData(user: User): Result<Unit> {
 
         val request = FullUserRequestDTO(
             user.toResponseDTO(),
@@ -80,7 +104,7 @@ class UserRepositoryImpl @Inject constructor(
 
         return if (response.isSuccessful) {
             val data = response.body()
-            if (data!=null) {
+            if (data != null) {
                 val userData = data.user
 
                 val finalUser = if (user is Master) {
@@ -92,7 +116,8 @@ class UserRepositoryImpl @Inject constructor(
                         city = userData.city,
                         experienceInYears = data.experienceInYears ?: user.experienceInYears,
                         description = data.description ?: user.description,
-                        masterSpecialization = data.masterSpecialization ?: user.masterSpecialization
+                        masterSpecialization = data.masterSpecialization
+                            ?: user.masterSpecialization
                     )
 
                 } else {
@@ -107,14 +132,13 @@ class UserRepositoryImpl @Inject constructor(
 
                 _userData.value = finalUser
                 userDao.saveUser(finalUser.toEntity())
-                if(finalUser is Master){
-                    Log.d("USERINFO", data.masterSpecialization.toString())
+                if (finalUser is Master) {
                     masterDao.saveMaster(
                         MasterEntity(
                             userId = finalUser.id,
-                            description =  finalUser.description,
+                            description = finalUser.description,
                             experienceInYears = finalUser.experienceInYears,
-                            masterSpecialization =  finalUser.masterSpecialization
+                            masterSpecialization = finalUser.masterSpecialization
                         )
                     )
                 }
@@ -128,10 +152,13 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun updateUserPhoto(id: Long, file: MultipartBody.Part): Result<UpdatePhotoResponseDTO> {
+    override suspend fun updateUserPhoto(
+        id: Long,
+        file: MultipartBody.Part,
+    ): Result<UpdatePhotoResponseDTO> {
         return try {
             val response = userApi.updateUserPhoto(id, file)
-            if(response.isSuccessful){
+            if (response.isSuccessful) {
                 val body = response.body()!!
                 val currentUser = _userData.value
                     ?: return Result.failure(Exception("User not found"))
@@ -144,16 +171,16 @@ class UserRepositoryImpl @Inject constructor(
                 _userData.value = updatedUser
                 userDao.updateUserPhoto(updatedUser.toEntity())
                 Result.success(body)
-            }else{
+            } else {
                 val errorMsg = response.errorBody()?.string()
                 Result.failure(Exception(errorMsg))
             }
-        } catch(e: Exception){
+        } catch (e: Exception) {
             Result.failure(e)
         }
     }
 
-    override suspend fun updateUserStatus(id: Long, dto: ChangeStatusRequestDTO) : Result<Unit> {
+    override suspend fun updateUserStatus(id: Long, dto: ChangeStatusRequestDTO): Result<Unit> {
         return try {
             val currentUser =
                 _userData.value ?: return Result.failure(Exception("current user is null"))
@@ -162,11 +189,12 @@ class UserRepositoryImpl @Inject constructor(
 
                 val data = response.body()
 
-                if (data == null){
+                if (data == null) {
                     return Result.failure(Exception("Response body is null"))
                 }
                 val updatedUser = if (dto.statusOfUser == StatusOfUser.MASTER) {
                     currentUser.toMaster(
+                        masterId = data.masterId?:0,
                         statusOfUser = StatusOfUser.MASTER
                     ).copy(
                         experienceInYears = data.experienceInYears ?: 0,
@@ -197,7 +225,7 @@ class UserRepositoryImpl @Inject constructor(
             } else {
                 Result.failure(Exception("Network error"))
             }
-        } catch (e: Exception){
+        } catch (e: Exception) {
             Result.failure(Exception(e.message))
         }
 

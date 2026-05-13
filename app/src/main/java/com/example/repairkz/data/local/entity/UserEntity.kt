@@ -10,7 +10,7 @@ import com.example.repairkz.common.models.User
 
 @Entity("user")
 data class UserEntity(
-    @PrimaryKey(autoGenerate = true)
+    @PrimaryKey()
     val id: Long? = 0,
     val userPhotoUrl: String?,
     val firstName: String,
@@ -36,6 +36,7 @@ data class UserEntity(
     fun toMaster(masterEntity: MasterEntity?): Master {
         return Master(
             id = this.id ?: 0,
+            masterId = masterEntity?.masterId?:0,
             userPhotoUrl = this.userPhotoUrl,
             firstName = this.firstName,
             lastName = this.lastName,
@@ -46,7 +47,6 @@ data class UserEntity(
             experienceInYears = masterEntity?.experienceInYears?:0,
             description = masterEntity?.description?: "",
             masterSpecialization = masterEntity?.masterSpecialization?: MasterSpetializationsEnum.UNKNOWN,
-            services = masterEntity?.services?: emptyList()
         )
     }
 }

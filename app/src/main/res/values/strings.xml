@@ -149,9 +149,14 @@
     <string name="to_reject">Отклонить</string>
     <string name="master_data">Профессиональные данные</string>
     <string name="user_data">Пользовательские данные</string>
+    <string name="services">Услуги</string>
     <string name="number">Номер телефона:</string>
     <string name="address">Адрес:</string>
     <string name="email">Почта:</string>
+    <string name="price_in_tenge">Цена в ₸</string>
+    <string name="service_name">Название</string>
+    <string name="edit">Редактировать</string>
+    <string name="delete">Удаление</string>
 
 
 

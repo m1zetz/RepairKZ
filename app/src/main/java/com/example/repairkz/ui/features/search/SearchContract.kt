@@ -57,5 +57,5 @@ sealed class FilterIntent{
 sealed interface SearchEffects {
     object NavigateBack : SearchEffects
 
-    data class NavigateToUserInfo(val id: Long) : SearchEffects
+    data class NavigateToMasterInfo(val id: Long) : SearchEffects
 }

@@ -15,7 +15,6 @@ class OrderRepositoryImpl @Inject constructor(
     override suspend fun getMasterOrderHistory(userId: Long): Result<List<MasterHistoryItemDTO>> {
         return try {
             val response = orderApi.getMasterOrderHistory(userId)
-            Log.d("NOTIF", "master history response code: ${response.code()}")
             if(response.isSuccessful) {
                 val body = response.body()
                 return Result.success(body?: emptyList())

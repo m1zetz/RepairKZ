@@ -39,6 +39,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.repairkz.Navigation.Routes.masterInfoRoute
 import com.example.repairkz.Navigation.Routes.userInfoRoute
 import com.example.repairkz.common.enums.CitiesEnum
 import com.example.repairkz.common.enums.MasterSpetializationsEnum
@@ -63,8 +64,8 @@ fun SearchScreen(navController: NavController, searchViewModel: SearchViewModel)
         searchViewModel.searchEffectsChannel.collect { effect ->
             when (effect) {
                 is SearchEffects.NavigateBack -> navController.popBackStack()
-                is SearchEffects.NavigateToUserInfo -> {
-                    navController.navigate(userInfoRoute(effect.id))
+                is SearchEffects.NavigateToMasterInfo -> {
+                    navController.navigate(masterInfoRoute(effect.id))
                 }
             }
         }

@@ -59,7 +59,9 @@ class SignInViewModel @Inject constructor(
                                     isLoading = true
                                 )
                             }
+
                             val response = loginUseCase(LoginDTO(_signInState.value.email, _signInState.value.password))
+
                             response.onSuccess {loginResponseDTO ->
                                 val dto = loginResponseDTO.user
                                 val user = User(
@@ -72,13 +74,14 @@ class SignInViewModel @Inject constructor(
                                     status = dto.status,
                                     city = dto.city
                                 )
+                                Log.d("LOGIN", "master id from response: ${loginResponseDTO.master?.masterId}")
                                 saveUserToLocalUseCase(
                                     when(loginResponseDTO.user.status){
                                         StatusOfUser.CLIENT -> {
                                             user
                                         }
                                         StatusOfUser.MASTER -> {
-                                            user.toMaster().copy(
+                                            user.toMaster(masterId = loginResponseDTO.master?.masterId?:0).copy(
                                                 masterSpecialization = loginResponseDTO.master?.masterSpecialization
                                                     ?: MasterSpetializationsEnum.UNKNOWN,
                                                 description = loginResponseDTO.master?.description

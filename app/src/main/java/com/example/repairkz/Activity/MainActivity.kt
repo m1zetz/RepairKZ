@@ -1,6 +1,5 @@
 package com.example.repairkz.Activity
 
-import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
@@ -9,22 +8,11 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.only
-import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
@@ -42,6 +30,8 @@ import com.example.repairkz.ui.MainWindow
 import com.example.repairkz.ui.features.auth.signIn.SignIn
 import com.example.repairkz.ui.features.auth.signIn.SignInViewModel
 import com.example.repairkz.ui.features.main.MainViewModel
+import com.example.repairkz.ui.features.masterInfo.MasterInfo
+import com.example.repairkz.ui.features.masterInfo.MasterInfoViewModel
 import com.example.repairkz.ui.features.notifiacton.NotificationViewModel
 import com.example.repairkz.ui.features.search.SearchScreen
 import com.example.repairkz.ui.features.search.SearchViewModel
@@ -117,6 +107,18 @@ class MainActivity : ComponentActivity() {
                                 )
                             ){
                                 OrderRegistration(navController = navController)
+                            }
+                            composable(
+                                route = "${Routes.MASTER_INFO}?userId={userId}",
+                                arguments = listOf(
+                                    navArgument("userId") {
+                                        type = NavType.Companion.LongType
+                                        defaultValue = 0
+                                    }
+                                )
+                            ){
+                                val masterInfoViewModel: MasterInfoViewModel = hiltViewModel()
+                                MasterInfo(masterInfoViewModel)
                             }
                         }
                     }

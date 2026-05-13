@@ -10,7 +10,8 @@ object Routes {
     const val SEARCH = "search"
     const val CAMERA = "camera"
     const val DETAILS = "details"
-    const val USERINFO = "user_info"
+    const val USER_INFO = "user_info"
+    const val MASTER_INFO = "master_info"
     const val SIGN_IN_SCREEN = "sign_in"
     const val SIGN_UP_SCREEN = "sign_up"
     const val PROFILE_GROUP = "profile_group"
@@ -22,9 +23,16 @@ object Routes {
 
     fun userInfoRoute(id:Long?): String{
         return if(id!=null){
-            "${USERINFO}?userId=${id}"
+            "${USER_INFO}?userId=${id}"
         } else{
-            USERINFO
+            USER_INFO
+        }
+    }
+    fun masterInfoRoute(id:Long?): String{
+        return if(id!=null){
+            "${MASTER_INFO}?userId=${id}"
+        } else{
+            USER_INFO
         }
     }
 }

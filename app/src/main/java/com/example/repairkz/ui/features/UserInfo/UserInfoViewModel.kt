@@ -1,22 +1,23 @@
 package com.example.repairkz.ui.features.UserInfo
 
 import android.content.Context
-import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.repairkz.common.enums.MasterSpetializationsEnum
 import com.example.repairkz.common.models.Master
-import com.example.repairkz.common.models.User
+import com.example.repairkz.data.remote.dto.MasterServiceDTO
 import com.example.repairkz.domain.useCases.files.PreparePhotoPartUseCase
 import com.example.repairkz.domain.useCases.files.SaveToInternalUseCase
+import com.example.repairkz.domain.useCases.services.CreateServiceUseCase
+import com.example.repairkz.domain.useCases.services.UpdateServiceUseCase
+import com.example.repairkz.domain.useCases.services.DeleteServiceUseCase
+import com.example.repairkz.domain.useCases.services.GetServicesUseCase
 import com.example.repairkz.domain.useCases.userData.GetProfileTypeUseCase
 import com.example.repairkz.domain.useCases.userData.GetUserDataUseCase
 import com.example.repairkz.domain.useCases.userData.UpdateUserDataUseCase
 import com.example.repairkz.domain.useCases.userData.UpdateUserPhotoUseCase
 import com.example.repairkz.ui.features.UserInfo.UserEffects.*
-import com.example.repairkz.ui.theme.darkAccept
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject
@@ -31,46 +32,26 @@ import kotlinx.coroutines.withContext
 
 @HiltViewModel
 class UserInfoViewModel @Inject constructor(
-    savedStateHandle: SavedStateHandle,
-    private val getUserDataUseCase: GetUserDataUseCase,
-    private val getProfileTypeUseCase: GetProfileTypeUseCase,
+
     private val updateUserDataUseCase: UpdateUserDataUseCase,
     private val saveToInternalUseCase: SaveToInternalUseCase,
     private val updateUserPhotoUseCase: UpdateUserPhotoUseCase,
     private val preparePhotoPartUseCase: PreparePhotoPartUseCase,
+    private val createServiceUseCase: CreateServiceUseCase,
+    private val deleteServiceUseCase: DeleteServiceUseCase,
+    private val updateServiceUseCase: UpdateServiceUseCase,
     @ApplicationContext private val context: Context,
 ) : ViewModel() {
 
 
-    private val _uiState = MutableStateFlow<UserState>(UserState.Loading)
+    private val _uiState = MutableStateFlow<UserState>(UserState())
     val uiState = _uiState.asStateFlow()
 
     private val _channel = Channel<UserEffects>(Channel.BUFFERED)
     val channel = _channel.receiveAsFlow()
 
-    val comingId: Long? = try {
-        savedStateHandle.get<Long>("userId")
-    } catch (e: Exception) {
-        savedStateHandle.get<String>("userId")?.toLongOrNull()
-    }
-
     fun handleIntent(intent: UserIntent) {
         when (intent) {
-
-            is UserIntent.MasterProfileIntent.AddToFavorites -> {
-                Log.d("Сообщение", "Добавлен мастер в избранное с айди ${intent.masterId}")
-            }
-
-            is UserIntent.MasterProfileIntent.DoOrder -> {
-                viewModelScope.launch {
-                    _channel.send(NavigateToOrderRegistration(intent.masterId))
-                }
-
-            }
-
-            is UserIntent.MasterProfileIntent.Report -> {
-                Log.d("Сообщение", "Репорт на мастера с айди ${intent.masterId}")
-            }
 
             is UserIntent.ChangeAvatar -> {
                 viewModelScope.launch {
@@ -79,44 +60,33 @@ class UserInfoViewModel @Inject constructor(
 
             }
 
-
             UserIntent.CloseSheet -> {
                 _uiState.update { currentState ->
-                    if (currentState is UserState.Success) {
-                        currentState.copy(avatarSheetState = false)
-                    } else {
-                        currentState
-                    }
+                    currentState.copy(
+                        avatarSheetState = false
+                    )
                 }
             }
 
             UserIntent.OpenSheet -> {
                 _uiState.update { currentState ->
-                    if (currentState is UserState.Success) {
-                        currentState.copy(avatarSheetState = true)
-                    } else {
-                        currentState
-                    }
+                    currentState.copy(
+                        avatarSheetState = true
+                    )
                 }
             }
 
             is UserIntent.GetPhotoFromMedia -> {
                 _uiState.update { currentState ->
-                    if (currentState is UserState.Success) {
-                        currentState.copy(
-                            pendingUri = intent.uri
-                        )
-                    } else {
-                        currentState
-                    }
-
+                    currentState.copy(
+                        pendingUri = intent.uri
+                    )
                 }
             }
 
             UserIntent.CancelPhoto -> {
-                val currentState = _uiState.value
-                if (currentState is UserState.Success) {
-                    _uiState.value = currentState.copy(
+                _uiState.update { currentState ->
+                    currentState.copy(
                         pendingUri = null
                     )
                 }
@@ -125,28 +95,26 @@ class UserInfoViewModel @Inject constructor(
             is UserIntent.ConfirmPhoto -> {
                 viewModelScope.launch {
                     val localUri = saveToInternalUseCase(intent.uri)
-                    val currentState = _uiState.value
-                    if (currentState !is UserState.Success) return@launch
-                    _uiState.value = currentState.copy(
-                        newAvatarData = localUri,
-                        pendingUri = null,
-                        isPhotoSaving = true
-                    )
-                    val user = getUserDataUseCase()
+                    _uiState.update { currentState ->
+                        currentState.copy(
+                            newAvatarData = localUri,
+                            pendingUri = null,
+                            isPhotoSaving = true
+                        )
+                    }
+                    val user = _uiState.value.user
                     user?.let {
                         val photo = preparePhotoPartUseCase(context, intent.uri)
                         photo?.let {
-                            val result = withContext(NonCancellable) {
+                            withContext(NonCancellable) {
                                 updateUserPhotoUseCase(user.id, photo)
                             }
-                            result.onSuccess {
-                                defineUser(comingId)
+                            _uiState.update { currentState ->
+                                currentState.copy(
+                                    isPhotoSaving = false
+                                )
                             }
-                            val newState = _uiState.value
-                            if (newState !is UserState.Success) return@launch
-                            _uiState.value = newState.copy(
-                                isPhotoSaving = false
-                            )
+
                         }
                     }
 
@@ -154,9 +122,8 @@ class UserInfoViewModel @Inject constructor(
             }
 
             is UserIntent.CurrentMasterIntent.ChangeDescription -> {
-                val state = _uiState.value
-                if (state is UserState.Success) {
-                    _uiState.value = state.copy(
+                _uiState.update { currentState ->
+                    currentState.copy(
                         descriptionDraft = intent.description
                     )
                 }
@@ -164,9 +131,8 @@ class UserInfoViewModel @Inject constructor(
             }
 
             is UserIntent.CurrentMasterIntent.ChangeExperience -> {
-                val state = _uiState.value
-                if (state is UserState.Success) {
-                    _uiState.value = state.copy(
+                _uiState.update { currentState ->
+                    currentState.copy(
                         experienceDraft = intent.experience
                     )
                 }
@@ -174,12 +140,10 @@ class UserInfoViewModel @Inject constructor(
             }
 
             is UserIntent.CurrentMasterIntent.ChangeSpecialization -> {
-                val state = _uiState.value
-                if (state is UserState.Success) {
-                    _uiState.value = state.copy(
+                _uiState.update { currentState ->
+                    currentState.copy(
                         specDraft = intent.spec
                     )
-
                 }
 
 
@@ -187,10 +151,9 @@ class UserInfoViewModel @Inject constructor(
 
 
             is UserIntent.ChangeNumber -> {
-                val state = _uiState.value
-                if (state is UserState.Success) {
-                    _uiState.value = state.copy(
-                        number = intent.number
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        numberDraft = intent.number
                     )
                 }
 
@@ -198,39 +161,87 @@ class UserInfoViewModel @Inject constructor(
             }
 
             is UserIntent.ChangeCity -> {
-                val state = _uiState.value
-                if (state is UserState.Success) {
-                    _uiState.value = state.copy(
-                        city = intent.city
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        cityDraft = intent.city
                     )
                 }
 
             }
 
             is UserIntent.ChangeEmail -> {
-                val state = _uiState.value
-                if (state is UserState.Success) {
-                    _uiState.value = state.copy(
-                        email = intent.email
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        emailDraft = intent.email
                     )
                 }
             }
 
             UserIntent.SaveChanges -> {
                 viewModelScope.launch {
-                    val state = _uiState.value
-                    if (state is UserState.Success) {
-                        _uiState.value = state.copy(isSaving = true)
-                        val userResult = updateProfile(state)
-                        if (userResult.isSuccess) {
-                            defineUser(comingId)
-                        } else {
-                            _uiState.value = state.copy(isSaving = false)
-                        }
-
-                    }
+                    updateProfile()
                 }
 
+            }
+
+            is UserIntent.CurrentMasterIntent.CreateService -> {
+                viewModelScope.launch {
+                    val state = _uiState.value
+                    val user = _uiState.value.user
+                    if(user !is Master) return@launch
+                    val dto = MasterServiceDTO(
+                        id = null,
+                        masterId = user.masterId,
+                        service = state.serviceDraft,
+                        price = state.priceDraft.toIntOrNull()?:0,
+                        position = null
+                    )
+                   createServiceUseCase(dto)
+                }
+
+            }
+
+            is UserIntent.CurrentMasterIntent.DeleteService -> {
+                viewModelScope.launch {
+                    deleteServiceUseCase(intent.id)
+                }
+
+            }
+            is UserIntent.CurrentMasterIntent.UpdateService -> {
+                viewModelScope.launch {
+                    //потом добавлю
+                }
+
+            }
+
+            UserIntent.CurrentMasterIntent.CloseCreate -> {
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        showCreate = false
+                    )
+                }
+            }
+            UserIntent.CurrentMasterIntent.OpenCreate -> {
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        showCreate = true
+                    )
+                }
+            }
+
+            is UserIntent.CurrentMasterIntent.ChangePriceDraft -> {
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        priceDraft = intent.value
+                    )
+                }
+            }
+            is UserIntent.CurrentMasterIntent.ChangeServiceDraft -> {
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        serviceDraft = intent.value
+                    )
+                }
             }
         }
 
@@ -239,37 +250,32 @@ class UserInfoViewModel @Inject constructor(
 
 
 
-    private suspend fun updateProfile(state: UserState.Success): Result<Unit> {
-
-        val type = state.userTypes
-        if (type !is UserTypes.IsCurrentUser) return Result.failure(Exception("The state is not success"))
-        val user = type.user
-
-        val finalUser = if (type.isMaster && user is Master) {
+    private suspend fun updateProfile(): Result<Unit> {
+        val state = _uiState.value
+        val user = state.user?:return Result.failure(Exception("current user is null"))
+        val finalUser = if (user is Master) {
             user.copy(
-                phoneNumber = state.number,
-                email = state.email,
-                city = state.city,
-                description = state.descriptionDraft ?: user.description,
-                experienceInYears = state.experienceDraft?.toIntOrNull() ?: user.experienceInYears,
-                masterSpecialization = state.specDraft ?: user.masterSpecialization
+                phoneNumber = state.numberDraft,
+                email = state.emailDraft,
+                city = state.cityDraft,
+                description = state.descriptionDraft,
+                experienceInYears = state.experienceDraft.toIntOrNull() ?: user.experienceInYears,
+                masterSpecialization = state.specDraft
             )
         } else {
             user.copy(
-                phoneNumber = state.number,
-                email = state.email,
-                city = state.city
+                phoneNumber = state.numberDraft,
+                email = state.emailDraft,
+                city = state.cityDraft
             )
         }
         return updateUserDataUseCase(finalUser)
     }
 
     private fun checkChanges(state: UserState) : Boolean {
-        if (state !is UserState.Success) return false
-        val type = state.userTypes
-        if (type !is UserTypes.IsCurrentUser) return false
-        val user = type.user
-        val userDataChanges = state.number.trim() != user.phoneNumber.trim() || state.city != user.city
+        val user = state.user
+        if (user == null) return false
+        val userDataChanges = state.numberDraft.trim() != user.phoneNumber.trim() || state.cityDraft != user.city
         val masterDataChanges = if (user is Master) {
             state.specDraft != user.masterSpecialization ||
                     (state.experienceDraft.toIntOrNull() ?: 0) != user.experienceInYears ||
@@ -280,35 +286,6 @@ class UserInfoViewModel @Inject constructor(
         return userDataChanges || masterDataChanges
     }
 
-    init {
-        defineUser(comingId)
-        viewModelScope.launch {
-            uiState.collect {state ->
-                if(state is UserState.Success){
-                    val shouldShow = checkChanges(state)
-                    if(state.showSave != shouldShow){
-                        _uiState.value = state.copy(showSave = shouldShow)
-                    }
-                }
-
-            }
-        }
-    }
-
-    fun defineUser(id: Long?) {
-        viewModelScope.launch {
-            _uiState.value = UserState.Loading
-            getProfileTypeUseCase(id).fold(
-                onSuccess = { type ->
-                    _uiState.value = type.toSuccessState()
-                },
-                onFailure = {
-                    _uiState.value = UserState.Error(it.message.toString())
-                }
-            )
-        }
-
-    }
 
 }
 

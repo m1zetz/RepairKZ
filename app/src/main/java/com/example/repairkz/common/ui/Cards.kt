@@ -361,8 +361,7 @@ fun ShortInput(
 fun ProfileMainActions(
     @StringRes titleResId: Int,
     icon: ImageVector,
-    action: UserIntent,
-    onAction: (UserIntent) -> Unit,
+    onAction: () -> Unit,
     modifier: Modifier,
 ) {
     Card(
@@ -372,7 +371,7 @@ fun ProfileMainActions(
             .height(110.dp)
             .shadow(6.dp, RoundedCornerShape(24.dp)),
         onClick = {
-            onAction(action)
+            onAction()
         }
     ) {
         Column(
