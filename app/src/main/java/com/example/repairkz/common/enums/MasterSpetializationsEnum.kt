@@ -10,7 +10,7 @@ enum class MasterSpetializationsEnum(@StringRes override val resID: Int) : Displ
     ELECTRIC(R.string.electrician),
     PLUMBER(R.string.plumber),
     HANDYMAN(R.string.handyman),
-    СOMPUTER(R.string.computer),
+    COMPUTER(R.string.computer),
     FURNITURE(R.string.furniture);
 
     companion object{

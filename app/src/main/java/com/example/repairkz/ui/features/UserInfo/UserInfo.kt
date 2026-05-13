@@ -185,7 +185,7 @@ fun UserInfo(userInfoViewModel: UserInfoViewModel, navController: NavController)
                                 photoUrl = user.userPhotoUrl ?: "",
                                 firstName = user.firstName,
                                 lastName = user.lastName,
-                                isMe = false
+                                isMe = true
                             ),
                             changeAvatarIntent = { userInfoViewModel.handleIntent(UserIntent.OpenSheet) },
                             isLoading = state.isPhotoSaving

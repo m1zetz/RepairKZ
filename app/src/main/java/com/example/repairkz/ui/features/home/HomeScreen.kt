@@ -68,7 +68,7 @@ fun HomeScreen(navController: NavController){
         listOf(
             CardFill(Icons.Default.WaterDrop, MasterSpetializationsEnum.PLUMBER),
             CardFill(Icons.Default.Bolt, MasterSpetializationsEnum.ELECTRIC),
-            CardFill(Icons.Default.Computer, MasterSpetializationsEnum.СOMPUTER),
+            CardFill(Icons.Default.Computer, MasterSpetializationsEnum.COMPUTER),
             CardFill(Icons.Default.Handyman, MasterSpetializationsEnum.HANDYMAN),
             CardFill(Icons.Default.TableBar, MasterSpetializationsEnum.FURNITURE)
         )

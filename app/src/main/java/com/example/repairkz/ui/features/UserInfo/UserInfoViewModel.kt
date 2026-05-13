@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.repairkz.common.enums.CitiesEnum
 import com.example.repairkz.common.models.Master
+import com.example.repairkz.common.models.User
 import com.example.repairkz.data.remote.dto.MasterServiceDTO
 import com.example.repairkz.domain.useCases.files.PreparePhotoPartUseCase
 import com.example.repairkz.domain.useCases.files.SaveToInternalUseCase
@@ -55,11 +56,30 @@ class UserInfoViewModel @Inject constructor(
         viewModelScope.launch {
             getUserDataUseCase().collect {user ->
                 _uiState.update { currentState ->
-                    currentState.copy(
+                    var state = currentState.copy(
                         user = user,
                         numberDraft = user?.phoneNumber ?: "",
                         cityDraft = user?.city ?: CitiesEnum.UNKNOWN,
-                        emailDraft = user?.email ?: ""
+                        emailDraft = user?.email ?: "",
+                    )
+                    if(user is Master){
+                        state = state.copy(
+                            descriptionDraft = user.description,
+                            experienceDraft = user.experienceInYears.toString(),
+                            specDraft = user.masterSpecialization
+                        )
+                    }
+                    state
+                }
+            }
+        }
+    }
+    init {
+        viewModelScope.launch {
+            _uiState.collect { it ->
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        showSave = checkChanges(currentState)
                     )
                 }
             }
@@ -289,16 +309,24 @@ class UserInfoViewModel @Inject constructor(
     }
 
     private fun checkChanges(state: UserState) : Boolean {
-        val user = state.user
-        if (user == null) return false
+        val user = state.user ?: return false
         val userDataChanges = state.numberDraft.trim() != user.phoneNumber.trim() || state.cityDraft != user.city
+        Log.d("CHECK", "${state.numberDraft.trim()} | ${user.phoneNumber.trim()}")
+        Log.d("CHECK", "${state.cityDraft} | ${user.city}")
         val masterDataChanges = if (user is Master) {
             state.specDraft != user.masterSpecialization ||
                     (state.experienceDraft.toIntOrNull() ?: 0) != user.experienceInYears ||
                     state.descriptionDraft != user.description
+
         } else {
             false
         }
+        if (user is Master){
+            Log.d("CHECK", "${state.specDraft} | ${user.masterSpecialization}")
+            Log.d("CHECK", "${state.experienceDraft} | ${user.experienceInYears}")
+            Log.d("CHECK", "${state.descriptionDraft} | ${user.description}")
+        }
+
         return userDataChanges || masterDataChanges
     }
 

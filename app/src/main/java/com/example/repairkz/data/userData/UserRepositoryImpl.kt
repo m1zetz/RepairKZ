@@ -36,17 +36,19 @@ class UserRepositoryImpl @Inject constructor(
 ) : UserRepository {
 
     override val userData: Flow<User?> = userDao.getUser()
-        .onEach { Log.d("REPO", "User flow emitted") } // Лог здесь
         .combine(
-            serviceDao.getServices().onEach { Log.d("REPO", "Services flow emitted") } // И здесь
-        ){ data, services ->
-        Log.d("REPO", "combine triggered, services count: ${services.size}")
-        val userEntity = data?.user ?: return@combine null
-        when (userEntity.status) {
-            StatusOfUser.MASTER -> userEntity.toMaster(data.master, services = services)
-            else -> userEntity.toUser()
+            serviceDao.getServices()
+        ) { data, services ->
+            val userEntity = data?.user ?: return@combine null
+            when (userEntity.status) {
+                StatusOfUser.MASTER -> {
+                    Log.d("REPO", data.master?.masterSpecialization.toString())
+                    userEntity.toMaster(data.master, services = services)
+                }
+
+                else -> userEntity.toUser()
+            }
         }
-    }
 
 
     override suspend fun saveUserToLocal(user: User): Result<Unit> {
@@ -114,6 +116,7 @@ class UserRepositoryImpl @Inject constructor(
                     masterDao.saveMaster(
                         MasterEntity(
                             userId = finalUser.id,
+                            masterId = finalUser.masterId,
                             description = finalUser.description,
                             experienceInYears = finalUser.experienceInYears,
                             masterSpecialization = finalUser.masterSpecialization
