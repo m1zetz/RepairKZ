@@ -42,7 +42,7 @@ import androidx.navigation.NavController
 import com.example.repairkz.Activity.ActivityIntent
 import com.example.repairkz.Activity.MainActivityViewModel
 import com.example.repairkz.Navigation.Routes
-import com.example.repairkz.Navigation.Routes.userInfoRoute
+import com.example.repairkz.Navigation.Routes.USER_INFO
 import com.example.repairkz.common.enums.StatusOfUser
 import com.example.repairkz.common.ui.ProfileString
 import com.example.repairkz.common.ui.StandartString
@@ -59,7 +59,7 @@ fun SettingsScreen(settingsViewModel: SettingsViewModel, activityViewModel: Main
         settingsViewModel.settingEffectsChannel.collect { effect ->
             when (effect) {
                 is SettingsEffect.NavigateToUserInfo -> {
-                    navController.navigate(userInfoRoute(effect.id))
+                    navController.navigate(USER_INFO)
                 }
 
                 SettingsEffect.NavigateToLogin -> {
@@ -72,150 +72,130 @@ fun SettingsScreen(settingsViewModel: SettingsViewModel, activityViewModel: Main
             }
         }
     }
-    when (val state = uiState) {
-        is SettingsState.Success -> {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
-            ) {
-                ProfileString(
-                    state.userData,
-                    descriptionPrefix = stringResource(R.string.your_status),
-                    intent = { settingsViewModel.handleIntent(SettingIntent.ToUserScreen(state.userData.id)) },
+    if(!uiState.isLoading && uiState.user != null) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+        ) {
+            ProfileString(
+                uiState.user!!,
+                descriptionPrefix = stringResource(R.string.your_status),
+                intent = { settingsViewModel.handleIntent(SettingIntent.ToUserScreen) },
 
-                    )
-                StandartString(
-                    R.string.payment_system,
-                    intent = {},
-                    icon = Icons.Default.AddCard
                 )
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 8.dp, vertical = 8.dp),
-                    onClick = {
-                        activityViewModel.handleIntent(ActivityIntent.ChangeTheme(!activityState.isDarkTheme))
-                    }
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .padding(12.dp)
-                            .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ){
-                        Row(
-                            modifier = Modifier,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-
-                            Icon(Icons.Default.InvertColors, null)
-                            Text(
-                                text = stringResource(R.string.themes),
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                        }
-                        Row(
-                            modifier = Modifier,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ){
-                            Icon(Icons.Default.WbSunny, null)
-                            Switch(
-                                checked = activityState.isDarkTheme,
-                                onCheckedChange = null
-                            )
-                            Icon(Icons.Default.Nightlight, null)
-                        }
-                    }
-
+            StandartString(
+                R.string.payment_system,
+                intent = {},
+                icon = Icons.Default.AddCard
+            )
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp, vertical = 8.dp),
+                onClick = {
+                    activityViewModel.handleIntent(ActivityIntent.ChangeTheme(!activityState.isDarkTheme))
                 }
-
-                val switchConfig = when(state.currentStatus){
-                    StatusOfUser.CLIENT -> {
-                        ChangeStatusConfig(
-                            Icons.Default.Build,
-                            R.string.become_a_master,
-                            StatusOfUser.MASTER
-                        )
-                    }
-                    StatusOfUser.MASTER -> {
-                        ChangeStatusConfig(
-                            Icons.Default.BackHand,
-                            R.string.become_a_client,
-                            StatusOfUser.CLIENT
-                        )
-                    }
-                }
-                Card(
+            ) {
+                Row(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 8.dp, vertical = 8.dp),
-                    onClick = {
-                        settingsViewModel.handleIntent(SettingIntent.SwitchStatus(switchConfig.status))
-                    }
+                        .padding(12.dp)
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ){
                     Row(
-                        modifier = Modifier
-                            .padding(12.dp)
-                            .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+
+                        Icon(Icons.Default.InvertColors, null)
+                        Text(
+                            text = stringResource(R.string.themes),
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                    Row(
+                        modifier = Modifier,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ){
-                        Row(
-                            modifier = Modifier,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ){
-                            Icon(switchConfig.icon, null)
-                            Text(
-                                text = stringResource(switchConfig.textRes),
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                        }
-                        Row(
-                            modifier = Modifier,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ){
-                            if(state.isChangeStatusLoading){
-                                CircularProgressIndicator()
-                            }
-                        }
+                        Icon(Icons.Default.WbSunny, null)
+                        Switch(
+                            checked = activityState.isDarkTheme,
+                            onCheckedChange = null
+                        )
+                        Icon(Icons.Default.Nightlight, null)
+                    }
+                }
 
+            }
+
+            val switchConfig = when(uiState.user!!.status){
+                StatusOfUser.CLIENT -> {
+                    ChangeStatusConfig(
+                        Icons.Default.Build,
+                        R.string.become_a_master,
+                        StatusOfUser.MASTER
+                    )
+                }
+                StatusOfUser.MASTER -> {
+                    ChangeStatusConfig(
+                        Icons.Default.BackHand,
+                        R.string.become_a_client,
+                        StatusOfUser.CLIENT
+                    )
+                }
+            }
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp, vertical = 8.dp),
+                onClick = {
+                    settingsViewModel.handleIntent(SettingIntent.SwitchStatus(switchConfig.status))
+                }
+            ){
+                Row(
+                    modifier = Modifier
+                        .padding(12.dp)
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ){
+                    Row(
+                        modifier = Modifier,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ){
+                        Icon(switchConfig.icon, null)
+                        Text(
+                            text = stringResource(switchConfig.textRes),
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                    Row(
+                        modifier = Modifier,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ){
+                        if(uiState.isChangeStatusLoading){
+                            CircularProgressIndicator()
+                        }
                     }
 
                 }
 
-                StandartString(
-                    R.string.exit,
-                    intent = {settingsViewModel.handleIntent(SettingIntent.Exit)},
-                    color = MaterialTheme.colorScheme.error,
-                    icon = Icons.Default.ExitToApp
-                )
-
             }
-        }
 
-        is SettingsState.Error -> {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(state.error.toMessage(context))
-            }
-        }
+            StandartString(
+                R.string.exit,
+                intent = {settingsViewModel.handleIntent(SettingIntent.Exit)},
+                color = MaterialTheme.colorScheme.error,
+                icon = Icons.Default.ExitToApp
+            )
 
-        SettingsState.Loading -> {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                CircularProgressIndicator()
-            }
         }
+    } else{
+        CircularProgressIndicator()
     }
 
 }

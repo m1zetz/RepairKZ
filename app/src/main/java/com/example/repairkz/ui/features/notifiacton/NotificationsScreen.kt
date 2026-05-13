@@ -36,7 +36,7 @@ fun NotificationsScreen(notificationViewModel: NotificationViewModel) {
     val sheetState = rememberModalBottomSheetState()
 
     LaunchedEffect(Unit) {
-        notificationViewModel.handleIntent(NotificationIntent.GetNotifications)
+        notificationViewModel.handleIntent(GetNotifications)
     }
 
     Box(

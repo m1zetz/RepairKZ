@@ -7,10 +7,13 @@ import com.example.repairkz.data.remote.dto.order.ChangeOrderStateDTO
 import com.example.repairkz.data.remote.dto.order.ClientHistoryItemDTO
 import com.example.repairkz.data.remote.dto.order.MasterHistoryItemDTO
 import com.example.repairkz.data.remote.dto.order.OrderRequestDTO
+import com.example.repairkz.data.userData.UserRepository
+import kotlinx.coroutines.flow.firstOrNull
 import javax.inject.Inject
 
 class OrderRepositoryImpl @Inject constructor(
-    private val orderApi: OrderApi
+    private val orderApi: OrderApi,
+    private val userRepository: UserRepository
 ) : OrderRepository {
     override suspend fun getMasterOrderHistory(userId: Long): Result<List<MasterHistoryItemDTO>> {
         return try {

@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -34,7 +35,7 @@ class SettingsViewModel @Inject constructor(
     private val dataStoreManager: DataStoreManager,
     private val roomDB: RepairDataBase
 ) : ViewModel() {
-    private var _uiState = MutableStateFlow<SettingsState>(SettingsState.Loading)
+    private var _uiState = MutableStateFlow<SettingsState>(SettingsState())
     val uiState = _uiState.asStateFlow()
 
     private val _settingEffectsChannel = Channel<SettingsEffect>(Channel.BUFFERED)
@@ -42,47 +43,36 @@ class SettingsViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            getUserDataUseCase()
+            getUserDataUseCase().collect { user ->
+                _uiState.update {currentState ->
+                    currentState.copy(
+                        user = user
+                    )
+                }
+            }
         }
     }
 
-    init {
-        userRepository.userData.onEach { user ->
-            if (user != null) {
-                _uiState.value = SettingsState.Success(user, user.status, true)
-            } else {
-                _uiState.value = SettingsState.Error(SettingsError.UserIsNotRegistered)
-            }
-        }.launchIn(viewModelScope)
-
-    }
 
     fun handleIntent(intent: SettingIntent) {
         when (intent) {
             is SettingIntent.ToUserScreen -> {
                 viewModelScope.launch {
-
-                    _settingEffectsChannel.send(NavigateToUserInfo(intent.id))
+                    _settingEffectsChannel.send(NavigateToUserInfo)
                 }
             }
 
             is SettingIntent.SwitchStatus -> {
                 viewModelScope.launch {
                     val currentState = _uiState.value
-                    if (currentState !is SettingsState.Success) return@launch
                     _uiState.value = currentState.copy(isChangeStatusLoading = true)
                     val result = switchUserStatus(intent.status)
                     result.onFailure {
-                        _settingEffectsChannel.send(SettingsEffect.ShowError(SettingsError.ChangeStatusError))
+                        _settingEffectsChannel.send(ShowError(SettingsError.ChangeStatusError))
                     }
                     val updatedState = _uiState.value
-                    if (updatedState is SettingsState.Success) {
-                        _uiState.value = updatedState.copy(isChangeStatusLoading = false)
-                    }
-
-
+                    _uiState.value = updatedState.copy(isChangeStatusLoading = false)
                 }
-
             }
 
             SettingIntent.Exit -> {
@@ -101,10 +91,7 @@ class SettingsViewModel @Inject constructor(
 
     private suspend fun switchUserStatus(newStatus: StatusOfUser) : Result<Unit>{
         val currentState = _uiState.value
-        if (currentState !is SettingsState.Success) {
-            return Result.failure(Exception("State is not Success"))
-        }
-        val user = currentState.userData
+        val user = currentState.user?: return Result.failure(Exception("current user is null"))
 
         val request = ChangeStatusRequestDTO(
             statusOfUser = newStatus,

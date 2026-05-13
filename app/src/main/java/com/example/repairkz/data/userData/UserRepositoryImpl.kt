@@ -20,7 +20,10 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import okhttp3.MultipartBody
 
@@ -31,29 +34,24 @@ class UserRepositoryImpl @Inject constructor(
     private val masterDao: MasterDao,
     private val userApi: UserApi,
 ) : UserRepository {
-    private val _userData: Flow<User?> = userDao.getUser().map { data ->
-        val userEntity = data?.user?:return@map null
-        when(userEntity){
-            StatusOfUser.MASTER -> userEntity.toMaster(data.master)
+
+    override val userData: Flow<User?> = userDao.getUser()
+        .onEach { Log.d("REPO", "User flow emitted") } // Лог здесь
+        .combine(
+            serviceDao.getServices().onEach { Log.d("REPO", "Services flow emitted") } // И здесь
+        ){ data, services ->
+        Log.d("REPO", "combine triggered, services count: ${services.size}")
+        val userEntity = data?.user ?: return@combine null
+        when (userEntity.status) {
+            StatusOfUser.MASTER -> userEntity.toMaster(data.master, services = services)
             else -> userEntity.toUser()
         }
     }
-    override val userData = _userData.asStateFlow()
 
-    override suspend fun fetchUserData(): User? {
 
-        val currentState = userData.value
-        return currentState
-    }
-
-    override suspend fun saveUserToLocal(user: User) {
-        try {
-            _userData.value = user
-            Log.d("SAVE", "userId: ${user.id}")
+    override suspend fun saveUserToLocal(user: User): Result<Unit> {
+        return try {
             userDao.saveUser(user.toEntity())
-            val saved = userDao.getUser()
-            Log.d("SAVE", "user in db: ${saved?.user?.id}")
-            Log.d("SAVE", "user saved, now saving master with userId: ${user.id}")
             if (user is Master) {
                 val entity = MasterEntity(
                     userId = user.id,
@@ -62,35 +60,17 @@ class UserRepositoryImpl @Inject constructor(
                     masterSpecialization = user.masterSpecialization,
                     description = user.description,
                 )
-                Log.d("SAVE", "is master: ${user is Master}")
                 val masterId = masterDao.saveMaster(entity)
-                Log.d("SAVE", "masterId saved: $masterId")
                 user.services.forEach { service ->
                     serviceDao.upsertMasterService(service.copy(masterId = masterId).toEntity())
                 }
             }
+            Result.success(Unit)
         } catch (e: Exception) {
-            Log.e("SAVE", "error: ${e.message}", e)
+            Result.failure(Exception(e.message))
         }
     }
 
-
-    override suspend fun getRoomData() : Flow<User?> {
-
-        val data = userDao.getUser()
-        val userEntity = data?.user
-        if (userEntity != null) {
-            _userData.value = when (userEntity.status) {
-                StatusOfUser.MASTER -> {
-                    val masterEntity = data.master
-                    userEntity.toMaster(masterEntity)
-                }
-
-                else -> userEntity.toUser()
-            }
-        }
-
-    }
 
     override suspend fun updateUserData(user: User): Result<Unit> {
 
@@ -129,8 +109,6 @@ class UserRepositoryImpl @Inject constructor(
                         city = userData.city
                     )
                 }
-
-                _userData.value = finalUser
                 userDao.saveUser(finalUser.toEntity())
                 if (finalUser is Master) {
                     masterDao.saveMaster(
@@ -160,15 +138,14 @@ class UserRepositoryImpl @Inject constructor(
             val response = userApi.updateUserPhoto(id, file)
             if (response.isSuccessful) {
                 val body = response.body()!!
-                val currentUser = _userData.value
+                val currentUser = userData.firstOrNull()
                     ?: return Result.failure(Exception("User not found"))
                 val updatedUser = if (currentUser is Master) {
                     currentUser.copyMaster(userPhotoUrl = body.photoUrl)
                 } else {
                     currentUser.copy(userPhotoUrl = body.photoUrl)
                 }
-                _userData.value = updatedUser
-                _userData.value = updatedUser
+                userDao.saveUser(updatedUser.toEntity())
                 userDao.updateUserPhoto(updatedUser.toEntity())
                 Result.success(body)
             } else {
@@ -183,7 +160,7 @@ class UserRepositoryImpl @Inject constructor(
     override suspend fun updateUserStatus(id: Long, dto: ChangeStatusRequestDTO): Result<Unit> {
         return try {
             val currentUser =
-                _userData.value ?: return Result.failure(Exception("current user is null"))
+                userData.firstOrNull() ?: return Result.failure(Exception("current user is null"))
             val response = userApi.updateStatus(id, dto)
             return if (response.isSuccessful) {
 
@@ -194,7 +171,7 @@ class UserRepositoryImpl @Inject constructor(
                 }
                 val updatedUser = if (dto.statusOfUser == StatusOfUser.MASTER) {
                     currentUser.toMaster(
-                        masterId = data.masterId?:0,
+                        masterId = data.masterId ?: 0,
                         statusOfUser = StatusOfUser.MASTER
                     ).copy(
                         experienceInYears = data.experienceInYears ?: 0,
@@ -205,8 +182,6 @@ class UserRepositoryImpl @Inject constructor(
                 } else {
                     currentUser.copy(statusOfUser = StatusOfUser.CLIENT)
                 }
-                _userData.value = updatedUser
-
                 userDao.saveUser(updatedUser.toEntity())
 
 
@@ -214,6 +189,7 @@ class UserRepositoryImpl @Inject constructor(
                     masterDao.saveMaster(
                         MasterEntity(
                             userId = updatedUser.id,
+                            masterId = updatedUser.masterId,
                             description = updatedUser.description,
                             experienceInYears = updatedUser.experienceInYears,
                             masterSpecialization = updatedUser.masterSpecialization

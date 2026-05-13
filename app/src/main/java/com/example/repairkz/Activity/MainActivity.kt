@@ -13,6 +13,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
@@ -23,10 +24,13 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.repairkz.Navigation.Routes
+import com.example.repairkz.Navigation.Routes.PROFILE_GROUP
 import com.example.repairkz.Navigation.photo.photoGraph
 import com.example.repairkz.Navigation.profile.profileGraph
 import com.example.repairkz.Navigation.registration.registrationGraph
 import com.example.repairkz.ui.MainWindow
+import com.example.repairkz.ui.features.UserInfo.UserInfo
+import com.example.repairkz.ui.features.UserInfo.UserInfoViewModel
 import com.example.repairkz.ui.features.auth.signIn.SignIn
 import com.example.repairkz.ui.features.auth.signIn.SignInViewModel
 import com.example.repairkz.ui.features.main.MainViewModel
@@ -67,7 +71,13 @@ class MainActivity : ComponentActivity() {
                             startDestination = if (state.startDestination == StartDestination.MainWindow) Routes.MAIN_WINDOW else Routes.SIGN_IN
                         ) {
                             registrationGraph(navController)
-                            profileGraph(navController)
+                            composable(
+                                route = Routes.USER_INFO
+                            ) {
+                                val userInfoViewModel: UserInfoViewModel = hiltViewModel()
+
+                                UserInfo(userInfoViewModel, navController)
+                            }
                             photoGraph(navController)
                             composable(Routes.SIGN_IN) {
                                 val signInViewModel: SignInViewModel = hiltViewModel()

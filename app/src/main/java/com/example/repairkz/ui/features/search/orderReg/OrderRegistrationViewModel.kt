@@ -84,9 +84,7 @@ class OrderRegistrationViewModel @Inject constructor(
             is OrderRegistrationIntent.CreateOrderRequest -> {
                 val orderData = _state.value
                 viewModelScope.launch {
-                    val user = getUserDataUseCase()
                     val requestDto = OrderRequestDTO(
-                        userId = user?.id,
                         masterId = masterId,
                         description = orderData.description,
                         clientPhoneNumber = orderData.clientNumber,

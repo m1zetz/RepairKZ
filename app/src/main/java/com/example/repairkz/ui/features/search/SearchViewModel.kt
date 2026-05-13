@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.repairkz.common.enums.MasterSpetializationsEnum
 import com.example.repairkz.domain.useCases.masterData.GetMastersUseCase
-import com.example.repairkz.domain.useCases.userData.GetProfileTypeUseCase
 import com.example.repairkz.ui.features.search.SearchEffects.*
 import com.example.repairkz.ui.features.search.SearchResult.*
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,7 +21,6 @@ import kotlinx.coroutines.launch
 class SearchViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val getMastersUseCase: GetMastersUseCase,
-    private val getProfileTypeUseCase: GetProfileTypeUseCase
 ) : ViewModel() {
 
     private val comingId: Int? = savedStateHandle.get<Int>("pattern")

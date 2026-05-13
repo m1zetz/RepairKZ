@@ -70,7 +70,6 @@ class MainActivityViewModel @Inject constructor(
                 val result = refreshToken()
                 result.onSuccess { token ->
                     dataStoreManager.saveToken(token)
-                    userRepository.getRoomData()
                     _state.update {state ->
                         state.copy(
                             startDestination = StartDestination.MainWindow
@@ -78,7 +77,6 @@ class MainActivityViewModel @Inject constructor(
                     }
                 }.onFailure { exception ->
                     if (isNetworkError(exception)) {
-                        userRepository.getRoomData()
                         _state.update { it.copy(startDestination = StartDestination.MainWindow) }
                     } else {
                         _state.update { it.copy(startDestination = StartDestination.Login) }

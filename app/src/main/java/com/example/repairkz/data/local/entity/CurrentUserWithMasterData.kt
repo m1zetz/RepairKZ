@@ -7,5 +7,7 @@ data class CurrentUserWithMasterData(
     @Embedded
     var user: UserEntity? = null,
     @Relation(parentColumn = "id", entityColumn = "user_id")
-    var master: MasterEntity? = null
+    var master: MasterEntity? = null,
+    @Relation(parentColumn = "id", entityColumn = "master_id", entity = ServiceEntity::class)
+    var services: List<ServiceEntity> = emptyList()
 )

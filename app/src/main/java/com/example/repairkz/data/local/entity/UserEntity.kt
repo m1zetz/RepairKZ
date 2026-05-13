@@ -33,7 +33,7 @@ data class UserEntity(
         )
     }
 
-    fun toMaster(masterEntity: MasterEntity?): Master {
+    fun toMaster(masterEntity: MasterEntity?, services: List<ServiceEntity> = emptyList()): Master {
         return Master(
             id = this.id ?: 0,
             masterId = masterEntity?.masterId?:0,
@@ -47,6 +47,7 @@ data class UserEntity(
             experienceInYears = masterEntity?.experienceInYears?:0,
             description = masterEntity?.description?: "",
             masterSpecialization = masterEntity?.masterSpecialization?: MasterSpetializationsEnum.UNKNOWN,
+            services = services.map { it.toDto() }
         )
     }
 }

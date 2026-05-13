@@ -11,7 +11,6 @@ import com.example.repairkz.domain.useCases.services.CreateServiceUseCase
 import com.example.repairkz.domain.useCases.services.DeleteServiceUseCase
 import com.example.repairkz.domain.useCases.services.GetServicesUseCase
 import com.example.repairkz.domain.useCases.services.UpdateServiceUseCase
-import com.example.repairkz.domain.useCases.userData.GetProfileTypeUseCase
 import com.example.repairkz.domain.useCases.userData.GetUserDataUseCase
 import com.example.repairkz.domain.useCases.userData.UpdateUserDataUseCase
 import com.example.repairkz.domain.useCases.userData.UpdateUserPhotoUseCase

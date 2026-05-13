@@ -2,7 +2,6 @@ package com.example.repairkz.ui.features.masterInfo
 
 import com.example.repairkz.common.models.Master
 import com.example.repairkz.data.remote.dto.MasterServiceDTO
-import com.example.repairkz.ui.features.UserInfo.UserIntent.MasterProfileIntent
 
 data class MasterProfileState(
     val master: Master? = null,

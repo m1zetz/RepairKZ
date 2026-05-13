@@ -15,22 +15,11 @@ import com.example.repairkz.ui.features.UserInfo.UserInfoViewModel
 @SuppressLint("UnrememberedGetBackStackEntry")
 fun NavGraphBuilder.profileGraph(navController: NavController){
     navigation(
-        startDestination = "${Routes.USER_INFO}?userId={userId}",
+        startDestination = "USER_INFO",
         route = PROFILE_GROUP
     ) {
 
-        composable(
-            route = "${Routes.USER_INFO}?userId={userId}"
-        ) { nbse ->
 
-            val parrentEntry = remember(nbse) {
-                navController.getBackStackEntry(PROFILE_GROUP)
-            }
-
-            val userInfoViewModel: UserInfoViewModel = hiltViewModel(parrentEntry)
-
-            UserInfo(userInfoViewModel, navController)
-        }
 
 
     }

@@ -8,17 +8,12 @@ import com.example.repairkz.common.models.User
 import com.example.repairkz.domain.errors.SettingsError
 
 
-sealed class SettingsState {
-    object Loading : SettingsState()
-    data class Success(
-        val userData: User,
-        val currentStatus: StatusOfUser,
-        val isMe: Boolean,
-        val isChangeStatusLoading: Boolean = false,
-    ) : SettingsState()
-
-    data class Error(val error: SettingsError) : SettingsState()
-}
+data class SettingsState(
+    val user: User? = null,
+    val isChangeStatusLoading: Boolean = false,
+    val isLoading: Boolean = false,
+    val error: String? = null
+)
 
 data class ChangeStatusConfig(
     val icon: ImageVector,
@@ -27,7 +22,7 @@ data class ChangeStatusConfig(
 )
 
 sealed class SettingIntent {
-    data class ToUserScreen(val id: Long) : SettingIntent()
+    object ToUserScreen : SettingIntent()
 
     data class SwitchStatus(val status: StatusOfUser) : SettingIntent()
 
@@ -36,7 +31,7 @@ sealed class SettingIntent {
 
 
 sealed class SettingsEffect {
-    data class NavigateToUserInfo(val id: Long) : SettingsEffect()
+    object NavigateToUserInfo : SettingsEffect()
     data class ShowError(val error: SettingsError) : SettingsEffect()
     object NavigateToLogin : SettingsEffect()
 

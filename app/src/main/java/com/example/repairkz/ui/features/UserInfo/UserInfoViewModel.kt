@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.repairkz.common.enums.CitiesEnum
 import com.example.repairkz.common.models.Master
 import com.example.repairkz.data.remote.dto.MasterServiceDTO
 import com.example.repairkz.domain.useCases.files.PreparePhotoPartUseCase
@@ -13,7 +14,6 @@ import com.example.repairkz.domain.useCases.services.CreateServiceUseCase
 import com.example.repairkz.domain.useCases.services.UpdateServiceUseCase
 import com.example.repairkz.domain.useCases.services.DeleteServiceUseCase
 import com.example.repairkz.domain.useCases.services.GetServicesUseCase
-import com.example.repairkz.domain.useCases.userData.GetProfileTypeUseCase
 import com.example.repairkz.domain.useCases.userData.GetUserDataUseCase
 import com.example.repairkz.domain.useCases.userData.UpdateUserDataUseCase
 import com.example.repairkz.domain.useCases.userData.UpdateUserPhotoUseCase
@@ -32,7 +32,7 @@ import kotlinx.coroutines.withContext
 
 @HiltViewModel
 class UserInfoViewModel @Inject constructor(
-
+    private val getUserDataUseCase: GetUserDataUseCase,
     private val updateUserDataUseCase: UpdateUserDataUseCase,
     private val saveToInternalUseCase: SaveToInternalUseCase,
     private val updateUserPhotoUseCase: UpdateUserPhotoUseCase,
@@ -44,11 +44,27 @@ class UserInfoViewModel @Inject constructor(
 ) : ViewModel() {
 
 
-    private val _uiState = MutableStateFlow<UserState>(UserState())
+    private val _uiState = MutableStateFlow(UserState())
     val uiState = _uiState.asStateFlow()
 
     private val _channel = Channel<UserEffects>(Channel.BUFFERED)
     val channel = _channel.receiveAsFlow()
+
+
+    init{
+        viewModelScope.launch {
+            getUserDataUseCase().collect {user ->
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        user = user,
+                        numberDraft = user?.phoneNumber ?: "",
+                        cityDraft = user?.city ?: CitiesEnum.UNKNOWN,
+                        emailDraft = user?.email ?: ""
+                    )
+                }
+            }
+        }
+    }
 
     fun handleIntent(intent: UserIntent) {
         when (intent) {

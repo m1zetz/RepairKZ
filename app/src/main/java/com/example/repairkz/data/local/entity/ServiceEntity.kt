@@ -11,14 +11,14 @@ import com.example.repairkz.data.remote.dto.MasterServiceDTO
     "service",
     foreignKeys = [ForeignKey(
         entity = MasterEntity::class,
-        parentColumns = arrayOf("id"),
+        parentColumns = arrayOf("master_id"),
         childColumns = arrayOf("master_id"),
         onDelete = ForeignKey.CASCADE
     )]
 )
 data class ServiceEntity(
     @PrimaryKey
-    val id: Long? = null,
+    val id: Long = 0,
     @ColumnInfo(name = "master_id")
     val masterId: Long,
     val service: String,
@@ -26,7 +26,7 @@ data class ServiceEntity(
     val position: Int? = null,
 ){
     fun toDto() = MasterServiceDTO(
-        id = id,
+        id = if (id == 0L) null else id,
         masterId = masterId,
         service = service,
         price = price,

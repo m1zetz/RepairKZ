@@ -39,36 +39,45 @@ class NotificationViewModel @Inject constructor(
     private val _state = MutableStateFlow<NotificationState>(Loading)
     val state = _state.asStateFlow()
 
+    private var currentUserId: Long? = null
+
+    init {
+        viewModelScope.launch {
+            getUserDataUseCase().collect { user ->
+                currentUserId = user?.id
+            }
+        }
+
+    }
+
     @RequiresApi(Build.VERSION_CODES.O)
     fun handleIntent(intent: NotificationIntent) {
         when (intent) {
             is NotificationIntent.GetNotifications -> {
 
                 viewModelScope.launch {
+                    val userId = currentUserId ?: return@launch
                     _state.value = Loading
-                    val user = getUserDataUseCase()
-                    if (user != null) {
-                        try {
-                            coroutineScope {
-                                val clientResult = async { getClientOrderHistoryUseCase(user.id) }
-                                val masterResult = async { getMasterOrderHistoryUseCase(user.id) }
-                                val clientList = clientResult.await().getOrNull() ?: emptyList()
-                                val masterList = masterResult.await().getOrNull() ?: emptyList()
-                                val combined = (
-                                        masterList.map {
-                                            MasterItem(it)
-                                        }
-                                                + clientList.map {
-                                            ClientItem(it)
-                                        }
-                                        ).sortedBy { it.createdAt }
-                                _state.value =
-                                    Success(combined)
-                            }
-                        } catch (e: Exception) {
-                            _state.value = Error(message = "Ошибка запроса")
-
+                    try {
+                        coroutineScope {
+                            val clientResult = async { getClientOrderHistoryUseCase(userId) }
+                            val masterResult = async { getMasterOrderHistoryUseCase(userId) }
+                            val clientList = clientResult.await().getOrNull() ?: emptyList()
+                            val masterList = masterResult.await().getOrNull() ?: emptyList()
+                            val combined = (
+                                    masterList.map {
+                                        MasterItem(it)
+                                    }
+                                            + clientList.map {
+                                        ClientItem(it)
+                                    }
+                                    ).sortedBy { it.createdAt }
+                            _state.value =
+                                Success(notifications = combined)
                         }
+                    } catch (e: Exception) {
+                        _state.value = Error(message = "Ошибка запроса")
+
                     }
 
                 }

@@ -4,6 +4,7 @@ import com.example.repairkz.data.orderData.OrderRepository
 import com.example.repairkz.data.orderData.OrderRepositoryImpl
 import com.example.repairkz.data.remote.api.OrderApi
 import com.example.repairkz.data.remote.api.RegistrationApi
+import com.example.repairkz.data.userData.UserRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -14,8 +15,8 @@ import retrofit2.Retrofit
 @Module
 object OrderModule {
     @Provides
-    fun provideOrderRepository(orderApi: OrderApi): OrderRepository {
-        return OrderRepositoryImpl(orderApi)
+    fun provideOrderRepository(orderApi: OrderApi, userRepository: UserRepository): OrderRepository {
+        return OrderRepositoryImpl(orderApi, userRepository)
     }
 
     @Provides

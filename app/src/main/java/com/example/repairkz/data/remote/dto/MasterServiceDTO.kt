@@ -10,7 +10,7 @@ data class MasterServiceDTO(
     val position: Int? = null
 ){
     fun toEntity() = ServiceEntity(
-        id = id,
+        id = id ?: 0,
         masterId = masterId,
         service = service,
         price = price,

@@ -6,20 +6,19 @@ import com.example.repairkz.data.local.entity.UserEntity
 import com.example.repairkz.data.remote.dto.order.ChangeStatusRequestDTO
 import com.example.repairkz.data.remote.dto.UpdatePhotoResponseDTO
 import com.example.repairkz.data.remote.dto.UserResponseDTO
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import okhttp3.MultipartBody
 import retrofit2.http.Multipart
 
 interface UserRepository {
-    val userData: StateFlow<User?>
-    suspend fun fetchUserData() : User?
-    suspend fun saveUserToLocal(user:User)
+    val userData: Flow<User?>
+    suspend fun saveUserToLocal(user: User) : Result<Unit>
     suspend fun updateUserStatus(id: Long, dto: ChangeStatusRequestDTO) : Result<Unit>
 
     suspend fun updateUserData(user: User) : Result<Unit>
     suspend fun updateUserPhoto(id: Long ,file: MultipartBody.Part) : Result<UpdatePhotoResponseDTO>
 
-    suspend fun getRoomData()
 
 
 }

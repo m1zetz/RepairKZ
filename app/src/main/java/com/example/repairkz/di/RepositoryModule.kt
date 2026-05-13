@@ -19,6 +19,7 @@ import com.example.repairkz.data.registration.RegistrationRepository
 import com.example.repairkz.data.remote.api.MasterApi
 import com.example.repairkz.data.remote.api.OrderApi
 import com.example.repairkz.data.remote.api.ServicesApi
+import com.example.repairkz.data.userData.UserRepository
 import com.example.repairkz.domain.useCases.userData.GetUserDataUseCase
 import dagger.Binds
 import dagger.Module
@@ -29,25 +30,44 @@ import dagger.hilt.components.SingletonComponent
 
 @InstallIn(SingletonComponent::class)
 @Module
-object RepositoryModule{
+object RepositoryModule {
 
     @Provides
-    fun provideNotificationRepository() : NotificationRepository{
+    fun provideNotificationRepository(): NotificationRepository {
         return NotificationRepositoryImpl()
     }
+
     @Provides
-    fun provideMasterRepository(masterApi: MasterApi, servicesApi: ServicesApi, getUserDataUseCase: GetUserDataUseCase, serviceDao: ServiceDao, masterDao: MasterDao) : MasterRepository {
-        return MasterRepositoryImpl(masterApi, servicesApi , getUserDataUseCase, serviceDao, masterDao)
+    fun provideMasterRepository(
+        masterApi: MasterApi,
+        servicesApi: ServicesApi,
+        getUserDataUseCase: GetUserDataUseCase,
+        serviceDao: ServiceDao,
+        masterDao: MasterDao,
+        userRepository: UserRepository,
+    ): MasterRepository {
+        return MasterRepositoryImpl(
+            masterApi,
+            servicesApi,
+            getUserDataUseCase,
+            serviceDao,
+            masterDao,
+            userRepository
+        )
     }
 
     @Provides
-    fun provideFileRepository(@ApplicationContext context: Context) : FileRepository {
+    fun provideFileRepository(@ApplicationContext context: Context): FileRepository {
         return FileRepositoryImpl(context)
     }
 
 
     @Provides
-    fun provideRegistrationRepository(registrationApi: RegistrationApi, tokenApi: TokenApi, userApi: UserApi) : RegistrationRepository{
+    fun provideRegistrationRepository(
+        registrationApi: RegistrationApi,
+        tokenApi: TokenApi,
+        userApi: UserApi,
+    ): RegistrationRepository {
         return RegistrationRepositoryImpl(
             registrationApi = registrationApi,
             tokenApi = tokenApi,
@@ -55,6 +75,5 @@ object RepositoryModule{
         )
     }
 
-    
 
 }

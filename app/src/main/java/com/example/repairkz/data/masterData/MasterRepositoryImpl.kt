@@ -12,6 +12,7 @@ import com.example.repairkz.data.remote.api.MasterApi
 import com.example.repairkz.data.remote.api.ServicesApi
 import com.example.repairkz.data.remote.dto.MasterInfoDTO
 import com.example.repairkz.data.remote.dto.MasterServiceDTO
+import com.example.repairkz.data.userData.UserRepository
 import com.example.repairkz.domain.useCases.userData.GetUserDataUseCase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,7 +25,8 @@ class MasterRepositoryImpl @Inject constructor(
     private val servicesApi: ServicesApi,
     private val getUserDataUseCase: GetUserDataUseCase,
     private val serviceDao: ServiceDao,
-    private val masterDao: MasterDao
+    private val masterDao: MasterDao,
+    private val userRepository: UserRepository
 ) : MasterRepository {
 
     private val _masters = MutableStateFlow<List<Master>?>(null)
@@ -50,13 +52,11 @@ class MasterRepositoryImpl @Inject constructor(
     override suspend fun createService(masterServiceDTO: MasterServiceDTO): Result<MasterServiceDTO> {
         return try {
             val response = servicesApi.createService(masterServiceDTO)
-            val service = response.body()?: return Result.failure(Exception("Network error"))
-            serviceDao.upsertMasterService(
-                service.toEntity()
-            )
-            serviceDao.getServices().first()
+
+            val service = response.body() ?: return Result.failure(Exception("Network error"))
+            serviceDao.upsertMasterService(service.toEntity())
             Result.success(service)
-        } catch(e: Exception){
+        } catch(e: Exception) {
             Result.failure(Exception(e.message))
         }
     }
@@ -78,9 +78,8 @@ class MasterRepositoryImpl @Inject constructor(
 
 
     override suspend fun getMasters(): Result<List<Master>> {
-        val userData =
-            getUserDataUseCase() ?: return Result.failure(Exception("Current user is null"))
-        val response = masterApi.getMasters(userData.id)
+        val myId = userRepository.userData.first()?.id?: return Result.failure(Exception("Current user is null"))
+        val response = masterApi.getMasters(myId)
         val list = response.body()?: return Result.failure(Exception("Network error"))
         _masters.value = list.map { dto ->
             Master(

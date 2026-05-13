@@ -13,15 +13,11 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @HiltViewModel
-class MainViewModel @Inject constructor(userRepository: UserRepository) : ViewModel() {
+class MainViewModel @Inject constructor() : ViewModel() {
     private val _screenIndexState = MutableStateFlow(MainUiState())
     val screenIndexState = _screenIndexState.asStateFlow()
 
-    init {
-        viewModelScope.launch {
-            userRepository.fetchUserData()
-        }
-    }
+
     fun handleIntent(intent: MainIntent){
         when(intent){
             is MainIntent.ChangeScreen -> {
