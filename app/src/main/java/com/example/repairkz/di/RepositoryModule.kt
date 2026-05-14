@@ -3,7 +3,6 @@ package com.example.repairkz.di
 import android.content.Context
 import com.example.repairkz.data.fileData.FileRepository
 import com.example.repairkz.data.fileData.FileRepositoryImpl
-import com.example.repairkz.data.local.dao.MasterDao
 import com.example.repairkz.data.local.dao.ServiceDao
 import com.example.repairkz.data.masterData.MasterRepository
 import com.example.repairkz.data.masterData.MasterRepositoryImpl
@@ -43,15 +42,12 @@ object RepositoryModule {
         servicesApi: ServicesApi,
         getUserDataUseCase: GetUserDataUseCase,
         serviceDao: ServiceDao,
-        masterDao: MasterDao,
         userRepository: UserRepository,
     ): MasterRepository {
         return MasterRepositoryImpl(
             masterApi,
             servicesApi,
-            getUserDataUseCase,
             serviceDao,
-            masterDao,
             userRepository
         )
     }

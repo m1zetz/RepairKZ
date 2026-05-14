@@ -81,14 +81,11 @@ class SignInViewModel @Inject constructor(
                                             user
                                         }
                                         StatusOfUser.MASTER -> {
-                                            user.toMaster(masterId = loginResponseDTO.master?.masterId?:0).copy(
-                                                masterSpecialization = loginResponseDTO.master?.masterSpecialization
-                                                    ?: MasterSpetializationsEnum.UNKNOWN,
-                                                description = loginResponseDTO.master?.description
-                                                    ?: "",
-                                                experienceInYears = loginResponseDTO.master?.experienceInYears
-                                                    ?: 0,
-                                                services = loginResponseDTO.master?.services?:emptyList()
+                                            user.toMasterWithData(
+                                                masterId = loginResponseDTO.master?.masterId ?: 0,
+                                                spec = loginResponseDTO.master?.masterSpecialization ?: MasterSpetializationsEnum.UNKNOWN,
+                                                desc = loginResponseDTO.master?.description ?: "",
+                                                exp = loginResponseDTO.master?.experienceInYears ?: 0
                                             )
                                         }
                                     }

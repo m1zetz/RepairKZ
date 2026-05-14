@@ -4,6 +4,7 @@ import com.example.repairkz.R
 import com.example.repairkz.common.enums.CitiesEnum
 import com.example.repairkz.common.enums.MasterSpetializationsEnum
 import com.example.repairkz.common.enums.StatusOfUser
+import com.example.repairkz.data.local.entity.UserEntity
 import com.example.repairkz.data.remote.dto.MasterServiceDTO
 
 data class Master(
@@ -35,6 +36,22 @@ data class Master(
         )
     }
 
+    override fun toEntity(): UserEntity {
+        return UserEntity(
+            id = this.id,
+            userPhotoUrl = this.userPhotoUrl,
+            firstName = this.firstName,
+            lastName = this.lastName,
+            email = this.email,
+            phoneNumber = this.phoneNumber,
+            status = this.status,
+            city = this.city,
+            masterId = this.masterId,
+            experienceInYears = this.experienceInYears,
+            description = this.description,
+            masterSpecialization = this.masterSpecialization
+        )
+    }
     fun copyMaster(userPhotoUrl: String? = this.userPhotoUrl): Master {
         return Master(
             id = this.id,

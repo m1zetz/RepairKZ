@@ -1,14 +1,11 @@
 package com.example.repairkz.data.userData
 
-import android.util.Log
 import com.example.repairkz.common.enums.MasterSpetializationsEnum
 import com.example.repairkz.common.enums.StatusOfUser
 import com.example.repairkz.common.models.Master
 import com.example.repairkz.common.models.User
-import com.example.repairkz.data.local.dao.MasterDao
 import com.example.repairkz.data.local.dao.ServiceDao
 import com.example.repairkz.data.local.dao.UserDao
-import com.example.repairkz.data.local.entity.MasterEntity
 import com.example.repairkz.data.local.entity.ServiceEntity
 import com.example.repairkz.data.remote.api.UserApi
 import com.example.repairkz.data.remote.dto.order.ChangeStatusRequestDTO
@@ -31,19 +28,17 @@ import okhttp3.MultipartBody
 class UserRepositoryImpl @Inject constructor(
     private val userDao: UserDao,
     private val serviceDao: ServiceDao,
-    private val masterDao: MasterDao,
     private val userApi: UserApi,
 ) : UserRepository {
 
     override val userData: Flow<User?> = combine(
             userDao.getUser(),
-            masterDao.getMaster(),
             serviceDao.getServices(),
-        ) { user, master, services ->
+        ) { user, services ->
             val userEntity = user ?: return@combine null
             when (userEntity.status) {
                 StatusOfUser.MASTER -> {
-                    userEntity.toMaster(master, services = services)
+                    userEntity.toMaster(services = services)
                 }
                 else -> userEntity.toUser()
             }
@@ -54,16 +49,8 @@ class UserRepositoryImpl @Inject constructor(
         return try {
             userDao.saveUser(user.toEntity())
             if (user is Master) {
-                val entity = MasterEntity(
-                    userId = user.id,
-                    masterId = user.masterId,
-                    experienceInYears = user.experienceInYears,
-                    masterSpecialization = user.masterSpecialization,
-                    description = user.description,
-                )
-                val masterId = masterDao.saveMaster(entity)
                 user.services.forEach { service ->
-                    serviceDao.upsertMasterService(service.copy(masterId = masterId).toEntity())
+                    serviceDao.upsertMasterService(service.copy(masterId = user.masterId).toEntity())
                 }
             }
             Result.success(Unit)
@@ -111,20 +98,6 @@ class UserRepositoryImpl @Inject constructor(
                     )
                 }
                 userDao.saveUser(finalUser.toEntity())
-                if (finalUser is Master) {
-                    Log.d("DEBUG", "saving master with masterId=${finalUser.masterId}")
-                    masterDao.saveMaster(
-                        MasterEntity(
-                            userId = finalUser.id,
-                            masterId = finalUser.masterId,
-                            description = finalUser.description,
-                            experienceInYears = finalUser.experienceInYears,
-                            masterSpecialization = finalUser.masterSpecialization
-                        )
-                    )
-                }
-
-
             }
 
             Result.success(Unit)
@@ -149,7 +122,6 @@ class UserRepositoryImpl @Inject constructor(
                     currentUser.copy(userPhotoUrl = body.photoUrl)
                 }
                 userDao.saveUser(updatedUser.toEntity())
-                userDao.updateUserPhoto(updatedUser.toEntity())
                 Result.success(body)
             } else {
                 val errorMsg = response.errorBody()?.string()
@@ -186,19 +158,6 @@ class UserRepositoryImpl @Inject constructor(
                     currentUser.copy(statusOfUser = StatusOfUser.CLIENT)
                 }
                 userDao.saveUser(updatedUser.toEntity())
-
-
-                if (updatedUser is Master) {
-                    masterDao.saveMaster(
-                        MasterEntity(
-                            userId = updatedUser.id,
-                            masterId = updatedUser.masterId,
-                            description = updatedUser.description,
-                            experienceInYears = updatedUser.experienceInYears,
-                            masterSpecialization = updatedUser.masterSpecialization
-                        )
-                    )
-                }
                 Result.success(Unit)
 
             } else {

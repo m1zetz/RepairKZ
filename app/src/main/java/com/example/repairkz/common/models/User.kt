@@ -120,9 +120,9 @@ open  class User(
         phone = this.phoneNumber,
         status = this.status
     )
-    fun toEntity(): UserEntity {
+    open fun toEntity(): UserEntity {
         return UserEntity(
-            id = this.id.toLong(),
+            id = this.id,
             userPhotoUrl = this.userPhotoUrl,
             firstName = this.firstName,
             lastName = this.lastName,

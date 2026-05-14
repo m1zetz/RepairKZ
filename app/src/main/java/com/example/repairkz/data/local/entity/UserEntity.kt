@@ -1,5 +1,6 @@
 package com.example.repairkz.data.local.entity
 
+import android.util.Log
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.repairkz.common.enums.CitiesEnum
@@ -19,6 +20,10 @@ data class UserEntity(
     val phoneNumber: String,
     val status: StatusOfUser,
     val city: CitiesEnum?,
+    val masterId: Long? = null,
+    val experienceInYears: Int? = null,
+    val description: String? = null,
+    val masterSpecialization: MasterSpetializationsEnum? = null
 ){
     fun toUser(): User {
         return User(
@@ -33,10 +38,15 @@ data class UserEntity(
         )
     }
 
-    fun toMaster(masterEntity: MasterEntity?, services: List<ServiceEntity> = emptyList()): Master {
+    fun toMaster(services: List<ServiceEntity> = emptyList()): Master {
+        Log.d("DEBUG", "toMaster called")
+        Log.d("DEBUG", "masterId=$masterId")
+        Log.d("DEBUG", "experienceInYears=$experienceInYears")
+        Log.d("DEBUG", "description=$description")
+        Log.d("DEBUG", "masterSpecialization=$masterSpecialization")
         return Master(
             id = this.id ?: 0,
-            masterId = masterEntity?.masterId?:0,
+            masterId = this.masterId?:0,
             userPhotoUrl = this.userPhotoUrl,
             firstName = this.firstName,
             lastName = this.lastName,
@@ -44,9 +54,9 @@ data class UserEntity(
             phoneNumber = this.phoneNumber,
             status = this.status,
             city = this.city,
-            experienceInYears = masterEntity?.experienceInYears?:0,
-            description = masterEntity?.description?: "",
-            masterSpecialization = masterEntity?.masterSpecialization?: MasterSpetializationsEnum.UNKNOWN,
+            experienceInYears = this.experienceInYears ?:0,
+            description = this.description ?: "",
+            masterSpecialization = this.masterSpecialization ?: MasterSpetializationsEnum.UNKNOWN,
             services = services.map { it.toDto() }
         )
     }

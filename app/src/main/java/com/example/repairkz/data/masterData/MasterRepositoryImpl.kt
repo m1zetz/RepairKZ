@@ -5,7 +5,6 @@ import com.example.repairkz.common.enums.CitiesEnum
 import com.example.repairkz.common.enums.MasterSpetializationsEnum
 import com.example.repairkz.common.enums.StatusOfUser
 import com.example.repairkz.common.models.Master
-import com.example.repairkz.data.local.dao.MasterDao
 import com.example.repairkz.data.local.dao.ServiceDao
 import com.example.repairkz.data.local.entity.ServiceEntity
 import com.example.repairkz.data.remote.api.MasterApi
@@ -23,9 +22,7 @@ import javax.inject.Inject
 class MasterRepositoryImpl @Inject constructor(
     private val masterApi: MasterApi,
     private val servicesApi: ServicesApi,
-    private val getUserDataUseCase: GetUserDataUseCase,
     private val serviceDao: ServiceDao,
-    private val masterDao: MasterDao,
     private val userRepository: UserRepository
 ) : MasterRepository {
 

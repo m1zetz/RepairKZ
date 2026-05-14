@@ -7,15 +7,7 @@ import androidx.room.PrimaryKey
 import com.example.repairkz.common.enums.MasterSpetializationsEnum
 import com.example.repairkz.data.remote.dto.MasterServiceDTO
 
-@Entity(
-    "service",
-    foreignKeys = [ForeignKey(
-        entity = MasterEntity::class,
-        parentColumns = arrayOf("master_id"),
-        childColumns = arrayOf("master_id"),
-        onDelete = ForeignKey.CASCADE
-    )]
-)
+@Entity("service")
 data class ServiceEntity(
     @PrimaryKey
     val id: Long = 0,
@@ -24,7 +16,7 @@ data class ServiceEntity(
     val service: String,
     val price: Int,
     val position: Int? = null,
-){
+) {
     fun toDto() = MasterServiceDTO(
         id = if (id == 0L) null else id,
         masterId = masterId,

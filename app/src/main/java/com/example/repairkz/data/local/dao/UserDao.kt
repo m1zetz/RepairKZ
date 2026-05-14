@@ -7,6 +7,7 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import androidx.room.Upsert
+import com.example.repairkz.common.models.User
 import com.example.repairkz.data.local.entity.UserEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -22,6 +23,6 @@ interface UserDao {
     @Delete
     suspend fun clearUser(userEntity: UserEntity)
 
-    @Query("SELECT * FROM user")
+    @Query("SELECT * FROM user LIMIT 1")
     fun getUser() : Flow<UserEntity?>
 }
