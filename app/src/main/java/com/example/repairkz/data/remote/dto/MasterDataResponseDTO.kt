@@ -7,5 +7,5 @@ data class MasterDataResponseDTO(
     val experienceInYears: Int = 0,
     val description: String = "",
     val masterSpecialization: MasterSpetializationsEnum = MasterSpetializationsEnum.UNKNOWN,
-    val services: List<MasterServiceDTO>? = null
+    val services: List<MasterServiceDTO> = emptyList()
 )

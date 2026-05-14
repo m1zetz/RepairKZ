@@ -75,6 +75,7 @@ import com.example.repairkz.common.ui.ShortWithComposableWOpadding
 import com.example.repairkz.ui.features.CameraX.CameraIntent
 import com.example.repairkz.ui.features.CameraX.CameraViewModel
 import com.example.repairkz.ui.features.CameraX.PhotoPreview
+import com.example.repairkz.ui.features.components.ServicesTable
 import com.example.repairkz.ui.features.profile.common.Cap
 
 
@@ -350,101 +351,27 @@ fun UserInfo(userInfoViewModel: UserInfoViewModel, navController: NavController)
                                     .padding(horizontal = 8.dp)
                                     .fillMaxWidth()
                             ) {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween
-                                ) {
-                                    Text(
-                                        stringResource(R.string.services),
-                                        style = MaterialTheme.typography.titleMedium.copy(
-                                            letterSpacing = 1.5.sp
-                                        ),
-                                        color = MaterialTheme.colorScheme.primary,
-                                    )
-                                    Button(
-                                        onClick = {
-                                            userInfoViewModel.handleIntent(UserIntent.CurrentMasterIntent.OpenCreate)
-                                        }
-                                    ) {
-                                        Text("Создать")
-                                    }
-                                }
+                                Text(
+                                    stringResource(R.string.services),
+                                    style = MaterialTheme.typography.titleMedium.copy(
+                                        letterSpacing = 1.5.sp
+                                    ),
+                                    color = MaterialTheme.colorScheme.primary,
+                                )
 
                             }
-                            Card(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 8.dp),
-                                shape = RoundedCornerShape(12.dp)
-                            ) {
-                                Column(
-                                    modifier = Modifier.fillMaxWidth()
-                                ) {
-                                    Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .height(IntrinsicSize.Min)
-                                            .padding(10.dp),
+                            ServicesTable(
+                                services = user.services,
+                                onCreate = {
+                                    userInfoViewModel.handleIntent(UserIntent.CurrentMasterIntent.OpenCreate)
+                                },
+                                onEdit = {
 
-                                        ) {
-                                        Text(
-                                            stringResource(R.string.service_name),
-                                            modifier = Modifier
-                                                .weight(1f)
-                                                .padding(end = 8.dp)
-                                                .align(Alignment.Top),
-                                            textAlign = TextAlign.Center,
-                                            fontWeight = FontWeight.Medium
-                                        )
-                                        VerticalDivider(
-                                            Modifier
-                                                .fillMaxHeight()
-                                                .width(1.dp),
-                                            color = MaterialTheme.colorScheme.outlineVariant
-                                        )
-                                        Text(
-                                            stringResource(R.string.price_in_tenge),
-                                            modifier = Modifier
-                                                .weight(1f)
-                                                .padding(start = 8.dp)
-                                                .align(Alignment.Top),
-                                            textAlign = TextAlign.Center,
-                                            color = MaterialTheme.colorScheme.primary
-                                        )
-
-
-                                    }
-                                    HorizontalDivider(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(horizontal = 8.dp)
-                                    )
-                                    user.services.sortedBy {
-                                        it.position
-                                    }.forEach { item ->
-                                        Log.d("UI", "rendering service: ${item.service}")
-
-                                        Service(
-                                            item,
-                                            onDelete = {
-                                                if (item.id != null) {
-                                                    userInfoViewModel.handleIntent(
-                                                        UserIntent.CurrentMasterIntent.DeleteService(
-                                                            item.id
-                                                        )
-                                                    )
-                                                } else {
-                                                }
-                                            },
-                                            onEdit = {
-
-                                            }
-                                        )
-                                    }
-                                    Spacer(Modifier.size(8.dp))
+                                },
+                                onDelete = { itemId ->
+                                    userInfoViewModel.handleIntent(UserIntent.CurrentMasterIntent.DeleteService(itemId))
                                 }
-
-                            }
+                            )
                             AnimatedVisibility(
                                 visible = state.showSave,
                                 enter = fadeIn(),

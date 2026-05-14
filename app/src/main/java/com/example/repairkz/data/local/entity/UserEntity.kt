@@ -39,11 +39,6 @@ data class UserEntity(
     }
 
     fun toMaster(services: List<ServiceEntity> = emptyList()): Master {
-        Log.d("DEBUG", "toMaster called")
-        Log.d("DEBUG", "masterId=$masterId")
-        Log.d("DEBUG", "experienceInYears=$experienceInYears")
-        Log.d("DEBUG", "description=$description")
-        Log.d("DEBUG", "masterSpecialization=$masterSpecialization")
         return Master(
             id = this.id ?: 0,
             masterId = this.masterId?:0,
@@ -57,7 +52,7 @@ data class UserEntity(
             experienceInYears = this.experienceInYears ?:0,
             description = this.description ?: "",
             masterSpecialization = this.masterSpecialization ?: MasterSpetializationsEnum.UNKNOWN,
-            services = services.map { it.toDto() }
+            services = services.map { it.toModel() }
         )
     }
 }

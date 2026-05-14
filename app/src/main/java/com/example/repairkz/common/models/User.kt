@@ -83,11 +83,11 @@ open  class User(
         lastName: String = this.lastName,
         email: String = this.email,
         phoneNumber: String = this.phoneNumber,
-        statusOfUser: StatusOfUser = this.status,
         city: CitiesEnum? = this.city,
         desc: String,
         spec: MasterSpetializationsEnum,
-        exp: Int
+        exp: Int,
+        services: List<MasterService>
     ) : Master {
 
         val master = Master(
@@ -102,7 +102,8 @@ open  class User(
             city,
             exp,
             desc,
-            spec
+            spec,
+            services
         )
         return master
     }

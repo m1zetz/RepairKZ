@@ -286,9 +286,15 @@ class UserInfoViewModel @Inject constructor(
 
 
 
-    private suspend fun updateProfile(): Result<Unit> {
+    private suspend fun updateProfile(){
+        _uiState.update {
+            it.copy(
+                isSaving = true
+            )
+        }
         val state = _uiState.value
-        val user = state.user?:return Result.failure(Exception("current user is null"))
+
+        val user = state.user?: return
         val finalUser = if (user is Master) {
             user.copy(
                 phoneNumber = state.numberDraft,
@@ -305,14 +311,19 @@ class UserInfoViewModel @Inject constructor(
                 city = state.cityDraft
             )
         }
-        return updateUserDataUseCase(finalUser)
+
+        updateUserDataUseCase(finalUser)
+        _uiState.update {
+            it.copy(
+                isSaving = false
+            )
+        }
+
     }
 
     private fun checkChanges(state: UserState) : Boolean {
         val user = state.user ?: return false
         val userDataChanges = state.numberDraft.trim() != user.phoneNumber.trim() || state.cityDraft != user.city
-        Log.d("CHECK", "${state.numberDraft.trim()} | ${user.phoneNumber.trim()}")
-        Log.d("CHECK", "${state.cityDraft} | ${user.city}")
         val masterDataChanges = if (user is Master) {
             state.specDraft != user.masterSpecialization ||
                     (state.experienceDraft.toIntOrNull() ?: 0) != user.experienceInYears ||
@@ -321,12 +332,6 @@ class UserInfoViewModel @Inject constructor(
         } else {
             false
         }
-        if (user is Master){
-            Log.d("CHECK", "${state.specDraft} | ${user.masterSpecialization}")
-            Log.d("CHECK", "${state.experienceDraft} | ${user.experienceInYears}")
-            Log.d("CHECK", "${state.descriptionDraft} | ${user.description}")
-        }
-
         return userDataChanges || masterDataChanges
     }
 

@@ -37,11 +37,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.example.repairkz.common.models.MasterService
 import com.example.repairkz.data.remote.dto.MasterServiceDTO
 
 @Composable
 fun Service(
-    item: MasterServiceDTO,
+    item: MasterService,
     onDelete: (() -> Unit)? = null,
     onEdit: (() -> Unit)? = null,
 ) {
@@ -59,7 +60,7 @@ fun Service(
 
             ) {
             Text(
-                item.service, modifier = Modifier
+                item.name, modifier = Modifier
                     .weight(1f)
                     .padding(end = 8.dp)
                     .align(Alignment.Top),

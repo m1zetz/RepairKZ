@@ -74,7 +74,6 @@ class SignInViewModel @Inject constructor(
                                     status = dto.status,
                                     city = dto.city
                                 )
-                                Log.d("LOGIN", "master id from response: ${loginResponseDTO.master?.masterId}")
                                 saveUserToLocalUseCase(
                                     when(loginResponseDTO.user.status){
                                         StatusOfUser.CLIENT -> {
@@ -85,7 +84,10 @@ class SignInViewModel @Inject constructor(
                                                 masterId = loginResponseDTO.master?.masterId ?: 0,
                                                 spec = loginResponseDTO.master?.masterSpecialization ?: MasterSpetializationsEnum.UNKNOWN,
                                                 desc = loginResponseDTO.master?.description ?: "",
-                                                exp = loginResponseDTO.master?.experienceInYears ?: 0
+                                                exp = loginResponseDTO.master?.experienceInYears ?: 0,
+                                                services = loginResponseDTO.master?.services?.map {
+                                                    it.toModel()
+                                                } ?: emptyList()
                                             )
                                         }
                                     }

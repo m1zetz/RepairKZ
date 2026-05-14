@@ -20,7 +20,7 @@ data class Master(
     val experienceInYears: Int = 0,
     val description: String = "",
     val masterSpecialization: MasterSpetializationsEnum = MasterSpetializationsEnum.UNKNOWN,
-    val services: List<MasterServiceDTO> = emptyList()
+    val services: List<MasterService> = emptyList()
 
 ) : User(id, userPhotoUrl, firstName, lastName, email, phoneNumber, status, city){
     override fun toUser(): User {

@@ -1,5 +1,6 @@
 package com.example.repairkz.data.remote.dto
 
+import com.example.repairkz.common.models.MasterService
 import com.example.repairkz.data.local.entity.ServiceEntity
 
 data class MasterServiceDTO(
@@ -14,6 +15,13 @@ data class MasterServiceDTO(
         masterId = masterId,
         service = service,
         price = price,
-        position = position
+        position = position!!
+    )
+    fun toModel() = MasterService(
+        id = id!!,
+        masterId = masterId,
+        name = service,
+        price = price,
+        position = position!!
     )
 }

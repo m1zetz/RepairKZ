@@ -110,7 +110,9 @@ class MasterRepositoryImpl @Inject constructor(
                     experienceInYears = body.experienceInYears?:0,
                     description = body.description?:"",
                     masterSpecialization = body.masterSpecialization?: MasterSpetializationsEnum.UNKNOWN,
-                    services = body.services,
+                    services = body.services.map {
+                        it.toModel()
+                    },
                     masterId = body.masterId
                 )
                 Result.success(master)

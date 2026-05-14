@@ -5,6 +5,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import com.example.repairkz.common.enums.MasterSpetializationsEnum
+import com.example.repairkz.common.models.MasterService
 import com.example.repairkz.data.remote.dto.MasterServiceDTO
 
 @Entity("service")
@@ -15,12 +16,12 @@ data class ServiceEntity(
     val masterId: Long,
     val service: String,
     val price: Int,
-    val position: Int? = null,
+    val position: Int,
 ) {
-    fun toDto() = MasterServiceDTO(
-        id = if (id == 0L) null else id,
+    fun toModel() = MasterService(
+        id = id,
         masterId = masterId,
-        service = service,
+        name = service,
         price = price,
         position = position
     )

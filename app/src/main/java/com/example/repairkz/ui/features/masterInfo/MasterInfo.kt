@@ -33,7 +33,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.repairkz.R
 import com.example.repairkz.ui.features.UserInfo.BusinessCardData
+import com.example.repairkz.ui.features.UserInfo.UserIntent
 import com.example.repairkz.ui.features.components.Service
+import com.example.repairkz.ui.features.components.ServicesTable
 import com.example.repairkz.ui.features.profile.common.Cap
 import com.example.repairkz.ui.features.profile.master.MasterBar
 
@@ -99,61 +101,12 @@ fun MasterInfo(masterInfoViewModel: MasterInfoViewModel) {
                                 color = MaterialTheme.colorScheme.primary,
                             )
                         }
-                        Card(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 8.dp),
-                            shape = RoundedCornerShape(12.dp)
-                        ) {
-                            Column(
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(IntrinsicSize.Min)
-                                        .padding(10.dp),
-
-                                    ) {
-                                    Text(
-                                        stringResource(R.string.service_name), modifier = Modifier
-                                            .weight(1f)
-                                            .padding(end = 8.dp)
-                                            .align(Alignment.Top),
-                                        textAlign = TextAlign.Center,
-                                        fontWeight = FontWeight.Medium
-                                    )
-                                    VerticalDivider(
-                                        Modifier
-                                            .fillMaxHeight()
-                                            .width(1.dp),
-                                        color = MaterialTheme.colorScheme.outlineVariant
-                                    )
-                                    Text(
-                                        stringResource(R.string.price_in_tenge), modifier = Modifier
-                                            .weight(1f)
-                                            .padding(start = 8.dp)
-                                            .align(Alignment.Top),
-                                        textAlign = TextAlign.Center,
-                                        color = MaterialTheme.colorScheme.primary
-                                    )
-
-
-                                }
-                                HorizontalDivider(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(horizontal = 8.dp)
-                                )
-                            }
-                            services?.sortedBy {
-                                it.position
-                            }?.forEach { item ->
-                                Service(
-                                    item
-                                )
-                            }
+                        if(services != null && services.isNotEmpty()){
+                            ServicesTable(
+                                services = services
+                            )
                         }
+
 
                     }
                 }
