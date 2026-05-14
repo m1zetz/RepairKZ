@@ -19,7 +19,7 @@ import com.example.repairkz.data.remote.dto.MasterServiceDTO
 data class MasterEntity(
     @PrimaryKey()
     @ColumnInfo(name = "master_id")
-    val masterId: Long = 0,
+    val masterId: Long,
     @ColumnInfo(name = "user_id")
     val userId: Long,
     val experienceInYears: Int? = null,

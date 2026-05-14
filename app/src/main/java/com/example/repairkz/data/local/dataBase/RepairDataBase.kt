@@ -14,7 +14,7 @@ import retrofit2.Converter
 
 @Database(
     entities = [UserEntity::class, MasterEntity::class, ServiceEntity::class],
-    version = 11
+    version = 12
 )
 abstract class RepairDataBase : RoomDatabase(){
     abstract val userDao: UserDao

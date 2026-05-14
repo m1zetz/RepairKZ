@@ -35,17 +35,16 @@ class UserRepositoryImpl @Inject constructor(
     private val userApi: UserApi,
 ) : UserRepository {
 
-    override val userData: Flow<User?> = userDao.getUser()
-        .combine(
-            serviceDao.getServices()
-        ) { data, services ->
-            val userEntity = data?.user ?: return@combine null
+    override val userData: Flow<User?> = combine(
+            userDao.getUser(),
+            masterDao.getMaster(),
+            serviceDao.getServices(),
+        ) { user, master, services ->
+            val userEntity = user ?: return@combine null
             when (userEntity.status) {
                 StatusOfUser.MASTER -> {
-                    Log.d("REPO", data.master?.masterSpecialization.toString())
-                    userEntity.toMaster(data.master, services = services)
+                    userEntity.toMaster(master, services = services)
                 }
-
                 else -> userEntity.toUser()
             }
         }
@@ -113,6 +112,7 @@ class UserRepositoryImpl @Inject constructor(
                 }
                 userDao.saveUser(finalUser.toEntity())
                 if (finalUser is Master) {
+                    Log.d("DEBUG", "saving master with masterId=${finalUser.masterId}")
                     masterDao.saveMaster(
                         MasterEntity(
                             userId = finalUser.id,
