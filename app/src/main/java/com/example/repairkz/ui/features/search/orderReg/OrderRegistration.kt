@@ -1,6 +1,7 @@
 package com.example.repairkz.ui.features.search.orderReg
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -89,6 +90,7 @@ fun OrderRegistration(
                     .navigationBarsPadding(),
                 onClick = {
                     orderRegistrationViewModel.handleIntent(OrderRegistrationIntent.CreateOrderRequest)
+                    Log.d("ORDER", "нажал")
                 }
             ) {
                 Text(stringResource(R.string.order_master))

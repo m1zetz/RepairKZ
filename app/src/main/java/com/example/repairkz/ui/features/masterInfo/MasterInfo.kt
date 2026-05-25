@@ -22,6 +22,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -31,6 +32,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import com.example.repairkz.Navigation.Routes
 import com.example.repairkz.R
 import com.example.repairkz.ui.features.UserInfo.BusinessCardData
 import com.example.repairkz.ui.features.UserInfo.UserIntent
@@ -40,7 +43,18 @@ import com.example.repairkz.ui.features.profile.common.Cap
 import com.example.repairkz.ui.features.profile.master.MasterBar
 
 @Composable
-fun MasterInfo(masterInfoViewModel: MasterInfoViewModel) {
+fun MasterInfo(masterInfoViewModel: MasterInfoViewModel, navController: NavController) {
+
+    LaunchedEffect(Unit) {
+        masterInfoViewModel.channel.collect {  effect ->
+            when(effect){
+                is MasterInfoEffect.NavigateToOrderReg -> {
+                    navController.navigate(Routes.orderRegRoute(effect.masterId))
+                }
+            }
+        }
+    }
+
     val state by masterInfoViewModel.uiState.collectAsState()
     val scrollState = rememberScrollState()
     val master = state.master
@@ -77,7 +91,7 @@ fun MasterInfo(masterInfoViewModel: MasterInfoViewModel) {
                     ) {
                         MasterBar(
                             doOrder = {
-
+                                masterInfoViewModel.handleIntent(MasterInfoIntent.DoOrder)
                             },
                             addToFavorites = {
 

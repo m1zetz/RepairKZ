@@ -19,6 +19,9 @@ object Routes {
 
     const val REG_PHOTO_GROUP = "reg_photo_group"
     const val ORDER_REG = "order_reg"
+    fun orderRegRoute(masterId: Long): String {
+        return "${ORDER_REG}?masterId=${masterId}"
+    }
     const val PROFILE_PHOTO_GROUP = "profile_photo_group"
 
     fun masterInfoRoute(id:Long?): String{

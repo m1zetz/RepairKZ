@@ -1,10 +1,13 @@
 package com.example.repairkz.ui.features.search.orderReg
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.repairkz.common.enums.CitiesEnum
+import com.example.repairkz.common.models.Master
 import com.example.repairkz.common.utils.formattedTime
 import com.example.repairkz.data.remote.dto.order.OrderRequestDTO
 import com.example.repairkz.domain.useCases.order.CreateOrderRequestUseCase
@@ -38,7 +41,15 @@ class OrderRegistrationViewModel @Inject constructor(
     val channel = _channel.receiveAsFlow()
 
     private val masterId = savedStateHandle.get<Long>("masterId")
+    private var currentUserId: Long? = null
 
+    init {
+        viewModelScope.launch {
+            getUserDataUseCase().collect { user ->
+                currentUserId = user?.id
+            }
+        }
+    }
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun handleIntent(intent: OrderRegistrationIntent){
@@ -86,6 +97,7 @@ class OrderRegistrationViewModel @Inject constructor(
                 viewModelScope.launch {
                     val requestDto = OrderRequestDTO(
                         masterId = masterId,
+                        userId = currentUserId,
                         description = orderData.description,
                         clientPhoneNumber = orderData.clientNumber,
                         clientAddress = orderData.clientAddress,
@@ -95,6 +107,9 @@ class OrderRegistrationViewModel @Inject constructor(
 ,                    )
                     createOrderRequestUseCase(requestDto).onSuccess {
                         _channel.send(OrderRegistrationEffects.NavigateBack)
+                        Log.d("ORDER", "успешно")
+                    }.onFailure {
+                        Log.d("ORDER", it.message.toString())
                     }
                 }
 

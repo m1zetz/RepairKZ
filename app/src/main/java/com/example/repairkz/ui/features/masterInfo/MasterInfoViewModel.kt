@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.repairkz.domain.useCases.files.PreparePhotoPartUseCase
 import com.example.repairkz.domain.useCases.files.SaveToInternalUseCase
 import com.example.repairkz.domain.useCases.masterData.GetMasterByIdUseCase
+import com.example.repairkz.domain.useCases.order.CreateOrderRequestUseCase
 import com.example.repairkz.domain.useCases.services.CreateServiceUseCase
 import com.example.repairkz.domain.useCases.services.DeleteServiceUseCase
 import com.example.repairkz.domain.useCases.services.GetServicesUseCase
@@ -18,8 +19,10 @@ import com.example.repairkz.ui.features.UserInfo.UserState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlin.onSuccess
@@ -28,9 +31,13 @@ import kotlin.onSuccess
 class MasterInfoViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val getMasterByIdUseCase: GetMasterByIdUseCase,
+    private val createOrderRequestUseCase: CreateOrderRequestUseCase
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(MasterProfileState())
     val uiState = _uiState.asStateFlow()
+
+    val _channel = Channel<MasterInfoEffect>(Channel.BUFFERED)
+    val channel = _channel.receiveAsFlow()
 
     val comingId: Long? = try {
         savedStateHandle.get<Long>("userId")
@@ -76,7 +83,12 @@ class MasterInfoViewModel @Inject constructor(
             }
 
             is MasterInfoIntent.DoOrder -> {
+                viewModelScope.launch {
+                    comingId?.let {
+                        _channel.send(MasterInfoEffect.NavigateToOrderReg(comingId))
+                    }
 
+                }
             }
 
             is MasterInfoIntent.Report -> {

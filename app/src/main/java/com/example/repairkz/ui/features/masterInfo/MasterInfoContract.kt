@@ -10,7 +10,10 @@ data class MasterProfileState(
 )
 
 sealed class MasterInfoIntent{
-    data class DoOrder(val masterId: Long) : MasterInfoIntent()
+    object DoOrder : MasterInfoIntent()
     data class AddToFavorites(val masterId: Long) : MasterInfoIntent()
     data class Report(val masterId: Long) : MasterInfoIntent()
+}
+sealed class MasterInfoEffect{
+    data class NavigateToOrderReg(val masterId: Long) : MasterInfoEffect()
 }

@@ -108,11 +108,11 @@ class MainActivity : ComponentActivity() {
                                 SearchScreen(navController, searchViewModel)
                             }
                             composable(
-                                route = "${Routes.ORDER_REG}?id={masterId}",
+                                route = "${Routes.ORDER_REG}?masterId={masterId}",
                                 arguments = listOf(
                                     navArgument("masterId") {
                                         type = NavType.Companion.LongType
-                                        defaultValue = 0
+                                        defaultValue = 0L
                                     }
                                 )
                             ){
@@ -128,7 +128,7 @@ class MainActivity : ComponentActivity() {
                                 )
                             ){
                                 val masterInfoViewModel: MasterInfoViewModel = hiltViewModel()
-                                MasterInfo(masterInfoViewModel)
+                                MasterInfo(masterInfoViewModel, navController)
                             }
                         }
                     }
