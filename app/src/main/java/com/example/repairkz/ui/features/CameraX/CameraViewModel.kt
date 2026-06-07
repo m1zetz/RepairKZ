@@ -2,8 +2,10 @@ package com.example.repairkz.ui.features.CameraX
 
 
 import android.net.Uri
+import com.example.repairkz.ui.features.CameraX.CameraEffect
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.repairkz.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,14 +18,14 @@ import kotlinx.coroutines.flow.update
 @HiltViewModel
 class CameraViewModel @Inject constructor(
 
-) : ViewModel(){
-    private val _state = MutableStateFlow(CameraState())
-    val state = _state.asStateFlow()
+) : BaseViewModel<CameraState, CameraIntent, CameraEffect>(){
 
-    fun handleIntent(intent: CameraIntent) {
+    override val initialState = CameraState()
+
+    override fun handleIntent(intent: CameraIntent) {
         when (intent) {
-            is CameraIntent.SetPhoto -> _state.update { it.copy(uri = intent.uri) }
-            CameraIntent.ClearPhoto -> _state.update { it.copy(uri = null) }
+            is CameraIntent.SetPhoto -> setState { copy(uri = intent.uri) }
+            CameraIntent.ClearPhoto -> setState { copy(uri = null) }
         }
     }
 }

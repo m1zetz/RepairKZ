@@ -1,25 +1,20 @@
 package com.example.repairkz.ui.features.home
 
-import com.example.repairkz.R
-import androidx.compose.ui.res.stringResource
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.repairkz.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 @HiltViewModel
-class HomeViewModel @Inject constructor() : ViewModel() {
-    private val _effectsChannel = Channel<Effects>(Channel.BUFFERED)
-    val effectsChannel = _effectsChannel.receiveAsFlow()
+class HomeViewModel @Inject constructor() : BaseViewModel<HomeState, HomeIntent, HomeEffect>() {
+    override val initialState = HomeState
 
-    fun handleIntent(intent: HomeScreenIntent){
+    override fun handleIntent(intent: HomeIntent){
         when(intent){
-            is HomeScreenIntent.ClickOnCard -> {
+            is HomeIntent.ClickOnCard -> {
                 viewModelScope.launch {
-                    _effectsChannel.send(Effects.NavigateToSearch(intent.pattern?.resID))
+                    sendEffect(HomeEffect.NavigateToSearch(intent.pattern?.resID))
                 }
             }
         }

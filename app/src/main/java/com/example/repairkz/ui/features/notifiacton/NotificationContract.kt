@@ -8,6 +8,9 @@ import com.example.repairkz.common.models.Order
 import com.example.repairkz.common.models.User
 import com.example.repairkz.data.remote.dto.order.ClientHistoryItemDTO
 import com.example.repairkz.data.remote.dto.order.MasterHistoryItemDTO
+import com.example.repairkz.ui.base.UiEffect
+import com.example.repairkz.ui.base.UiIntent
+import com.example.repairkz.ui.base.UiState
 import java.time.LocalDateTime
 
 sealed class HistoryItem {
@@ -28,7 +31,7 @@ sealed class HistoryItem {
     }
 }
 
-sealed class NotificationState {
+sealed class NotificationState : UiState {
     object Loading : NotificationState()
     data class Success(
         val notifications: List<HistoryItem>,
@@ -37,10 +40,12 @@ sealed class NotificationState {
     data class Error(val message: String) : NotificationState()
 }
 
-sealed class NotificationIntent {
+sealed class NotificationIntent : UiIntent{
     data class ShowDetails(val order: HistoryItem?) : NotificationIntent()
     object HideDetails : NotificationIntent()
     object GetNotifications : NotificationIntent()
     data class AcceptOrReject(val status: OrderRequestStatus, val request: HistoryItem.MasterItem) : NotificationIntent()
     data class ChangeOrderStatus(val status: OrderStatus, val order: HistoryItem.ClientItem) : NotificationIntent()
 }
+
+object NotificationEffect : UiEffect

@@ -83,7 +83,7 @@ import com.example.repairkz.ui.features.profile.common.Cap
 @Composable
 fun UserInfo(userInfoViewModel: UserInfoViewModel, navController: NavController) {
     val context = LocalContext.current
-    val state by userInfoViewModel.uiState.collectAsStateWithLifecycle()
+    val state by userInfoViewModel.state.collectAsStateWithLifecycle()
     val activity = LocalActivity.current as ComponentActivity
     val cameraViewModel: CameraViewModel = hiltViewModel(viewModelStoreOwner = activity)
     val action = photoPickerHandler(
@@ -107,7 +107,7 @@ fun UserInfo(userInfoViewModel: UserInfoViewModel, navController: NavController)
     LaunchedEffect(userInfoViewModel) {
         userInfoViewModel.channel.collect { effect ->
             when (effect) {
-                is UserEffects.OpenPhotoPicker -> {
+                is UserEffect.OpenPhotoPicker -> {
                     when (effect.typeOfSelect) {
                         PhotoSourceEnum.CAMERA -> {
                             action.launchCamera()
@@ -120,11 +120,11 @@ fun UserInfo(userInfoViewModel: UserInfoViewModel, navController: NavController)
 
                 }
 
-                UserEffects.MapsToPreview -> {
+                UserEffect.MapsToPreview -> {
                     navController.navigate(Routes.PHOTO_PREVIEW)
                 }
 
-                is UserEffects.NavigateToOrderRegistration -> {
+                is UserEffect.NavigateToOrderRegistration -> {
                     navController.navigate("${Routes.ORDER_REG}?id=${effect.masterId}")
                 }
             }

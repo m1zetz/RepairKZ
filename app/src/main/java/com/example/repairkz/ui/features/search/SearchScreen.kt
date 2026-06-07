@@ -52,18 +52,18 @@ import com.example.repairkz.common.ui.ShortWithComposableCard
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchScreen(navController: NavController, searchViewModel: SearchViewModel) {
-    val currentState by searchViewModel.uiState.collectAsState()
+    val currentState by searchViewModel.state.collectAsState()
 
     LaunchedEffect(Unit) {
-        searchViewModel.handleIntent(SearchIntents.GetData)
+        searchViewModel.handleIntent(SearchIntent.GetData)
     }
 
 
-    LaunchedEffect(searchViewModel.searchEffectsChannel) {
-        searchViewModel.searchEffectsChannel.collect { effect ->
+    LaunchedEffect(searchViewModel.channel) {
+        searchViewModel.channel.collect { effect ->
             when (effect) {
-                is SearchEffects.NavigateBack -> navController.popBackStack()
-                is SearchEffects.NavigateToMasterInfo -> {
+                is SearchEffect.NavigateBack -> navController.popBackStack()
+                is SearchEffect.NavigateToMasterInfo -> {
                     navController.navigate(masterInfoRoute(effect.id))
                 }
             }
@@ -75,14 +75,14 @@ fun SearchScreen(navController: NavController, searchViewModel: SearchViewModel)
             SearchBar(
                 query = currentState.query,
                 onQueryChange = { newText ->
-                    searchViewModel.handleIntent(SearchIntents.ChangeText(newText))
-                    searchViewModel.handleIntent(SearchIntents.GetData)
+                    searchViewModel.handleIntent(SearchIntent.ChangeText(newText))
+                    searchViewModel.handleIntent(SearchIntent.GetData)
                 },
 
                 onSearch = {},
                 active = currentState.searchFieldState,
                 onActiveChange = { state ->
-                    searchViewModel.handleIntent(SearchIntents.ChangeSearchFieldState(state))
+                    searchViewModel.handleIntent(SearchIntent.ChangeSearchFieldState(state))
                 },
                 leadingIcon = {
                     IconButton(
@@ -98,7 +98,7 @@ fun SearchScreen(navController: NavController, searchViewModel: SearchViewModel)
                 trailingIcon = {
                     IconButton(
                         onClick = {
-                            searchViewModel.handleIntent(SearchIntents.OpenFilters)
+                            searchViewModel.handleIntent(SearchIntent.OpenFilters)
                         }
                     ) {
                         Icon(
@@ -125,7 +125,7 @@ fun SearchScreen(navController: NavController, searchViewModel: SearchViewModel)
                                         master,
                                         intent = {
                                             searchViewModel.handleIntent(
-                                                SearchIntents.NavigateToUserInfo(
+                                                SearchIntent.NavigateToUserInfo(
                                                     master.id
                                                 )
                                             )
@@ -175,7 +175,7 @@ fun SearchScreen(navController: NavController, searchViewModel: SearchViewModel)
     if (currentState.isFiltersSheetOpen) {
 
         ModalBottomSheet(
-            onDismissRequest = { searchViewModel.handleIntent(SearchIntents.CloseFilters) },
+            onDismissRequest = { searchViewModel.handleIntent(SearchIntent.CloseFilters) },
 
         ) {
             Filters(
@@ -190,7 +190,7 @@ fun SearchScreen(navController: NavController, searchViewModel: SearchViewModel)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Filters(searchState: SearchUiState, onIntent: (SearchIntents) -> Unit) {
+fun Filters(searchState: SearchState, onIntent: (SearchIntent) -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxHeight(0.8f)
@@ -202,7 +202,7 @@ fun Filters(searchState: SearchUiState, onIntent: (SearchIntents) -> Unit) {
         Button(
             modifier = Modifier,
             onClick = {
-                onIntent(SearchIntents.ResetFilters)
+                onIntent(SearchIntent.ResetFilters)
             }
         ) {
             Text(stringResource(R.string.reset_filters))
@@ -218,7 +218,7 @@ fun Filters(searchState: SearchUiState, onIntent: (SearchIntents) -> Unit) {
             R.string.enter_expirence,
             searchState.filterData.experienceInYears,
             { newValue ->
-                onIntent(SearchIntents.FilterAction(FilterIntent.UpdateYears(newValue)))
+                onIntent(SearchIntent.FilterAction(FilterIntent.UpdateYears(newValue)))
             },
             keyboardType = KeyboardType.Number
         )
@@ -227,7 +227,7 @@ fun Filters(searchState: SearchUiState, onIntent: (SearchIntents) -> Unit) {
             R.string.enter_words,
             searchState.filterData.detailDescriptions,
             { newValue ->
-                onIntent(SearchIntents.FilterAction(FilterIntent.UpdateDetailDescriptions(newValue)))
+                onIntent(SearchIntent.FilterAction(FilterIntent.UpdateDetailDescriptions(newValue)))
             }
         )
 
@@ -239,7 +239,7 @@ fun Filters(searchState: SearchUiState, onIntent: (SearchIntents) -> Unit) {
                     searchState.filterData.city,
                     CitiesEnum.entries,
                     onSelect = { city ->
-                        onIntent(SearchIntents.FilterAction(FilterIntent.UpdateCity(city)))
+                        onIntent(SearchIntent.FilterAction(FilterIntent.UpdateCity(city)))
                     }
                 )
             }
@@ -253,7 +253,7 @@ fun Filters(searchState: SearchUiState, onIntent: (SearchIntents) -> Unit) {
                     searchState.filterData.masterSpecialization,
                     MasterSpetializationsEnum.entries,
                     onSelect = { spec ->
-                        onIntent(SearchIntents.FilterAction(FilterIntent.UpdateMasterSpecialization(spec)))
+                        onIntent(SearchIntent.FilterAction(FilterIntent.UpdateMasterSpecialization(spec)))
                     }
                 )
             }
@@ -264,7 +264,7 @@ fun Filters(searchState: SearchUiState, onIntent: (SearchIntents) -> Unit) {
         Button(
             modifier = Modifier.fillMaxWidth(),
             onClick = {
-                onIntent(SearchIntents.ApplyFilters)
+                onIntent(SearchIntent.ApplyFilters)
             }
         ) {
             Text(stringResource(R.string.apply_filters))

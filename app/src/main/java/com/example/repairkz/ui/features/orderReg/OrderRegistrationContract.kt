@@ -1,6 +1,9 @@
-package com.example.repairkz.ui.features.search.orderReg
+package com.example.repairkz.ui.features.orderReg
 
 import com.example.repairkz.common.enums.PaymentMethod
+import com.example.repairkz.ui.base.UiEffect
+import com.example.repairkz.ui.base.UiIntent
+import com.example.repairkz.ui.base.UiState
 import java.time.LocalDateTime
 
 data class OrderRegistrationState(
@@ -17,9 +20,9 @@ data class OrderRegistrationState(
     val dateMillis: Long? = null,
     val hour: Int? = null,
     val minute: Int? = null,
-)
+) : UiState
 
-sealed class OrderRegistrationIntent{
+sealed class OrderRegistrationIntent : UiIntent{
     data class ChangeDescription(val description: String):OrderRegistrationIntent()
     data class ChangeNumber(val number: String):OrderRegistrationIntent()
     data class ChangeAddress(val address: String):OrderRegistrationIntent()
@@ -36,6 +39,6 @@ sealed class OrderRegistrationIntent{
     object CreateOrderRequest:OrderRegistrationIntent()
 }
 
-sealed class OrderRegistrationEffects{
-    object NavigateBack : OrderRegistrationEffects()
+sealed class OrderRegistrationEffect : UiEffect{
+    object NavigateBack : OrderRegistrationEffect()
 }

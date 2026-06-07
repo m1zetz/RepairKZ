@@ -1,7 +1,6 @@
-package com.example.repairkz.ui.features.auth.signUp
+package com.example.repairkz.ui.features.signUp
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.repairkz.common.enums.CitiesEnum
@@ -17,9 +16,8 @@ import com.example.repairkz.domain.useCases.auth.GetCodeUseCase
 import com.example.repairkz.domain.useCases.auth.SendCodeUseCase
 import com.example.repairkz.domain.useCases.files.PreparePhotoPartUseCase
 import com.example.repairkz.domain.useCases.userData.SaveUserToLocalUseCase
-import com.example.repairkz.domain.useCases.userData.UpdateUserDataUseCase
-import com.example.repairkz.ui.features.auth.signUp.SignUpEffect.*
-import com.google.gson.Gson
+import com.example.repairkz.ui.base.BaseViewModel
+import com.example.repairkz.ui.features.signUp.SignUpEffect.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Job
@@ -30,12 +28,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.MultipartBody
-import okhttp3.RequestBody.Companion.asRequestBody
-import okhttp3.RequestBody.Companion.toRequestBody
-import java.io.File
-import java.io.FileOutputStream
 import javax.inject.Inject
 
 @HiltViewModel
@@ -48,146 +40,164 @@ class SignUpViewModel @Inject constructor(
     private val dataStoreManager: DataStoreManager,
     private val preparePhotoPartUseCase: PreparePhotoPartUseCase,
     @ApplicationContext private val context: Context,
-) : ViewModel() {
+) : BaseViewModel<SignUpState, SignUpIntent, SignUpEffect>() {
 
 
-    private val _uiState = MutableStateFlow(SignUpState())
-    val state = _uiState.asStateFlow()
-
-    private val _channel = Channel<SignUpEffect>(Channel.BUFFERED)
-    val channel = _channel.receiveAsFlow()
+    override val initialState = SignUpState()
 
     private var timerJob: Job? = null
     private fun validationEmail(email: String): Boolean {
-        var newState = _uiState.value.copy(emailError = null)
+        setState {
+            copy(emailError = null)
+        }
 
         val checkEmail = Validator.validateEmail(email)
 
 
-        newState = newState.copy(
-            emailError = (checkEmail as? ValidationResult.Error)?.messageRes,
+        setState {
+            copy(
+                emailError = (checkEmail as? ValidationResult.Error)?.messageRes,
 
-            )
-        _uiState.value = newState
+                )
+        }
         return checkEmail is ValidationResult.Success
     }
 
     private fun validationCode(code: String): Boolean {
-        var newState = _uiState.value.copy(codeError = null)
+        setState {
+            copy(codeError = null)
+        }
 
         val checkCode = Validator.validateCode(code)
 
-        newState = newState.copy(
-            codeError = (checkCode as? ValidationResult.Error)?.messageRes
-        )
-        _uiState.value = newState
+        setState {
+            copy(
+                codeError = (checkCode as? ValidationResult.Error)?.messageRes
+            )
+        }
         return checkCode is ValidationResult.Success
     }
 
     private fun validationFirstName(firstName: String): Boolean {
-        var newState =
-            _uiState.value.copy(userInfo = _uiState.value.userInfo.copy(firstNameError = null))
+        setState {
+            copy(userInfo = userInfo.copy(firstNameError = null))
+        }
 
         val checkFirstName = Validator.validateFirstName(firstName)
 
-        newState = newState.copy(
-            userInfo = newState.userInfo.copy(
-                firstNameError = (checkFirstName as? ValidationResult.Error)?.messageRes
+        setState {
+            copy(
+                userInfo = userInfo.copy(
+                    firstNameError = (checkFirstName as? ValidationResult.Error)?.messageRes
+                )
             )
-        )
-
-        _uiState.value = newState
+        }
 
         return checkFirstName is ValidationResult.Success
     }
 
     private fun validationLastName(lastName: String): Boolean {
-        var newState =
-            _uiState.value.copy(userInfo = _uiState.value.userInfo.copy(lastNameError = null))
+        setState {
+            copy(userInfo = userInfo.copy(lastNameError = null))
+        }
 
         val checkLastName = Validator.validateLastName(lastName)
 
-        newState = newState.copy(
-            userInfo = newState.userInfo.copy(
-                lastNameError = (checkLastName as? ValidationResult.Error)?.messageRes
+        setState {
+            copy(
+                userInfo = userInfo.copy(
+                    lastNameError = (checkLastName as? ValidationResult.Error)?.messageRes
+                )
             )
-        )
-        _uiState.value = newState
+        }
 
         return checkLastName is ValidationResult.Success
     }
 
     private fun validationPassword(password: String): Boolean {
-        var newState =
-            _uiState.value.copy(passwordError = null)
+        setState {
+            copy(passwordError = null)
+        }
 
         val checkPassword = Validator.validatePassword(password)
 
-        newState = newState.copy(
-            passwordError = (checkPassword as? ValidationResult.Error)?.messageRes
-        )
-
-        _uiState.value = newState
-
+        setState {
+            copy(
+                passwordError = (checkPassword as? ValidationResult.Error)?.messageRes
+            )
+        }
         return checkPassword is ValidationResult.Success
     }
 
-    fun handleIntent(intent: SignUpIntent) {
+    override fun handleIntent(intent: SignUpIntent) {
         when (intent) {
             is SignUpIntent.ChangeEmail -> {
-                _uiState.value = _uiState.value.copy(email = intent.emailChar, emailError = null)
+                setState {
+                    copy(email = intent.emailChar, emailError = null)
+                }
             }
 
             is SignUpIntent.ChangeCode -> {
                 if (intent.codeChar.length <= 6) {
-                    _uiState.value = _uiState.value.copy(code = intent.codeChar, codeError = null)
+                    setState {
+                        copy(code = intent.codeChar, codeError = null)
+                    }
                 }
             }
 
             is SignUpIntent.SendEmail -> {
-                val isValid = validationEmail(_uiState.value.email)
+                val isValid = validationEmail(_state.value.email)
                 if (isValid) {
                     viewModelScope.launch {
-                        _uiState.value = _uiState.value.copy(
-                            isLoading = true,
-                            isCodeSent = true
-                        )
+                        setState {
+                            copy(
+                                isLoading = true,
+                                isCodeSent = true
+                            )
+                        }
                         val response = getCodeUseCase(intent.email)
                         response.onSuccess {
-                            _channel.send(NavigateToConfirmation)
+                            sendEffect(NavigateToConfirmation)
                             timer()
                         }.onFailure { error ->
                             if (error is AuthorizationError) {
-                                _channel.send(ShowSnackBar(error))
+                                sendEffect(ShowSnackBar(error))
                             }
 
                         }
-                        _uiState.value = _uiState.value.copy(
-                            isLoading = false
-                        )
+                        setState {
+                            copy(
+                                isLoading = false
+                            )
+
+                        }
                     }
                 }
             }
 
             is SignUpIntent.SendCode -> {
-                val isValid = validationCode(_uiState.value.code)
+                val isValid = validationCode(_state.value.code)
                 if (isValid) {
                     viewModelScope.launch {
-                        _uiState.value = _uiState.value.copy(
-                            isLoading = true
-                        )
+                        setState {
+                            copy(
+                                isLoading = true
+                            )
+                        }
                         val code = intent.code.toInt()
-                        val response = sendCodeUseCase(code, _uiState.value.email)
+                        val response = sendCodeUseCase(code, _state.value.email)
                         response.onSuccess {
-                            _channel.send(NavigateToFillingData)
+                            sendEffect(NavigateToFillingData)
                         }.onFailure { error ->
                             if (error is AuthorizationError) {
-                                _channel.send(ShowSnackBar(error))
+                                sendEffect(ShowSnackBar(error))
                             }
                         }
-                        _uiState.value = _uiState.value.copy(
-                            isLoading = false
-                        )
+                        setState {
+                            copy(
+                                isLoading = false
+                            )
+                        }
 
                     }
                 }
@@ -195,57 +205,64 @@ class SignUpViewModel @Inject constructor(
             }
 
             SignUpIntent.ResetRegistrationData -> {
-                _uiState.value = _uiState.value.copy(
-                    isLoading = false,
-                    code = "",
-                    error = null
-                )
+                setState {
+                    copy(
+                        isLoading = false,
+                        code = "",
+                        error = null
+                    )
+                }
             }
 
             is SignUpIntent.ChangeFirstName -> {
-                _uiState.value = _uiState.value.copy(
-                    userInfo = _uiState.value.userInfo.copy(
-                        firstName = intent.firstName,
-                        firstNameError = null
+                setState {
+                    copy(
+                        userInfo = userInfo.copy(
+                            firstName = intent.firstName,
+                            firstNameError = null
+                        )
                     )
-                )
+                }
             }
 
             is SignUpIntent.ChangeLastName -> {
-                _uiState.value = _uiState.value.copy(
-                    userInfo = _uiState.value.userInfo.copy(
-                        lastName = intent.lastName,
-                        lastNameError = null
+                setState {
+                    copy(
+                        userInfo = userInfo.copy(
+                            lastName = intent.lastName,
+                            lastNameError = null
+                        )
                     )
-                )
+                }
             }
 
             SignUpIntent.NavigateToMainWindow -> {
-                val firstName = _uiState.value.userInfo.firstName
-                val lastName = _uiState.value.userInfo.lastName
-                val password = _uiState.value.password
-                val photo = _uiState.value.userInfo.photoUri
+                val state = _state.value
+                val firstName = state.userInfo.firstName
+                val lastName = state.userInfo.lastName
+                val password = state.password
+                val photo = state.userInfo.photoUri
                 val isFirstNameValid = validationFirstName(firstName)
                 val isLastNameValid = validationLastName(lastName)
                 val isPasswordValid = validationPassword(password)
                 if (isFirstNameValid && isLastNameValid && isPasswordValid) {
-                    var user = User(
+                    val user = User(
                         id = 0,
                         firstName = firstName.replaceFirstChar { it.uppercase() },
                         lastName = lastName.replaceFirstChar { it.uppercase() },
                         userPhotoUrl = photo?.toString(),
-                        email = _uiState.value.email,
+                        email = state.email,
                         password = password,
                         phoneNumber = "",
                         status = StatusOfUser.CLIENT,
                         city = CitiesEnum.ALMATY
                     )
                     viewModelScope.launch {
-                        _uiState.update { state ->
-                            state.copy(isLoading = true)
+                        setState {
+                            copy(isLoading = true)
                         }
                         try {
-                            val uri = _uiState.value.userInfo.photoUri
+                            val uri = _state.value.userInfo.photoUri
                             val photoPart =
                                 if (uri != null) preparePhotoPartUseCase(context, uri) else null
 
@@ -255,16 +272,20 @@ class SignUpViewModel @Inject constructor(
                                 val finalUser = user.copy(userId = dto.id)
                                 dataStoreManager.saveToken(dto.token)
                                 saveUserToLocalUseCase(finalUser)
-                                _channel.send(NavigateToMainWindow)
+                                sendEffect(NavigateToMainWindow)
                             }.onFailure { error ->
-                                _uiState.update { it.copy(error = error.message) }
+                                setState {
+                                    copy(error = error.message)
+                                }
                             }
 
                         } catch (e: Exception) {
-                            _uiState.update { it.copy(error = "Ошибка сети") }
+                            setState {
+                                copy(error = "Ошибка сети")
+                            }
                         } finally {
-                            _uiState.update { state ->
-                                state.copy(isLoading = false)
+                            setState {
+                                copy(isLoading = false)
                             }
                         }
 
@@ -275,34 +296,34 @@ class SignUpViewModel @Inject constructor(
             }
 
             is SignUpIntent.ChangeAvatar -> {
-                viewModelScope.launch {
-                    _channel.send(SignUpEffect.OpenPhotoPicker(intent.typeOfSelect))
-                }
+                sendEffect(OpenPhotoPicker(intent.typeOfSelect))
             }
 
             SignUpIntent.CloseSheet -> {
-                _uiState.update {
-                    it.copy(
+                setState {
+                    copy(
                         avatarSheetState = false
                     )
                 }
             }
 
             SignUpIntent.OpenSheet -> {
-                _uiState.update {
-                    it.copy(
+                setState {
+                    copy(
                         avatarSheetState = true
                     )
                 }
             }
 
             is SignUpIntent.GetPhotoFromMedia -> {
-                _uiState.update { it.copy(userInfo = it.userInfo.copy(pendingPhotoUri = intent.uri)) }
+                setState { copy(userInfo = userInfo.copy(pendingPhotoUri = intent.uri)) }
 
             }
 
             SignUpIntent.CancelPhoto -> {
-                _uiState.update { it.copy(userInfo = it.userInfo.copy(pendingPhotoUri = null)) }
+                setState {
+                    copy(userInfo = userInfo.copy(pendingPhotoUri = null))
+                }
 
             }
 
@@ -310,25 +331,31 @@ class SignUpViewModel @Inject constructor(
             is SignUpIntent.ConfirmPhoto -> {
 
                 viewModelScope.launch {
-                    _uiState.value = _uiState.value.copy(
-                        isPhotoLoading = true,
-                        userInfo = _uiState.value.userInfo.copy(pendingPhotoUri = null)
-                    )
+                    setState {
+                        copy(
+                            isPhotoLoading = true,
+                            userInfo = userInfo.copy(pendingPhotoUri = null)
+                        )
+                    }
                     val localUri = saveToInternalUseCase(intent.uri)
-                    _uiState.value = _uiState.value.copy(
-                        userInfo = _uiState.value.userInfo.copy(
-                            photoUri = localUri,
-                        ),
-                        isPhotoLoading = false
-                    )
+                    setState {
+                        copy(
+                            userInfo = userInfo.copy(
+                                photoUri = localUri,
+                            ),
+                            isPhotoLoading = false
+                        )
+                    }
                 }
             }
 
             is SignUpIntent.ChangePassword -> {
-                _uiState.value = _uiState.value.copy(
-                    password = intent.password,
-                    passwordError = null
-                )
+                setState {
+                    copy(
+                        password = intent.password,
+                        passwordError = null
+                    )
+                }
             }
         }
 
@@ -336,13 +363,15 @@ class SignUpViewModel @Inject constructor(
     }
 
     fun timer() {
-        _uiState.update { it.copy(timerSeconds = 8) }
+        setState {
+            copy(timerSeconds = 60)
+        }
         timerJob?.cancel()
         timerJob = viewModelScope.launch {
-            while (_uiState.value.timerSeconds > 0) {
+            while (_state.value.timerSeconds > 0) {
                 delay(1000)
-                _uiState.update {
-                    it.copy(timerSeconds = it.timerSeconds - 1)
+                setState {
+                    copy(timerSeconds = timerSeconds - 1)
                 }
             }
         }

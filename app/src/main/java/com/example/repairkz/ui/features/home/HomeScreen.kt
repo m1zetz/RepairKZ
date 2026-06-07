@@ -19,9 +19,7 @@ import androidx.compose.material.icons.filled.Bolt
 import androidx.compose.material.icons.filled.Computer
 import androidx.compose.material.icons.filled.Handyman
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.TableBar
-import androidx.compose.material.icons.filled.Tablet
 import androidx.compose.material.icons.filled.WaterDrop
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -48,9 +46,9 @@ import com.example.repairkz.common.enums.MasterSpetializationsEnum
 fun HomeScreen(navController: NavController){
     val homeScreenViewModel: HomeViewModel = hiltViewModel()
     LaunchedEffect(Unit) {
-        homeScreenViewModel.effectsChannel.collect {effect ->
+        homeScreenViewModel.channel.collect {effect ->
             when(effect){
-                is Effects.NavigateToSearch -> {
+                is HomeEffect.NavigateToSearch -> {
                     val route = if(effect.patternResId == null){
                         Routes.SEARCH
                     } else {
@@ -79,7 +77,7 @@ fun HomeScreen(navController: NavController){
     ) {
         RepairSearchBar(
             onClick = {
-                homeScreenViewModel.handleIntent(HomeScreenIntent.ClickOnCard(null))
+                homeScreenViewModel.handleIntent(HomeIntent.ClickOnCard(null))
             }
         )
 
@@ -89,7 +87,7 @@ fun HomeScreen(navController: NavController){
         ) {
             items(mastersCards) {card ->
                 CardOfMaster(card, {
-                    homeScreenViewModel.handleIntent(HomeScreenIntent.ClickOnCard(card.spec))
+                    homeScreenViewModel.handleIntent(HomeIntent.ClickOnCard(card.spec))
                 })
             }
         }

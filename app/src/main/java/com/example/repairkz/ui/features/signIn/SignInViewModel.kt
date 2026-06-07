@@ -1,6 +1,5 @@
-package com.example.repairkz.ui.features.auth.signIn
+package com.example.repairkz.ui.features.signIn
 
-import android.util.Log
 import com.example.repairkz.R
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -10,13 +9,11 @@ import com.example.repairkz.common.models.User
 import com.example.repairkz.common.utils.ValidationResult
 import com.example.repairkz.common.utils.Validator
 import com.example.repairkz.data.local.dataStore.DataStoreManager
-import com.example.repairkz.data.remote.api.TokenApi
 import com.example.repairkz.data.remote.dto.LoginDTO
-import com.example.repairkz.data.userData.UserRepository
 import com.example.repairkz.domain.errors.AuthorizationError
 import com.example.repairkz.domain.useCases.auth.LoginUseCase
 import com.example.repairkz.domain.useCases.userData.SaveUserToLocalUseCase
-import com.example.repairkz.domain.useCases.userData.UpdateUserDataUseCase
+import com.example.repairkz.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.channels.Channel
@@ -31,36 +28,38 @@ class SignInViewModel @Inject constructor(
     private val loginUseCase: LoginUseCase,
     private val dataStoreManager: DataStoreManager,
     private val saveUserToLocalUseCase: SaveUserToLocalUseCase
-)  : ViewModel() {
-    private val _signInState = MutableStateFlow(SignInState())
-    val signInState = _signInState.asStateFlow()
-
-    private val _channel = Channel<SignInEffects>(Channel.BUFFERED)
-    val channel = _channel.receiveAsFlow()
+)  : BaseViewModel<SignInState, SignInIntent, SignInEffect>() {
+    override val initialState = SignInState()
 
 
-    fun handleIntent(intent: SignInIntent){
+
+
+    override fun handleIntent(intent: SignInIntent){
         when(intent){
             is SignInIntent.ChangeEmail -> {
-                _signInState.value = _signInState.value.copy(email = intent.value, emailError = null)
+                setState {
+                    copy(email = intent.value, emailError = null)
+                }
 
             }
             is SignInIntent.ChangePassword -> {
-                _signInState.value = _signInState.value.copy(password = intent.value, passwordError = null)
+                setState {
+                    copy(password = intent.value, passwordError = null)
+                }
             }
             is SignInIntent.SignIn -> {
-
-                val isValid = validateFields(_signInState.value.email, _signInState.value.password)
+                val state = _state.value
+                val isValid = validateFields(state.email, state.password)
                 if(isValid){
                     viewModelScope.launch {
                         try {
-                            _signInState.update {
-                                it.copy(
+                            setState {
+                                copy(
                                     isLoading = true
                                 )
                             }
 
-                            val response = loginUseCase(LoginDTO(_signInState.value.email, _signInState.value.password))
+                            val response = loginUseCase(LoginDTO(state.email, state.password))
 
                             response.onSuccess {loginResponseDTO ->
                                 val dto = loginResponseDTO.user
@@ -94,19 +93,21 @@ class SignInViewModel @Inject constructor(
 
                                 )
                                 dataStoreManager.saveToken(loginResponseDTO.token)
-                                _channel.send(SignInEffects.NavigateToMainWindow)
+                                sendEffect(SignInEffect.NavigateToMainWindow)
                             }.onFailure { error ->
                                 if(error is AuthorizationError){
-                                    _channel.send(SignInEffects.ShowSnackBar(error))
+                                    sendEffect(SignInEffect.ShowSnackBar(error))
                                 }
 
                             }
                         } catch (e: Exception){
-                            _signInState.update { it.copy(error = "Ошибка сети") }
+                            setState {
+                                copy(error = "Ошибка сети")
+                            }
 
                         } finally {
-                            _signInState.update {
-                                it.copy(
+                            setState {
+                                copy(
                                     isLoading = false
                                 )
                             }
@@ -115,25 +116,23 @@ class SignInViewModel @Inject constructor(
                 }
             }
             SignInIntent.NavigateToRegistration -> {
-                viewModelScope.launch {
-                    _channel.send(SignInEffects.NavigateToRegistration)
-                }
+                sendEffect(SignInEffect.NavigateToRegistration)
 
             }
         }
     }
     private fun validateFields(email: String, password: String) : Boolean{
-
-        var newState = _signInState.value.copy(emailError = null, passwordError = null)
+        setState { copy(emailError = null, passwordError = null) }
 
         val checkEmail = Validator.validateEmail(email)
         val checkPassword = if(password.isEmpty()) R.string.password_empty else null
 
-        newState = newState.copy(
-            emailError = (checkEmail as? ValidationResult.Error)?.messageRes,
-            passwordError = checkPassword
-        )
-        _signInState.value = newState
+        setState {
+            copy(
+                emailError = (checkEmail as? ValidationResult.Error)?.messageRes,
+                passwordError = checkPassword
+            )
+        }
         return checkEmail is ValidationResult.Success && checkPassword == null
     }
 }

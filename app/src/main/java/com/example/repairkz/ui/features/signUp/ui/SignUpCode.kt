@@ -1,4 +1,4 @@
-package com.example.repairkz.ui.features.auth.signUp.ui
+package com.example.repairkz.ui.features.signUp.ui
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
@@ -11,28 +11,18 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Code
-import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -42,18 +32,12 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.repairkz.Navigation.Routes
-import com.example.repairkz.Navigation.Routes.MAIN_WINDOW
-import com.example.repairkz.Navigation.Routes.SIGN_UP_CODE
 import com.example.repairkz.Navigation.Routes.SIGN_UP_DATA
 import com.example.repairkz.R
-import com.example.repairkz.common.enums.PhotoSourceEnum
 import com.example.repairkz.domain.errors.toMessage
-import com.example.repairkz.ui.features.auth.signIn.SignInIntent
-import com.example.repairkz.ui.features.auth.signUp.SignUpEffect
-import com.example.repairkz.ui.features.auth.signUp.SignUpIntent
-import com.example.repairkz.ui.features.auth.signUp.SignUpViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
+import com.example.repairkz.ui.features.signUp.SignUpEffect
+import com.example.repairkz.ui.features.signUp.SignUpIntent
+import com.example.repairkz.ui.features.signUp.SignUpViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable

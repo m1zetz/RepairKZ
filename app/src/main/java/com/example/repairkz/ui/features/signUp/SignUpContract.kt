@@ -1,10 +1,11 @@
-package com.example.repairkz.ui.features.auth.signUp
+package com.example.repairkz.ui.features.signUp
 
 import android.net.Uri
 import com.example.repairkz.common.enums.PhotoSourceEnum
 import com.example.repairkz.domain.errors.AuthorizationError
-import com.example.repairkz.ui.features.UserInfo.UserEffects
-import com.example.repairkz.ui.features.UserInfo.UserIntent
+import com.example.repairkz.ui.base.UiEffect
+import com.example.repairkz.ui.base.UiIntent
+import com.example.repairkz.ui.base.UiState
 
 data class SignUpState(
     val email: String = "",
@@ -21,7 +22,7 @@ data class SignUpState(
     val canResendCode: Boolean = true,
     val userInfo: MinimalUserInfo = MinimalUserInfo(),
     val avatarSheetState: Boolean = false
-)
+) : UiState
 
 data class MinimalUserInfo(
     val photoUri: Uri? = null,
@@ -32,7 +33,7 @@ data class MinimalUserInfo(
     val lastNameError: Int? = null
 )
 
-sealed class SignUpIntent{
+sealed class SignUpIntent : UiIntent{
     data class SendEmail(val email: String) : SignUpIntent()
     data class SendCode(val code: String) : SignUpIntent()
     data class ChangeEmail(val emailChar: String) : SignUpIntent()
@@ -52,7 +53,7 @@ sealed class SignUpIntent{
     data class GetPhotoFromMedia(val uri: Uri?) : SignUpIntent()
 }
 
-sealed class SignUpEffect{
+sealed class SignUpEffect : UiEffect{
     object NavigateToConfirmation : SignUpEffect()
 
     object NavigateToFillingData : SignUpEffect()

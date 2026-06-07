@@ -33,7 +33,7 @@ import com.example.repairkz.ui.features.settings.SettingsViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainWindow(activityViewModel: MainActivityViewModel, mainViewModel: MainViewModel, navController: NavController, notificationViewModel: NotificationViewModel, settingsViewModel: SettingsViewModel){
-    val selectedItemIndex = mainViewModel.screenIndexState.collectAsState()
+    val selectedItemIndex = mainViewModel.state.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     Scaffold(
         snackbarHost = {

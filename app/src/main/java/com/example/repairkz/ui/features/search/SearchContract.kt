@@ -3,8 +3,11 @@ package com.example.repairkz.ui.features.search
 import com.example.repairkz.common.enums.CitiesEnum
 import com.example.repairkz.common.enums.MasterSpetializationsEnum
 import com.example.repairkz.common.models.Master
+import com.example.repairkz.ui.base.UiEffect
+import com.example.repairkz.ui.base.UiIntent
+import com.example.repairkz.ui.base.UiState
 
-data class SearchUiState(
+data class SearchState(
     val query: String = "",
     val initialPatternResId: Int?,
     val result: SearchResult = SearchResult.Idle,
@@ -14,7 +17,7 @@ data class SearchUiState(
     val searchFieldState: Boolean = true,
     val error: String = ""
 
-)
+) : UiState
 
 sealed class SearchResult {
     data object Idle : SearchResult()
@@ -30,19 +33,19 @@ data class FilterData(
     val detailDescriptions: String = ""
 )
 
-sealed class SearchIntents {
-    data class ChangeSearchFieldState(val state: Boolean) : SearchIntents()
-    data class ChangeText(val text: String) : SearchIntents()
-    object GetData : SearchIntents()
-    object NavigateToBack : SearchIntents()
-    data class NavigateToUserInfo(val id: Long) : SearchIntents()
+sealed class SearchIntent : UiIntent {
+    data class ChangeSearchFieldState(val state: Boolean) : SearchIntent()
+    data class ChangeText(val text: String) : SearchIntent()
+    object GetData : SearchIntent()
+    object NavigateToBack : SearchIntent()
+    data class NavigateToUserInfo(val id: Long) : SearchIntent()
 
-    object OpenFilters : SearchIntents()
-    object CloseFilters : SearchIntents()
+    object OpenFilters : SearchIntent()
+    object CloseFilters : SearchIntent()
 
-    object ApplyFilters : SearchIntents()
-    object ResetFilters : SearchIntents()
-    data class FilterAction(val action: FilterIntent) : SearchIntents()
+    object ApplyFilters : SearchIntent()
+    object ResetFilters : SearchIntent()
+    data class FilterAction(val action: FilterIntent) : SearchIntent()
 
 
 }
@@ -54,8 +57,8 @@ sealed class FilterIntent{
     data class UpdateCity(val city: CitiesEnum) : FilterIntent()
 
 }
-sealed interface SearchEffects {
-    object NavigateBack : SearchEffects
+sealed interface SearchEffect : UiEffect {
+    object NavigateBack : SearchEffect
 
-    data class NavigateToMasterInfo(val id: Long) : SearchEffects
+    data class NavigateToMasterInfo(val id: Long) : SearchEffect
 }

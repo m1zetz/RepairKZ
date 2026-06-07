@@ -18,7 +18,8 @@ import com.example.repairkz.domain.useCases.services.GetServicesUseCase
 import com.example.repairkz.domain.useCases.userData.GetUserDataUseCase
 import com.example.repairkz.domain.useCases.userData.UpdateUserDataUseCase
 import com.example.repairkz.domain.useCases.userData.UpdateUserPhotoUseCase
-import com.example.repairkz.ui.features.UserInfo.UserEffects.*
+import com.example.repairkz.ui.base.BaseViewModel
+import com.example.repairkz.ui.features.UserInfo.UserEffect.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject
@@ -40,23 +41,18 @@ class UserInfoViewModel @Inject constructor(
     private val preparePhotoPartUseCase: PreparePhotoPartUseCase,
     private val createServiceUseCase: CreateServiceUseCase,
     private val deleteServiceUseCase: DeleteServiceUseCase,
-    private val updateServiceUseCase: UpdateServiceUseCase,
     @ApplicationContext private val context: Context,
-) : ViewModel() {
+) : BaseViewModel<UserState, UserIntent, UserEffect>() {
 
 
-    private val _uiState = MutableStateFlow(UserState())
-    val uiState = _uiState.asStateFlow()
-
-    private val _channel = Channel<UserEffects>(Channel.BUFFERED)
-    val channel = _channel.receiveAsFlow()
+    override val initialState = UserState()
 
 
     init{
         viewModelScope.launch {
             getUserDataUseCase().collect {user ->
-                _uiState.update { currentState ->
-                    var state = currentState.copy(
+                setState {
+                    var state = this.copy(
                         user = user,
                         numberDraft = user?.phoneNumber ?: "",
                         cityDraft = user?.city ?: CitiesEnum.UNKNOWN,
@@ -76,53 +72,52 @@ class UserInfoViewModel @Inject constructor(
     }
     init {
         viewModelScope.launch {
-            _uiState.collect { it ->
-                _uiState.update { currentState ->
-                    currentState.copy(
-                        showSave = checkChanges(currentState)
+            _state.collect { it ->
+                setState {
+                    copy(
+                        showSave = checkChanges(this)
                     )
                 }
+
             }
         }
     }
 
-    fun handleIntent(intent: UserIntent) {
+    override fun handleIntent(intent: UserIntent) {
         when (intent) {
 
             is UserIntent.ChangeAvatar -> {
-                viewModelScope.launch {
-                    _channel.send(OpenPhotoPicker(intent.typeOfSelect))
-                }
+                sendEffect(OpenPhotoPicker(intent.typeOfSelect))
 
             }
 
             UserIntent.CloseSheet -> {
-                _uiState.update { currentState ->
-                    currentState.copy(
+                setState {
+                    copy(
                         avatarSheetState = false
                     )
                 }
             }
 
             UserIntent.OpenSheet -> {
-                _uiState.update { currentState ->
-                    currentState.copy(
+                setState {
+                    copy(
                         avatarSheetState = true
                     )
                 }
             }
 
             is UserIntent.GetPhotoFromMedia -> {
-                _uiState.update { currentState ->
-                    currentState.copy(
+                setState {
+                    copy(
                         pendingUri = intent.uri
                     )
                 }
             }
 
             UserIntent.CancelPhoto -> {
-                _uiState.update { currentState ->
-                    currentState.copy(
+                setState {
+                    copy(
                         pendingUri = null
                     )
                 }
@@ -131,22 +126,22 @@ class UserInfoViewModel @Inject constructor(
             is UserIntent.ConfirmPhoto -> {
                 viewModelScope.launch {
                     val localUri = saveToInternalUseCase(intent.uri)
-                    _uiState.update { currentState ->
-                        currentState.copy(
+                    setState {
+                        copy(
                             newAvatarData = localUri,
                             pendingUri = null,
                             isPhotoSaving = true
                         )
                     }
-                    val user = _uiState.value.user
+                    val user = _state.value.user
                     user?.let {
                         val photo = preparePhotoPartUseCase(context, intent.uri)
                         photo?.let {
                             withContext(NonCancellable) {
                                 updateUserPhotoUseCase(user.id, photo)
                             }
-                            _uiState.update { currentState ->
-                                currentState.copy(
+                            setState {
+                                copy(
                                     isPhotoSaving = false
                                 )
                             }
@@ -158,8 +153,8 @@ class UserInfoViewModel @Inject constructor(
             }
 
             is UserIntent.CurrentMasterIntent.ChangeDescription -> {
-                _uiState.update { currentState ->
-                    currentState.copy(
+                setState {
+                    copy(
                         descriptionDraft = intent.description
                     )
                 }
@@ -167,8 +162,8 @@ class UserInfoViewModel @Inject constructor(
             }
 
             is UserIntent.CurrentMasterIntent.ChangeExperience -> {
-                _uiState.update { currentState ->
-                    currentState.copy(
+                setState {
+                    copy(
                         experienceDraft = intent.experience
                     )
                 }
@@ -176,8 +171,8 @@ class UserInfoViewModel @Inject constructor(
             }
 
             is UserIntent.CurrentMasterIntent.ChangeSpecialization -> {
-                _uiState.update { currentState ->
-                    currentState.copy(
+                setState {
+                    copy(
                         specDraft = intent.spec
                     )
                 }
@@ -187,8 +182,8 @@ class UserInfoViewModel @Inject constructor(
 
 
             is UserIntent.ChangeNumber -> {
-                _uiState.update { currentState ->
-                    currentState.copy(
+                setState {
+                    copy(
                         numberDraft = intent.number
                     )
                 }
@@ -197,8 +192,8 @@ class UserInfoViewModel @Inject constructor(
             }
 
             is UserIntent.ChangeCity -> {
-                _uiState.update { currentState ->
-                    currentState.copy(
+                setState {
+                    copy(
                         cityDraft = intent.city
                     )
                 }
@@ -206,8 +201,8 @@ class UserInfoViewModel @Inject constructor(
             }
 
             is UserIntent.ChangeEmail -> {
-                _uiState.update { currentState ->
-                    currentState.copy(
+                setState {
+                    copy(
                         emailDraft = intent.email
                     )
                 }
@@ -222,8 +217,8 @@ class UserInfoViewModel @Inject constructor(
 
             is UserIntent.CurrentMasterIntent.CreateService -> {
                 viewModelScope.launch {
-                    val state = _uiState.value
-                    val user = _uiState.value.user
+                    val state = _state.value
+                    val user = state.user
                     if(user !is Master) return@launch
                     val dto = MasterServiceDTO(
                         id = null,
@@ -251,30 +246,30 @@ class UserInfoViewModel @Inject constructor(
             }
 
             UserIntent.CurrentMasterIntent.CloseCreate -> {
-                _uiState.update { currentState ->
-                    currentState.copy(
+                setState {
+                    copy(
                         showCreate = false
                     )
                 }
             }
             UserIntent.CurrentMasterIntent.OpenCreate -> {
-                _uiState.update { currentState ->
-                    currentState.copy(
+                setState {
+                    copy(
                         showCreate = true
                     )
                 }
             }
 
             is UserIntent.CurrentMasterIntent.ChangePriceDraft -> {
-                _uiState.update { currentState ->
-                    currentState.copy(
-                        priceDraft = intent.value
-                    )
-                }
+               setState {
+                   copy(
+                       priceDraft = intent.value
+                   )
+               }
             }
             is UserIntent.CurrentMasterIntent.ChangeServiceDraft -> {
-                _uiState.update { currentState ->
-                    currentState.copy(
+                setState {
+                    copy(
                         serviceDraft = intent.value
                     )
                 }
@@ -287,12 +282,12 @@ class UserInfoViewModel @Inject constructor(
 
 
     private suspend fun updateProfile(){
-        _uiState.update {
-            it.copy(
+        setState {
+            copy(
                 isSaving = true
             )
         }
-        val state = _uiState.value
+        val state = _state.value
 
         val user = state.user?: return
         val finalUser = if (user is Master) {
@@ -313,8 +308,8 @@ class UserInfoViewModel @Inject constructor(
         }
 
         updateUserDataUseCase(finalUser)
-        _uiState.update {
-            it.copy(
+        setState {
+            copy(
                 isSaving = false
             )
         }

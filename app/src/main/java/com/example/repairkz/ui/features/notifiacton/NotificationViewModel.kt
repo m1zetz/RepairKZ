@@ -14,6 +14,7 @@ import com.example.repairkz.domain.useCases.order.ChangeOrderStateUseCase
 import com.example.repairkz.domain.useCases.order.GetClientOrderHistoryUseCase
 import com.example.repairkz.domain.useCases.order.GetMasterOrderHistoryUseCase
 import com.example.repairkz.domain.useCases.userData.GetUserDataUseCase
+import com.example.repairkz.ui.base.BaseViewModel
 import com.example.repairkz.ui.features.notifiacton.HistoryItem.*
 import com.example.repairkz.ui.features.notifiacton.NotificationState.*
 
@@ -34,10 +35,9 @@ class NotificationViewModel @Inject constructor(
     private val getMasterOrderHistoryUseCase: GetMasterOrderHistoryUseCase,
     private val acceptOrRejectOrderUseCase: AcceptOrRejectOrderUseCase,
     private val changeOrderStateUseCase: ChangeOrderStateUseCase,
-) : ViewModel() {
+) : BaseViewModel<NotificationState, NotificationIntent, NotificationEffect>() {
 
-    private val _state = MutableStateFlow<NotificationState>(Loading)
-    val state = _state.asStateFlow()
+    override val initialState = Loading
 
     private var currentUserId: Long? = null
 
@@ -51,13 +51,15 @@ class NotificationViewModel @Inject constructor(
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun handleIntent(intent: NotificationIntent) {
+    override fun handleIntent(intent: NotificationIntent) {
         when (intent) {
             is NotificationIntent.GetNotifications -> {
 
                 viewModelScope.launch {
                     val userId = currentUserId ?: return@launch
-                    _state.value = Loading
+                    setState {
+                        Loading
+                    }
                     try {
                         coroutineScope {
                             val clientResult = async { getClientOrderHistoryUseCase(userId) }
@@ -72,11 +74,14 @@ class NotificationViewModel @Inject constructor(
                                         ClientItem(it)
                                     }
                                     ).sortedBy { it.createdAt }
-                            _state.value =
+                            setState {
                                 Success(notifications = combined)
+                            }
                         }
                     } catch (e: Exception) {
-                        _state.value = Error(message = "Ошибка запроса")
+                        setState {
+                            Error(message = "Ошибка запроса")
+                        }
 
                     }
 
@@ -84,17 +89,20 @@ class NotificationViewModel @Inject constructor(
             }
 
             is NotificationIntent.ShowDetails -> {
-                val currentState = _state.value
-                if (currentState is Success) {
-                    _state.value = currentState.copy(selectedOrder = intent.order)
+                setState {
+                    if (this is Success) {
+                        copy(selectedOrder = intent.order)
+                    } else this
                 }
 
             }
 
             NotificationIntent.HideDetails -> {
-                val currentState = _state.value
-                if (currentState is Success) {
-                    _state.value = currentState.copy(selectedOrder = null)
+                @Suppress("USELESS_IS_CHECK")
+                setState {
+                    if (this is NotificationState.Success) {
+                        copy(selectedOrder = null)
+                    } else this
                 }
             }
 

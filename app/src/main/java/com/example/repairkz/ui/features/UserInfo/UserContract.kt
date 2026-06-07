@@ -6,6 +6,9 @@ import com.example.repairkz.common.enums.MasterSpetializationsEnum
 import com.example.repairkz.common.enums.PhotoSourceEnum
 import com.example.repairkz.common.models.User
 import com.example.repairkz.data.remote.dto.MasterServiceDTO
+import com.example.repairkz.ui.base.UiEffect
+import com.example.repairkz.ui.base.UiIntent
+import com.example.repairkz.ui.base.UiState
 
 data class UserState(
     val user: User? = null,
@@ -28,7 +31,7 @@ data class UserState(
     val isPhotoSaving: Boolean = false,
     val showSave: Boolean = false,
     val showCreate: Boolean = false,
-)
+) : UiState
 
 data class BusinessCardData(
     val id: Long,
@@ -38,7 +41,7 @@ data class BusinessCardData(
     val isMe: Boolean,
 )
 
-sealed class UserIntent {
+sealed class UserIntent : UiIntent{
     object OpenSheet : UserIntent()
     object CloseSheet : UserIntent()
     data class ChangeAvatar(val typeOfSelect: PhotoSourceEnum) : UserIntent()
@@ -68,9 +71,9 @@ sealed class UserIntent {
 }
 
 
-sealed interface UserEffects {
-    object MapsToPreview : UserEffects
+sealed interface UserEffect : UiEffect {
+    object MapsToPreview : UserEffect
 
-    data class OpenPhotoPicker(val typeOfSelect: PhotoSourceEnum) : UserEffects
-    data class NavigateToOrderRegistration(val masterId: Long) : UserEffects
+    data class OpenPhotoPicker(val typeOfSelect: PhotoSourceEnum) : UserEffect
+    data class NavigateToOrderRegistration(val masterId: Long) : UserEffect
 }

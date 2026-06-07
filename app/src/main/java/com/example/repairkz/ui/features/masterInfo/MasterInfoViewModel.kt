@@ -1,23 +1,12 @@
 package com.example.repairkz.ui.features.masterInfo
 
-import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.repairkz.domain.useCases.files.PreparePhotoPartUseCase
-import com.example.repairkz.domain.useCases.files.SaveToInternalUseCase
 import com.example.repairkz.domain.useCases.masterData.GetMasterByIdUseCase
 import com.example.repairkz.domain.useCases.order.CreateOrderRequestUseCase
-import com.example.repairkz.domain.useCases.services.CreateServiceUseCase
-import com.example.repairkz.domain.useCases.services.DeleteServiceUseCase
-import com.example.repairkz.domain.useCases.services.GetServicesUseCase
-import com.example.repairkz.domain.useCases.services.UpdateServiceUseCase
-import com.example.repairkz.domain.useCases.userData.GetUserDataUseCase
-import com.example.repairkz.domain.useCases.userData.UpdateUserDataUseCase
-import com.example.repairkz.domain.useCases.userData.UpdateUserPhotoUseCase
-import com.example.repairkz.ui.features.UserInfo.UserState
+import com.example.repairkz.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,19 +14,15 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlin.onSuccess
 
 @HiltViewModel
 class MasterInfoViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val getMasterByIdUseCase: GetMasterByIdUseCase,
     private val createOrderRequestUseCase: CreateOrderRequestUseCase
-) : ViewModel() {
-    private val _uiState = MutableStateFlow(MasterProfileState())
-    val uiState = _uiState.asStateFlow()
+) : BaseViewModel<MasterProfileState, MasterProfileIntent, MasterProfileEffect>() {
 
-    val _channel = Channel<MasterInfoEffect>(Channel.BUFFERED)
-    val channel = _channel.receiveAsFlow()
+    override val initialState = MasterProfileState()
 
     val comingId: Long? = try {
         savedStateHandle.get<Long>("userId")
@@ -54,44 +39,44 @@ class MasterInfoViewModel @Inject constructor(
 
     private suspend fun getMasterData() {
         comingId?.let { id ->
-            _uiState.update {
-                it.copy(isLoading = true)
+            setState {
+                copy(isLoading = true)
             }
             val result = getMasterByIdUseCase(id)
             result.fold(
                 onSuccess = { master ->
-                    _uiState.update {
-                        it.copy(master = master)
+                    setState {
+                        copy(master = master)
                     }
                 },
                 onFailure = {e ->
-                    _uiState.update {
-                        it.copy(error = e.message)
+                    setState {
+                        copy(error = e.message)
                     }
                 }
             )
-            _uiState.update {
-                it.copy(isLoading = false)
+            setState {
+                copy(isLoading = false)
             }
         }
     }
 
-    fun handleIntent(intent: MasterInfoIntent) {
+    override fun handleIntent(intent: MasterProfileIntent) {
         when (intent) {
-            is MasterInfoIntent.AddToFavorites -> {
+            is MasterProfileIntent.AddToFavorites -> {
 
             }
 
-            is MasterInfoIntent.DoOrder -> {
+            is MasterProfileIntent.DoOrder -> {
                 viewModelScope.launch {
                     comingId?.let {
-                        _channel.send(MasterInfoEffect.NavigateToOrderReg(comingId))
+                       sendEffect(MasterProfileEffect.NavigateToOrderReg(comingId))
                     }
 
                 }
             }
 
-            is MasterInfoIntent.Report -> {
+            is MasterProfileIntent.Report -> {
 
             }
         }

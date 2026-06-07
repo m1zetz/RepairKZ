@@ -11,10 +11,10 @@ import com.example.repairkz.Navigation.Routes.REG_GROUP
 import com.example.repairkz.Navigation.Routes.SIGN_UP_CODE
 import com.example.repairkz.Navigation.Routes.SIGN_UP_DATA
 import com.example.repairkz.Navigation.Routes.SIGN_UP_EMAIL
-import com.example.repairkz.ui.features.auth.signUp.SignUpViewModel
-import com.example.repairkz.ui.features.auth.signUp.ui.SignUpCode
-import com.example.repairkz.ui.features.auth.signUp.ui.SignUpData
-import com.example.repairkz.ui.features.auth.signUp.ui.SignUpEmail
+import com.example.repairkz.ui.features.signUp.SignUpViewModel
+import com.example.repairkz.ui.features.signUp.ui.SignUpCode
+import com.example.repairkz.ui.features.signUp.ui.SignUpData
+import com.example.repairkz.ui.features.signUp.ui.SignUpEmail
 
 @SuppressLint("UnrememberedGetBackStackEntry")
 fun NavGraphBuilder.registrationGraph(navController: NavController){

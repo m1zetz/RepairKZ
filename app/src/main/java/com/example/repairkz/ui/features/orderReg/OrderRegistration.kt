@@ -1,4 +1,4 @@
-package com.example.repairkz.ui.features.search.orderReg
+package com.example.repairkz.ui.features.orderReg
 
 import android.os.Build
 import android.util.Log
@@ -63,7 +63,7 @@ fun OrderRegistration(
     LaunchedEffect(Unit) {
         orderRegistrationViewModel.channel.collect { effect ->
             when (effect) {
-                OrderRegistrationEffects.NavigateBack -> {
+                OrderRegistrationEffect.NavigateBack -> {
                     navController.popBackStack()
                 }
             }

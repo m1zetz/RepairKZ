@@ -1,17 +1,14 @@
-package com.example.repairkz.ui.features.search.orderReg
+package com.example.repairkz.ui.features.orderReg
 
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.repairkz.common.enums.CitiesEnum
-import com.example.repairkz.common.models.Master
-import com.example.repairkz.common.utils.formattedTime
 import com.example.repairkz.data.remote.dto.order.OrderRequestDTO
 import com.example.repairkz.domain.useCases.order.CreateOrderRequestUseCase
 import com.example.repairkz.domain.useCases.userData.GetUserDataUseCase
+import com.example.repairkz.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,7 +16,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.datetime.LocalTime
 import java.time.Instant
 
 import java.time.LocalDateTime
@@ -32,13 +28,9 @@ class OrderRegistrationViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val getUserDataUseCase: GetUserDataUseCase,
     private val createOrderRequestUseCase: CreateOrderRequestUseCase
-): ViewModel() {
+): BaseViewModel<OrderRegistrationState, OrderRegistrationIntent, OrderRegistrationEffect>() {
 
-    private val _state = MutableStateFlow(OrderRegistrationState())
-    val state = _state.asStateFlow()
-
-    private val _channel = Channel<OrderRegistrationEffects>(Channel.BUFFERED)
-    val channel = _channel.receiveAsFlow()
+    override val initialState = OrderRegistrationState()
 
     private val masterId = savedStateHandle.get<Long>("masterId")
     private var currentUserId: Long? = null
@@ -52,41 +44,42 @@ class OrderRegistrationViewModel @Inject constructor(
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun handleIntent(intent: OrderRegistrationIntent){
+    override fun handleIntent(intent: OrderRegistrationIntent){
         when(intent){
             is OrderRegistrationIntent.ChangeAddress -> {
-                _state.update { state ->
-                    state.copy(
+                setState {
+                    copy(
                         clientAddress = intent.address
-                    )
-                }
-            }
-            is OrderRegistrationIntent.ChangeDescription -> {
-                _state.update { state ->
-                    state.copy(
-                        description = intent.description
                     )
                 }
 
             }
+            is OrderRegistrationIntent.ChangeDescription -> {
+               setState {
+                   copy(
+                       description = intent.description
+                   )
+               }
+
+            }
             is OrderRegistrationIntent.ChangeNumber -> {
-                _state.update { state ->
-                    state.copy(
+                setState {
+                    copy(
                         clientNumber = intent.number
                     )
                 }
             }
             is OrderRegistrationIntent.ChangePrice -> {
-                _state.update { state ->
-                    state.copy(
+                setState {
+                    copy(
                         price = intent.price
                     )
                 }
             }
 
             is OrderRegistrationIntent.ChangePaymentMethod -> {
-                _state.update { state ->
-                    state.copy(
+                setState {
+                    copy(
                         paymentMethod = intent.method
                     )
                 }
@@ -106,7 +99,7 @@ class OrderRegistrationViewModel @Inject constructor(
                         paymentMethod = orderData.paymentMethod
 ,                    )
                     createOrderRequestUseCase(requestDto).onSuccess {
-                        _channel.send(OrderRegistrationEffects.NavigateBack)
+                        sendEffect(OrderRegistrationEffect.NavigateBack)
                         Log.d("ORDER", "успешно")
                     }.onFailure {
                         Log.d("ORDER", it.message.toString())
@@ -120,46 +113,47 @@ class OrderRegistrationViewModel @Inject constructor(
                 val localDateTime = Instant.ofEpochMilli(millis)
                     .atZone(ZoneId.systemDefault())
                     .toLocalDateTime()
-                _state.update { state ->
-                    state.copy(
+                setState {
+                    copy(
                         dateMillis = millis
                     )
                 }
+
             }
 
             OrderRegistrationIntent.CloseDayPicker -> {
-                _state.update {state -> 
-                    state.copy(
+                setState {
+                    copy(
                         isDayModalOpen = false
                     )
                 }
             }
             OrderRegistrationIntent.OpenDayPicker -> {
-                _state.update {state ->
-                    state.copy(
+                setState {
+                    copy(
                         isDayModalOpen = true
                     )
                 }
             }
 
             OrderRegistrationIntent.CloseTimePicker -> {
-                _state.update {state ->
-                    state.copy(
+                setState {
+                    copy(
                         isTimeModalOpen = false
                     )
                 }
             }
             OrderRegistrationIntent.OpenTimePicker -> {
-                _state.update {state ->
-                    state.copy(
+                setState {
+                    copy(
                         isTimeModalOpen = true
                     )
                 }
             }
 
             is OrderRegistrationIntent.ChangeTime -> {
-                _state.update {
-                    it.copy(
+                setState {
+                    copy(
                         hour = intent.hour,
                         minute = intent.minute
                     )
@@ -175,8 +169,8 @@ class OrderRegistrationViewModel @Inject constructor(
                 val date = LocalDateTime.ofEpochSecond(dateMillis/1000,0,
                     ZoneOffset.UTC).toLocalDate()
                 val dateTime = LocalDateTime.of(date, java.time.LocalTime.of(hour,minute))
-                _state.update {
-                    it.copy(
+                setState {
+                    copy(
                         date = dateTime
                     )
                 }

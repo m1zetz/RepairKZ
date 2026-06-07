@@ -79,13 +79,12 @@ fun Details(data: HistoryItem) {
                     "${orderData.clientFirstName} ${orderData.clientLastName}"
                 )
                 val dateTime = orderData.orderDate
-                    ?.takeIf { it != "null" && it.isNotBlank() }
+                    ?.takeIf { it.isNotBlank() }
                     ?.let { text -> LocalDateTime.parse(text) }
-                val dateString = dateTime?.toRussianString() ?: ""
-                val timeString =
-                    if (dateTime != null) "${dateTime.hour}:${"% 02d".format(dateTime.minute)}" else ""
-                ShortInfoCard(R.string.time, "$dateString в $timeString")
-                ShortInfoCard(R.string.client_address, orderData.clientAddress ?: "")
+                val dateString =
+                    dateTime?.toRussianString() ?: stringResource(R.string.date_not_specified)
+                ShortInfoCard(R.string.time, dateString)
+                ShortInfoCard(R.string.client_address, orderData.clientAddress)
                 ShortInfoCard(R.string.client_number, orderData.clientPhoneNumber ?: "")
                 ShortInfoCard(R.string.description, orderData.description ?: "")
                 ShortInfoCard(R.string.cost, "${orderData.offeredPrice ?: 0} ₸")

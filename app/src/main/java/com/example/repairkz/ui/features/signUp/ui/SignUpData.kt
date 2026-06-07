@@ -1,4 +1,4 @@
-package com.example.repairkz.ui.features.auth.signUp.ui
+package com.example.repairkz.ui.features.signUp.ui
 
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
@@ -37,9 +37,9 @@ import com.example.repairkz.common.ui.UserPhoto
 import com.example.repairkz.ui.features.CameraX.CameraIntent
 import com.example.repairkz.ui.features.CameraX.CameraViewModel
 import com.example.repairkz.ui.features.CameraX.PhotoPreview
-import com.example.repairkz.ui.features.auth.signUp.SignUpEffect
-import com.example.repairkz.ui.features.auth.signUp.SignUpIntent
-import com.example.repairkz.ui.features.auth.signUp.SignUpViewModel
+import com.example.repairkz.ui.features.signUp.SignUpEffect
+import com.example.repairkz.ui.features.signUp.SignUpIntent
+import com.example.repairkz.ui.features.signUp.SignUpViewModel
 
 @Composable
 fun SignUpData(signUpViewModel: SignUpViewModel, navController: NavController) {

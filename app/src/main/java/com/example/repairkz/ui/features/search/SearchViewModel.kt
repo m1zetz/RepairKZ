@@ -5,7 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.repairkz.common.enums.MasterSpetializationsEnum
 import com.example.repairkz.domain.useCases.masterData.GetMastersUseCase
-import com.example.repairkz.ui.features.search.SearchEffects.*
+import com.example.repairkz.ui.base.BaseViewModel
+import com.example.repairkz.ui.features.search.SearchEffect.*
 import com.example.repairkz.ui.features.search.SearchResult.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
@@ -21,170 +22,183 @@ import kotlinx.coroutines.launch
 class SearchViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val getMastersUseCase: GetMastersUseCase,
-) : ViewModel() {
+) : BaseViewModel<SearchState, SearchIntent, SearchEffect>() {
 
     private val comingId: Int? = savedStateHandle.get<Int>("pattern")
-    private val _uiState = MutableStateFlow(SearchUiState(initialPatternResId = comingId))
-    val uiState = _uiState.asStateFlow()
 
-    private val _searchEffectsChannel = Channel<SearchEffects>(Channel.BUFFERED)
-    val searchEffectsChannel = _searchEffectsChannel.receiveAsFlow()
+    override val initialState = SearchState(initialPatternResId = comingId)
 
     init {
-        comingId?.let{ id ->
+        comingId?.let { id ->
             val masterSpecialization = MasterSpetializationsEnum.getSpecByResId(id)
-            if(masterSpecialization != MasterSpetializationsEnum.UNKNOWN){
-                handleIntent(SearchIntents.FilterAction(FilterIntent.UpdateMasterSpecialization(masterSpecialization)))
-                handleIntent(SearchIntents.ApplyFilters)
+            if (masterSpecialization != MasterSpetializationsEnum.UNKNOWN) {
+                handleIntent(
+                    SearchIntent.FilterAction(
+                        FilterIntent.UpdateMasterSpecialization(
+                            masterSpecialization
+                        )
+                    )
+                )
+                handleIntent(SearchIntent.ApplyFilters)
             }
         }
 
     }
 
-    fun handleIntent(intent: SearchIntents) {
+    override fun handleIntent(intent: SearchIntent) {
         when (intent) {
-            is SearchIntents.ChangeText -> _uiState.update {
-                it.copy(intent.text, initialPatternResId = null)
-            }
-            is SearchIntents.NavigateToBack -> {
-                viewModelScope.launch {
-                    _searchEffectsChannel.send(NavigateBack)
+            is SearchIntent.ChangeText -> {
+                setState {
+                    copy(intent.text, initialPatternResId = null)
                 }
             }
-            is SearchIntents.GetData -> {
+
+            is SearchIntent.NavigateToBack -> {
+                sendEffect(NavigateBack)
+            }
+
+            is SearchIntent.GetData -> {
                 viewModelScope.launch {
-                    _uiState.update {
-                        it.copy(result = Loading)
+                    setState {
+                        copy(result = Loading)
                     }
-                    try{
+                    try {
                         val result = getMastersUseCase()
 
-                        val filter = _uiState.value.filterData
+                        val filter = _state.value.filterData
                         result.onSuccess { masters ->
 
                             val mastersFromSearch = masters.filter { master ->
 
-                                val name = _uiState.value.query.isEmpty() || master.firstName.uppercase().contains(_uiState.value.query.uppercase())
+                                val name =
+                                    _state.value.query.isEmpty() || master.firstName.uppercase()
+                                        .contains(_state.value.query.uppercase())
                                 name
                             }
-                            if(_uiState.value.isFilterActive){
+                            if (_state.value.isFilterActive) {
                                 val sorteredMasters = masters.filter { master ->
                                     val city = filter.city == null || master.city == filter.city
-                                    val spec = filter.masterSpecialization == null || master.masterSpecialization == filter.masterSpecialization
-                                    val descriptions = filter.detailDescriptions.isEmpty() || master.description?.contains(filter.detailDescriptions) ?: false
+                                    val spec =
+                                        filter.masterSpecialization == null || master.masterSpecialization == filter.masterSpecialization
+                                    val descriptions =
+                                        filter.detailDescriptions.isEmpty() || master.description?.contains(
+                                            filter.detailDescriptions
+                                        ) ?: false
                                     val years =
-                                        filter.experienceInYears.isEmpty() || (master.experienceInYears ?: 0) >= (filter.experienceInYears.toIntOrNull() ?: 0)
+                                        filter.experienceInYears.isEmpty() || (master.experienceInYears
+                                            ?: 0) >= (filter.experienceInYears.toIntOrNull() ?: 0)
                                     city && spec && descriptions && years
                                 }
-                                _uiState.update {
-                                        it.copy(result = Success(sorteredMasters))
-                                    }
-                            } else{
-                                _uiState.update {
+                                _state.update {
+                                    it.copy(result = Success(sorteredMasters))
+                                }
+                            } else {
+                                _state.update {
                                     it.copy(result = Success(mastersFromSearch))
                                 }
                             }
                         }.onFailure {
-                            _uiState.update { state ->
-                                state.copy(
-                                    result = Error(it.message?:"")
+                            setState {
+                                copy(
+                                    result = Error(it.message ?: "")
                                 )
                             }
                         }
 
-                    } catch (e: Exception){
-                        _uiState.update {
-                            it.copy(result = Error("Ошибка запроса"))
+                    } catch (e: Exception) {
+                        setState {
+                            copy(result = Error("Ошибка запроса"))
                         }
                     }
                 }
             }
 
-            is SearchIntents.NavigateToUserInfo -> {
-                viewModelScope.launch {
-                    _searchEffectsChannel.send(NavigateToMasterInfo(intent.id))
-                }
+            is SearchIntent.NavigateToUserInfo -> {
+                sendEffect(NavigateToMasterInfo(intent.id))
             }
 
 
-
-            SearchIntents.OpenFilters -> {
-                _uiState.update {
-                    it.copy(isFiltersSheetOpen = true)
-                }
-            }
-            SearchIntents.CloseFilters -> {
-                _uiState.update {
-                    it.copy(isFiltersSheetOpen = false)
+            SearchIntent.OpenFilters -> {
+                setState {
+                    copy(isFiltersSheetOpen = true)
                 }
             }
 
-            is SearchIntents.FilterAction -> {
+            SearchIntent.CloseFilters -> {
+                setState {
+                    copy(isFiltersSheetOpen = false)
+                }
+            }
+
+            is SearchIntent.FilterAction -> {
                 handleFilterAction(intent.action)
             }
 
 
-            SearchIntents.ApplyFilters -> {
-                _uiState.update {
-                    it.copy(isFilterActive = true, isFiltersSheetOpen = false)
+            SearchIntent.ApplyFilters -> {
+                setState {
+                    copy(isFilterActive = true, isFiltersSheetOpen = false)
                 }
-                handleIntent(SearchIntents.GetData)
+                handleIntent(SearchIntent.GetData)
             }
 
-            SearchIntents.ResetFilters -> {
-                _uiState.update {
-                    it.copy(filterData = FilterData(), isFilterActive = false)
+            SearchIntent.ResetFilters -> {
+                setState {
+                    copy(filterData = FilterData(), isFilterActive = false)
                 }
-                handleIntent(SearchIntents.GetData)
+                handleIntent(SearchIntent.GetData)
             }
 
-            is SearchIntents.ChangeSearchFieldState -> {
-                if (!intent.state){
-                    viewModelScope.launch {
-                        _searchEffectsChannel.send(NavigateBack)
-                    }
+            is SearchIntent.ChangeSearchFieldState -> {
+                if (!intent.state) {
+                    sendEffect(NavigateBack)
                 }
 
             }
         }
     }
-    fun handleFilterAction(action: FilterIntent){
-        when(action){
+
+    fun handleFilterAction(action: FilterIntent) {
+        when (action) {
             is FilterIntent.UpdateCity -> {
-                _uiState.update {
-                    it.copy(
-                        filterData = it.filterData.copy(
+                setState {
+                    copy(
+                        filterData = filterData.copy(
                             city = action.city
                         )
                     )
                 }
             }
+
             is FilterIntent.UpdateDetailDescriptions -> {
-                _uiState.update {
-                    it.copy(
-                        filterData = it.filterData.copy(
+                setState {
+                    copy(
+                        filterData = filterData.copy(
                             detailDescriptions = action.words
                         )
                     )
                 }
             }
+
             is FilterIntent.UpdateMasterSpecialization -> {
-                _uiState.update {
-                    it.copy(
-                        filterData = it.filterData.copy(
+                setState {
+                    copy(
+                        filterData = filterData.copy(
                             masterSpecialization = action.spec
                         )
                     )
                 }
             }
+
             is FilterIntent.UpdateYears -> {
-                _uiState.update {
-                    it.copy(
-                        filterData = it.filterData.copy(
+                setState {
+                    copy(
+                        filterData = filterData.copy(
                             experienceInYears = action.years
                         )
                     )
                 }
+
             }
         }
     }

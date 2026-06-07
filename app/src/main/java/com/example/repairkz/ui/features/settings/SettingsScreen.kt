@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -23,8 +22,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -32,7 +29,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -53,10 +49,10 @@ import com.example.repairkz.domain.errors.toMessage
 fun SettingsScreen(settingsViewModel: SettingsViewModel, activityViewModel: MainActivityViewModel, navController: NavController, snackbarHostState: SnackbarHostState) {
 
     val context = LocalContext.current
-    val uiState by settingsViewModel.uiState.collectAsState()
+    val uiState by settingsViewModel.state.collectAsState()
     val activityState by activityViewModel.state.collectAsState()
     LaunchedEffect(Unit) {
-        settingsViewModel.settingEffectsChannel.collect { effect ->
+        settingsViewModel.channel.collect { effect ->
             when (effect) {
                 is SettingsEffect.NavigateToUserInfo -> {
                     navController.navigate(USER_INFO)
@@ -81,7 +77,7 @@ fun SettingsScreen(settingsViewModel: SettingsViewModel, activityViewModel: Main
             ProfileString(
                 uiState.user!!,
                 descriptionPrefix = stringResource(R.string.your_status),
-                intent = { settingsViewModel.handleIntent(SettingIntent.ToUserScreen) },
+                intent = { settingsViewModel.handleIntent(SettingsIntent.ToUserScreen) },
 
                 )
             StandartString(
@@ -152,7 +148,7 @@ fun SettingsScreen(settingsViewModel: SettingsViewModel, activityViewModel: Main
                     .fillMaxWidth()
                     .padding(horizontal = 8.dp, vertical = 8.dp),
                 onClick = {
-                    settingsViewModel.handleIntent(SettingIntent.SwitchStatus(switchConfig.status))
+                    settingsViewModel.handleIntent(SettingsIntent.SwitchStatus(switchConfig.status))
                 }
             ){
                 Row(
@@ -188,7 +184,7 @@ fun SettingsScreen(settingsViewModel: SettingsViewModel, activityViewModel: Main
 
             StandartString(
                 R.string.exit,
-                intent = {settingsViewModel.handleIntent(SettingIntent.Exit)},
+                intent = {settingsViewModel.handleIntent(SettingsIntent.Exit)},
                 color = MaterialTheme.colorScheme.error,
                 icon = Icons.Default.ExitToApp
             )
