@@ -9,7 +9,7 @@ import jakarta.persistence.Table
 @Table(name = "firebase_token")
 data class FirebaseToken(
     @Id
-    val userId: Long,
+    val userId: Long = 0,
     @Column(nullable = false, unique = true)
-    val token: String
+    val token: String = ""
 )
