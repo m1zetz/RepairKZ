@@ -79,8 +79,8 @@ class OrderService(
             if (changeDto.orderStatus == OrderRequestStatus.ACCEPTED) {
                 pushNotificationService.sendToUser(
                     userId = orderRequest.user?.id ?: return,
-                    title = "Заявка принята",
-                    body = "Мастер ${orderRequest.master?.user?.firstName ?: ""} принял вашу заявку",
+                    title = "Заказ принят",
+                    body = "Мастер ${orderRequest.master?.user?.firstName ?: ""} принял ваш заказ",
                     data = mapOf("orderRequestId" to (orderRequest.id?.toString() ?: ""), "type" to "ORDER_REQUEST_ACCEPTED")
                 )
             }
