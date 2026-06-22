@@ -12,7 +12,10 @@ class FirebaseConfig {
 
     @PostConstruct
     fun initialize() {
-        val serviceAccount = ClassPathResource("repairkz-firebase.json").inputStream
+        val serviceAccountJson = System.getenv("FIREBASE_SERVICE_ACCOUNT")
+            ?: throw IllegalStateException("FIREBASE_SERVICE_ACCOUNT env var not set")
+
+        val serviceAccount = serviceAccountJson.byteInputStream()
 
         val options = FirebaseOptions.builder()
             .setCredentials(GoogleCredentials.fromStream(serviceAccount))
