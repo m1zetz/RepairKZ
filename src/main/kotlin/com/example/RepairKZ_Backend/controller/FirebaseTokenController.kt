@@ -1,6 +1,7 @@
 package com.example.RepairKZ_Backend.controller
 
 import com.example.RepairKZ_Backend.entity.FirebaseToken
+import com.example.RepairKZ_Backend.model.RegisterTokenRequestDTO
 import com.example.RepairKZ_Backend.repository.FirebaseTokenRepository
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
@@ -16,11 +17,10 @@ class FirebaseTokenController(
 
     @PostMapping("/register")
     fun registerToken(
-        @RequestBody request: RegisterTokenRequest
+        @RequestBody request: RegisterTokenRequestDTO
     ): ResponseEntity<Void> {
         firebaseTokenRepository.save(FirebaseToken(userId = request.userId, token = request.token))
         return ResponseEntity.ok().build()
     }
 }
 
-data class RegisterTokenRequest(val userId: Long, val token: String)
