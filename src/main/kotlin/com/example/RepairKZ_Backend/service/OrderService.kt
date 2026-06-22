@@ -32,6 +32,7 @@ class OrderService(
     private val masterRepository: MasterRepository,
     private val orderRequestRepository: OrderRequestRepository,
     private val orderRepository: OrderRepository,
+    private val pushNotificationService: PushNotificationService
 ) {
     fun createOrder(dto: OrderRequestDTO) {
         val user = userRepository.findByIdOrNull(dto.userId!!) ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
@@ -50,11 +51,17 @@ class OrderService(
         orderRequestRepository.save(
             orderRequestEntity
         )
+        pushNotificationService.sendToUser(
+            userId = master.user?.id ?: return,
+            title = "Новый заказ",
+            body = "Клиент ${user.firstName} оставил вам заявку",
+            data = mapOf("orderRequestId" to (orderRequestEntity.id?.toString() ?: ""), "type" to "NEW_ORDER_REQUEST")
+        )
     }
 
     @Transactional
     fun changeRequestStatus(changeDto: ChangeOrderRequestStatusDTO) {
-        try{
+        try {
             val orderRequest = orderRequestRepository.findByIdOrNull(changeDto.orderRequestId)
                 ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
             orderRequest.apply {
@@ -62,19 +69,26 @@ class OrderService(
             }
             val order = Order(
                 orderRequest = orderRequest,
-                orderStatus = if(changeDto.orderStatus == OrderRequestStatus.ACCEPTED)
+                orderStatus = if (changeDto.orderStatus == OrderRequestStatus.ACCEPTED)
                     OrderStatus.RUNNING
                 else OrderStatus.REJECTED,
                 createdAt = LocalDateTime.now(ZoneId.of("Asia/Almaty")),
             )
             orderRepository.save(order)
-        } catch(e: Error){
+
+            if (changeDto.orderStatus == OrderRequestStatus.ACCEPTED) {
+                pushNotificationService.sendToUser(
+                    userId = orderRequest.user?.id ?: return,
+                    title = "Заявка принята",
+                    body = "Мастер ${orderRequest.master?.user?.firstName ?: ""} принял вашу заявку",
+                    data = mapOf("orderRequestId" to (orderRequest.id?.toString() ?: ""), "type" to "ORDER_REQUEST_ACCEPTED")
+                )
+            }
+        } catch (e: Error) {
             println("ERROR: ${e.message}")
             println("CAUSE: ${e.cause}")
             throw e
         }
-
-
     }
     @Transactional
     fun changeOrderStatus(dto: ChangeOrderStateDTO) {

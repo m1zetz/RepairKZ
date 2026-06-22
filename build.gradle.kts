@@ -21,6 +21,9 @@ repositories {
 }
 
 dependencies {
+    // Firebase
+    implementation("com.google.firebase:firebase-admin:9.3.0")
+
     implementation("com.mailersend:java-sdk:1.5.0")
     // Resend
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
