@@ -12,10 +12,14 @@ import com.example.repairkz.data.local.dataStore.DataStoreManager
 import com.example.repairkz.data.remote.dto.LoginDTO
 import com.example.repairkz.domain.errors.AuthorizationError
 import com.example.repairkz.domain.useCases.auth.LoginUseCase
+import com.example.repairkz.domain.useCases.fcm.RegisterFcmTokenUseCase
 import com.example.repairkz.domain.useCases.userData.SaveUserToLocalUseCase
 import com.example.repairkz.ui.base.BaseViewModel
+import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -27,7 +31,8 @@ import kotlinx.coroutines.launch
 class SignInViewModel @Inject constructor(
     private val loginUseCase: LoginUseCase,
     private val dataStoreManager: DataStoreManager,
-    private val saveUserToLocalUseCase: SaveUserToLocalUseCase
+    private val saveUserToLocalUseCase: SaveUserToLocalUseCase,
+    private val registerFcmTokenUseCase: RegisterFcmTokenUseCase
 )  : BaseViewModel<SignInState, SignInIntent, SignInEffect>() {
     override val initialState = SignInState()
 
@@ -93,6 +98,13 @@ class SignInViewModel @Inject constructor(
 
                                 )
                                 dataStoreManager.saveToken(loginResponseDTO.token)
+                                FirebaseMessaging.getInstance().token.addOnSuccessListener { fcmToken ->
+                                    CoroutineScope(Dispatchers.IO).launch {
+                                        try {
+                                            registerFcmTokenUseCase(loginResponseDTO.id, fcmToken)
+                                        } catch (e: Exception) { }
+                                    }
+                                }
                                 sendEffect(SignInEffect.NavigateToMainWindow)
                             }.onFailure { error ->
                                 if(error is AuthorizationError){

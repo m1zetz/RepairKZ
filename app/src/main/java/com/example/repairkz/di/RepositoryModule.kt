@@ -15,6 +15,7 @@ import com.example.repairkz.data.remote.api.RegistrationApi
 import com.example.repairkz.data.remote.api.TokenApi
 import com.example.repairkz.data.remote.api.UserApi
 import com.example.repairkz.data.registration.RegistrationRepository
+import com.example.repairkz.data.remote.api.FcmApi
 import com.example.repairkz.data.remote.api.MasterApi
 import com.example.repairkz.data.remote.api.OrderApi
 import com.example.repairkz.data.remote.api.ServicesApi
@@ -63,11 +64,13 @@ object RepositoryModule {
         registrationApi: RegistrationApi,
         tokenApi: TokenApi,
         userApi: UserApi,
+        fcmApi: FcmApi,
     ): RegistrationRepository {
         return RegistrationRepositoryImpl(
             registrationApi = registrationApi,
             tokenApi = tokenApi,
-            userApi = userApi
+            userApi = userApi,
+            fcmApi = fcmApi
         )
     }
 

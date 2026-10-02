@@ -13,4 +13,5 @@ interface RegistrationRepository {
     suspend fun login(loginDTO: LoginDTO) : Result<LoginResponseDTO>
 
     suspend fun refresh() : Result<String>
+    suspend fun registerFcmToken(userId: Long, token: String): Result<Unit>
 }

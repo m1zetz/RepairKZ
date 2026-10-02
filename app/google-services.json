@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1001234223481",
+    "project_id": "repairkz",
+    "storage_bucket": "repairkz.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1001234223481:android:513a654fdff00bd4725fa8",
+        "android_client_info": {
+          "package_name": "com.example.repairkz"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDxhJmTioU9UHiZNOsQepqNPF2DdXfzHFg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

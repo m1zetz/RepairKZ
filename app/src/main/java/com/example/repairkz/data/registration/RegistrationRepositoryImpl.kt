@@ -11,6 +11,8 @@ import com.example.repairkz.data.remote.dto.LoginDTO
 import com.example.repairkz.data.remote.dto.LoginResponseDTO
 import com.example.repairkz.data.remote.dto.RegistrationResponseDTO
 import com.example.repairkz.data.registration.RegistrationRepository
+import com.example.repairkz.data.remote.api.FcmApi
+import com.example.repairkz.data.remote.dto.FCM.RegisterTokenRequestDTO
 import com.example.repairkz.domain.errors.AuthorizationError
 import okhttp3.MultipartBody
 import javax.inject.Inject
@@ -19,6 +21,7 @@ class RegistrationRepositoryImpl @Inject constructor(
     private val registrationApi: RegistrationApi,
     private val tokenApi: TokenApi,
     private val userApi: UserApi,
+    private val fcmApi: FcmApi,
 ) : RegistrationRepository {
     override suspend fun getCode(email: String): Result<Unit> {
         return try {
@@ -30,6 +33,15 @@ class RegistrationRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun registerFcmToken(userId: Long, token: String): Result<Unit> {
+        return try {
+            val response = fcmApi.registerToken(RegisterTokenRequestDTO(userId, token))
+            if (response.isSuccessful) Result.success(Unit)
+            else Result.failure(Exception("Error: ${response.code()}"))
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
     override suspend fun sendCode(code: Int, email: String): Result<Unit> {
         return try {
             val response = registrationApi.sendCode(CodeDTO(code, email))

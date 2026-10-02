@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     id("com.google.devtools.ksp") version "2.0.21-1.0.27"
     id("com.google.dagger.hilt.android") version "2.57.1"
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -48,6 +49,9 @@ configurations.all {
 }
 
 dependencies {
+    //Firebase
+    implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
+    implementation("com.google.firebase:firebase-messaging-ktx")
     //DatePicker
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.2")
     //Logging
