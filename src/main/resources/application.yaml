@@ -17,28 +17,37 @@ spring:
     hikari:
       maximum-pool-size: 20
       minimum-idle: 5
+      connection-timeout: 5000
+
   servlet:
     multipart:
-      max-file-size: 100MB
-      max-request-size: 110MB
+      max-file-size: 10MB
+      max-request-size: 12MB
+
   jpa:
-    properties:
-      hibernate:
-        ddl-auto: update
-        show_sql: false
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-      temp:
-        use_jdbc_metadata_defaults: false
+    open-in-view: false
     hibernate:
       ddl-auto: update
+    properties:
+      hibernate:
+        show_sql: false
 
   application:
     name: RepairKZ-Backend
+
 security:
   key: ${JWT_SECRET}
+
 logging:
   level:
     org.springframework.web: INFO
     root: INFO
+
 mailersend:
   api-key: ${RESEND_API_KEY}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics
